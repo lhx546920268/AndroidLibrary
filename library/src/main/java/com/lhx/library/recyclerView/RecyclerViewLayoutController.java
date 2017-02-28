@@ -173,6 +173,68 @@ public abstract class RecyclerViewLayoutController{
     }
 
 
+    /**
+     * 获取item
+     * @param indexInSection section中的行下标
+     * @param section section下标
+     * @return 返回对应的item
+     */
+    public View itemAtIndexPath(int indexInSection, int section){
+        SectionInfo sectionInfo = mSections.get(section);
+        int position = sectionInfo.getItemPosition() + indexInSection;
+        return mRecyclerView.getLayoutManager().findViewByPosition(position);
+    }
+
+    /**
+     * 获取header
+     * @param section section下标
+     * @return 返回对应的header
+     */
+    public View headerAtSection(int section){
+        SectionInfo sectionInfo = mSections.get(section);
+        int position = sectionInfo.getHeaderPosition();
+        return mRecyclerView.getLayoutManager().findViewByPosition(position);
+    }
+
+    /**
+     * 获取footer
+     * @param section section下标
+     * @return 返回对应的footer
+     */
+    public View footerAtSection(int section){
+        SectionInfo sectionInfo = mSections.get(section);
+        int position = sectionInfo.getFooterPosition();
+        return mRecyclerView.getLayoutManager().findViewByPosition(position);
+    }
+
+    /**
+     * 获取item
+     * @param indexInSection section中的行下标
+     * @param section section下标
+     * @return 返回对应的item
+     */
+    public RecyclerView.ViewHolder itemViewHolderAtIndexPath(int indexInSection, int section){
+        return mRecyclerView.getChildViewHolder(itemAtIndexPath(indexInSection, section));
+    }
+
+    /**
+     * 获取header viewHolder
+     * @param section section下标
+     * @return 返回对应的header viewHolder
+     */
+    public RecyclerView.ViewHolder headerViewHolderAtSection(int section){
+        return mRecyclerView.getChildViewHolder(headerAtSection(section));
+    }
+
+    /**
+     * 获取footer viewHolder
+     * @param section section下标
+     * @return 返回对应的footer viewHolder
+     */
+    public RecyclerView.ViewHolder footerViewHolderAtSection(int section){
+        return mRecyclerView.getChildViewHolder(footerAtSection(section));
+    }
+
     ///刷新数据
     private void reloadData(){
 
@@ -218,7 +280,7 @@ public abstract class RecyclerViewLayoutController{
                 public void onClick(View view) {
 
                     ///添加点击事件
-                    int position = holder.getLayoutPosition();
+                    int position = holder.getAdapterPosition();
                     SectionInfo sectionInfo = sectionInfoForPosition(position);
 
                     ///存在头部
