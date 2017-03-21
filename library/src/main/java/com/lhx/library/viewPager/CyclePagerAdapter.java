@@ -199,7 +199,7 @@ public abstract class CyclePagerAdapter extends PagerAdapter {
      * @param position viewPager 位置
      * @return 真实的数据源位置
      */
-    private int getRealPosition(int position){
+    public int getRealPosition(int position){
         if(mRealCount <= 1){
             return position;
         }else {

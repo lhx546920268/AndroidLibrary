@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.lhx.demo.R;
 import com.lhx.library.viewPager.CyclePagerAdapter;
+import com.lhx.library.viewPager.PageControl;
 
 /**
  * 循环播放 demo
@@ -34,7 +35,15 @@ public class CyclePagerActivity extends AppCompatActivity {
         setContentView(R.layout.cycle_pager_activity);
         viewPager = (ViewPager)findViewById(R.id.view_pager);
 
-        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+
+        PageControl pageControl = (PageControl)findViewById(R.id.page_control);
+
+        pageControl.setNormalColor(Color.CYAN);
+        pageControl.setSelectedColor(Color.YELLOW);
+        pageControl.setPointSizeDip(10);
+        pageControl.setViewPager(viewPager);
+
+                findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 count = count == 3 ? 20 : 3;

@@ -18,4 +18,12 @@
         android:textColor="@android:color/white"
         android:id="@+id/btn"
         />
+
+    <com.lhx.library.viewPager.PageControl
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:id="@+id/page_control"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"/>
 </RelativeLayout>
