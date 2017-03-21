@@ -41,6 +41,7 @@ public class CyclePagerActivity extends AppCompatActivity {
         pageControl.setNormalColor(Color.CYAN);
         pageControl.setSelectedColor(Color.YELLOW);
         pageControl.setPointSizeDip(10);
+        pageControl.setPointIntervalDip(5);
         pageControl.setViewPager(viewPager);
 
                 findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {

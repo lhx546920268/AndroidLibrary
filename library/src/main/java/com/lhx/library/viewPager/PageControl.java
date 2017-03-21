@@ -40,6 +40,9 @@ public class PageControl extends LinearLayout {
 
     //点大小
     private int pointSizeDip = 5;
+    
+    //点间隔
+    private int pointIntervalDip = 5;
 
     //点颜色
     private int normalColor = Color.GRAY;
@@ -89,17 +92,17 @@ public class PageControl extends LinearLayout {
 //            创建点
             Context context = getContext();
             float scale = context.getResources().getDisplayMetrics().density;
-            int imageParams = (int) (scale * pointSizeDip + 0.5f);// XP与DP转换，适应不同分辨率
-            int imagePadding = (int) (scale * pointSizeDip + 0.5f);
+            int size = (int) (scale * pointSizeDip);// XP与DP转换，适应不同分辨率
+            int margin = (int) (scale * pointIntervalDip);
 
 
             for(int i = 0;i < pageCount;i ++){
                 PageControlPoint point = new PageControlPoint(context);
-                LayoutParams layoutParams = new LayoutParams(imageParams, imageParams);
-                layoutParams.setMargins(0, 0, imagePadding, 0);
+                LayoutParams layoutParams = new LayoutParams(size, size);
+                layoutParams.setMargins(0, 0, margin, 0);
                 layoutParams.gravity = Gravity.CENTER_VERTICAL;
                 point.setLayoutParams(layoutParams);
-                point.drawable.setCornerRadius(imageParams / 2);
+                point.drawable.setCornerRadius(size / 2);
                 point.drawable.setBackgroundColor(normalColor);
 
                 addView(point);
@@ -156,20 +159,58 @@ public class PageControl extends LinearLayout {
            //重新设置点大小
            Context context = getContext();
            float scale = context.getResources().getDisplayMetrics().density;
-           int imageParams = (int) (scale * pointSizeDip + 0.5f);// XP与DP转换，适应不同分辨率
-           int imagePadding = (int) (scale * pointSizeDip + 0.5f);
+           int size = (int) (scale * pointSizeDip);// XP与DP转换，适应不同分辨率
+           int margin = (int) (scale * pointIntervalDip);
 
 
            for(int i = 0;i < points.size();i ++){
                PageControlPoint point = points.get(i);
                LayoutParams layoutParams = (LayoutParams)point.getLayoutParams();
-               layoutParams.setMargins(0, 0, imagePadding, 0);
-               layoutParams.width = imageParams;
-               layoutParams.height = imageParams;
+               layoutParams.setMargins(0, 0, margin, 0);
+               layoutParams.width = size;
+               layoutParams.height = size;
                point.setLayoutParams(layoutParams);
-               point.drawable.setCornerRadius(imageParams / 2);
+               point.drawable.setCornerRadius(size / 2);
            }
        }
+    }
+
+    public int getPointIntervalDip() {
+        return pointIntervalDip;
+    }
+
+    public void setPointIntervalDip(int pointIntervalDip) {
+        if(pointIntervalDip != this.pointIntervalDip){
+            this.pointIntervalDip = pointIntervalDip;
+
+            //重新设置点间隔
+            Context context = getContext();
+            float scale = context.getResources().getDisplayMetrics().density;
+            int margin = (int) (scale * pointIntervalDip);
+
+
+            for(int i = 0;i < points.size();i ++){
+                PageControlPoint point = points.get(i);
+                LayoutParams layoutParams = (LayoutParams)point.getLayoutParams();
+                layoutParams.setMargins(0, 0, margin, 0);
+                point.setLayoutParams(layoutParams);
+            }
+        }
+    }
+
+    public boolean isHideForSingle() {
+        return hideForSingle;
+    }
+
+    public void setHideForSingle(boolean hideForSingle) {
+        if(hideForSingle != this.hideForSingle){
+            this.hideForSingle = hideForSingle;
+            if(hideForSingle && points.size() <= 1){
+                setVisibility(INVISIBLE);
+            }else {
+                setVisibility(VISIBLE);
+            }
+        }
     }
 
     public ViewPager getViewPager() {
