@@ -42,7 +42,7 @@ public class CyclePagerActivity extends AppCompatActivity {
             }
         });
 
-        viewPager.setAdapter(new CyclePagerAdapter(viewPager) {
+        CyclePagerAdapter adapter = new CyclePagerAdapter(viewPager) {
             @Override
             public int getRealCount() {
                 return count;
@@ -57,7 +57,6 @@ public class CyclePagerActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
                     convertView.setLayoutParams(layoutParams);
-                    Log.v("create", "创建新视图");
                 }
 
                 switch (position){
@@ -80,7 +79,10 @@ public class CyclePagerActivity extends AppCompatActivity {
 
                 return convertView;
             }
-        });
+        };
+        adapter.setShouldAutoPlay(true);
+
+        viewPager.setAdapter(adapter);
 
 
     }
