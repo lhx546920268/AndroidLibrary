@@ -55,6 +55,9 @@ public class CornerBorderDrawable extends Drawable {
     ///位图画笔
     private Paint mBitmapPaint;
 
+    ///范围
+    private RectF mRectF;
+
     public CornerBorderDrawable() {
         initialize();
     }
@@ -94,6 +97,13 @@ public class CornerBorderDrawable extends Drawable {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setAntiAlias(true); ///设置抗锯齿
+    }
+
+    @Override
+    public void setBounds(int left, int top, int right, int bottom) {
+        super.setBounds(left, top, right, bottom);
+        //必须的，否则会出现不可预料的bug，如键盘弹出后消失，直接getBounds() 返回越来越小的rect
+        mRectF = new RectF(left, top, right, bottom);
     }
 
     @Override
@@ -178,7 +188,7 @@ public class CornerBorderDrawable extends Drawable {
         ///绘制边框
         if(existBorder){
 
-            Rect bounds = getBounds();
+            RectF bounds = new RectF(mRectF);
             bounds.inset(mBorderWidth, mBorderWidth);
 
             float radius = mCornerRadius;
@@ -190,7 +200,7 @@ public class CornerBorderDrawable extends Drawable {
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setStrokeWidth(mBorderWidth);
             mPaint.setColor(mBorderColor);
-            canvas.drawRoundRect(new RectF(bounds), radius, radius, mPaint);
+            canvas.drawRoundRect(bounds, radius, radius, mPaint);
         }
     }
 
@@ -200,7 +210,7 @@ public class CornerBorderDrawable extends Drawable {
         ///绘制背景
         if(Color.alpha(mBackgroundColor) != 0){
 
-            Rect bounds = getBounds();
+            RectF bounds = new RectF(mRectF);
             float radius = mCornerRadius;
 
             boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
@@ -224,7 +234,7 @@ public class CornerBorderDrawable extends Drawable {
         ///绘制位图
         if(mBitmapPaint != null){
 
-            Rect bounds = getBounds();
+            RectF bounds = new RectF(mRectF);
             float radius = mCornerRadius;
 
             boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
