@@ -20,7 +20,7 @@
         />
 
     <com.lhx.library.viewPager.PageControl
-        android:background="@android:color/black"
+        android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:id="@+id/page_control"

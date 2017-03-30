@@ -26,6 +26,7 @@ import com.lhx.library.viewPager.PageControl;
 public class CyclePagerActivity extends AppCompatActivity {
 
     ViewPager viewPager;
+    CyclePagerAdapter adapter;
     int count = 3;
 
     @Override
@@ -52,7 +53,7 @@ public class CyclePagerActivity extends AppCompatActivity {
             }
         });
 
-        CyclePagerAdapter adapter = new CyclePagerAdapter(viewPager) {
+        adapter = new CyclePagerAdapter(viewPager) {
             @Override
             public int getRealCount() {
                 return count;
@@ -98,4 +99,10 @@ public class CyclePagerActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onDestroy() {
+
+        adapter.setShouldAutoPlay(false);
+        super.onDestroy();
+    }
 }

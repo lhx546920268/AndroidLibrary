@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="RefreshControl">
+    <declare-styleable name="refreshControl">
         <attr name="header_id" format="reference"/>
         <attr name="content_id" format="reference"/>
         <attr name="footer_id" format="reference"/>

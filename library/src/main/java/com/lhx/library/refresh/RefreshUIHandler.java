@@ -1,16 +1,27 @@
 package com.lhx.library.refresh;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.view.View;
+
 /**
- * 下拉刷新和上拉加载UI回调接口
+ * 下拉刷新UI回调接口
  */
 public interface RefreshUIHandler {
 
-    ///滑动
-    void onMove(float offset, RefreshControl refreshControl);
+    //正常下拉状态
+    void onPull(RefreshControl refreshControl);
 
-    ///刷新完成
-    void onFinish(RefreshControl refreshControl);
+    //下拉达到临界点，释放可刷新
+    void onReachCriticalPoint(RefreshControl refreshControl);
 
-    ///加载中
-    void onLoading(RefreshControl refreshControl);
+    //刷新中
+    void onRefresh(RefreshControl refreshControl);
+
+    ///刷新完成 是否成功
+    void onRefreshFinish(RefreshControl refreshControl, boolean success);
+
+    //内容视图
+    @NonNull
+    View getContentView(@NonNull Context context, @RefreshControl.Orientation int orientation);
 }
