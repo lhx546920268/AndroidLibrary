@@ -38,7 +38,7 @@ public class RefreshControlFooter implements LoadMoreUIHandler {
     }
 
     @Override
-    public void onPull(RefreshControl refreshControl) {
+    public void onPull(RefreshControl refreshControl, int offset) {
         mProgressBar.setVisibility(View.GONE);
         mTextView.setText("加载更多");
     }
@@ -47,6 +47,12 @@ public class RefreshControlFooter implements LoadMoreUIHandler {
     public void onReachCriticalPoint(RefreshControl refreshControl) {
         mProgressBar.setVisibility(View.GONE);
         mTextView.setText("加载更多");
+    }
+
+    @Override
+    public void onWillLoadMore(RefreshControl refreshControl, int delay) {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mTextView.setText("加载中...");
     }
 
     @Override

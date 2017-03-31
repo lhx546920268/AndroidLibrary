@@ -42,7 +42,7 @@ public class RefreshControlHeader implements RefreshUIHandler{
     }
 
     @Override
-    public void onPull(RefreshControl refreshControl) {
+    public void onPull(RefreshControl refreshControl, int offset) {
         mProgressBar.setVisibility(View.GONE);
         mTextView.setText("下拉刷新");
     }
@@ -61,6 +61,12 @@ public class RefreshControlHeader implements RefreshUIHandler{
 
     @Override
     public void onRefreshFinish(RefreshControl refreshControl, boolean success) {
+        mProgressBar.setVisibility(View.GONE);
+        mTextView.setText(success ? "刷新成功" : "刷新失败");
+    }
+
+    @Override
+    public void onRefreshWillFinish(RefreshControl refreshControl, boolean success, int delay) {
         mProgressBar.setVisibility(View.GONE);
         mTextView.setText(success ? "刷新成功" : "刷新失败");
     }

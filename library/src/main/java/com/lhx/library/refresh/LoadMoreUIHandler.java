@@ -10,10 +10,13 @@ import android.view.View;
 
 public interface LoadMoreUIHandler {
 
-    //正常上拉状态
-    void onPull(RefreshControl refreshControl);
+    //正常上拉状态 offset 偏移量 负数
+    void onPull(RefreshControl refreshControl, int offset);
 
-    //刷新中
+    ///将要加载 延迟中 delay 毫秒
+    void onWillLoadMore(RefreshControl refreshControl, int delay);
+
+    //加载中
     void onLoadMore(RefreshControl refreshControl);
 
     ///加载完成 是否成功

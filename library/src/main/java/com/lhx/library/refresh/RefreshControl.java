@@ -2,6 +2,7 @@ package com.lhx.library.refresh;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -11,12 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Scroller;
-
 import com.lhx.library.R;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Constructor;
 
 /**
  * 刷新控制器
@@ -49,25 +47,43 @@ public class RefreshControl extends ViewGroup{
     final static int STATE_REACH_REFRESH_CRITICAL = 1;
 
     ///刷新中
-    final static int STATE_REFRESHING= 2;
+    final static int STATE_REFRESHING = 2;
+
+    ///刷新将要完成
+    final static int STATE_REFRESH_WILL_FINISH = 3;
 
     ///刷新完成
-    final static int STATE_REFRESH_FINISH = 3;
+    final static int STATE_REFRESH_FINISH = 4;
 
     ///到达加载更多临界点
-    final static int STATE_REACH_LOAD_MORE_CRITICAL = 4;
+    final static int STATE_REACH_LOAD_MORE_CRITICAL = 5;
 
-    ///刷新中
-    final static int STATE_LOADING_MORE = 5;
+    ///将要加载更多
+    final static int STATE_WILL_LOADING_MORE = 6;
 
-    ///刷新完成
-    final static int STATE_LOAD_MORE_FINISH = 6;
+    ///加载中
+    final static int STATE_LOADING_MORE = 7;
+
+    ///加载完成
+    final static int STATE_LOAD_MORE_FINISH = 8;
 
     ///状态
     private int mState = STATE_NORMAL;
 
+    ///是否在刷新
+    private boolean mRefreshing = false;
+
+    ///是否在加载更多
+    private boolean mLoadingMore = false;
+
+    ///是否将要加载更多
+    private boolean mWillLoadingMore = false;
+
     ///是否正在触摸屏幕
     private boolean mTouching;
+
+    ///是否在手动刷新
+    private boolean mRefreshingManually = false;
 
     ///滑动到哪个位置松开可以刷新
     private int mRefreshCriticalOffset;
@@ -101,11 +117,26 @@ public class RefreshControl extends ViewGroup{
     ///是否可以上拉加载
     private boolean mLoadMoreEnable = true;
 
+    ///是否还有
+    private boolean mHasMore = true;
+
+    ///是否自动加载更多 将忽略mLoadMoreDelay
+    private boolean mShouldAutoLoadMore = true;
+
     ///动画时间 毫秒
     private int mAnimateDuration = 1500;
 
     ///滑动的难度系数 越大越难滑动
     private float mScrollDifficult = 1.7f;
+
+    ///刷新完成停留延迟 毫秒
+    private int mRefreshStayDelay = 1000;
+
+    ///加载延迟 释放后延迟加载更多 毫秒 如果mShouldAutoLoadMore 为true，将忽略
+    private int mLoadMoreDelay = 1000;
+
+    ///延迟执行
+    private Handler mDelayHandler = new Handler();
 
     public RefreshControl(Context context) {
         this(context, null);
@@ -189,21 +220,26 @@ public class RefreshControl extends ViewGroup{
         return mContentView;
     }
 
-    ///设置状态
-    private void setState(int state){
-        if(mState != state){
-            mState = state;
-
-            refreshUI();
-        }
-    }
-
     public void setRefreshHandler(RefreshHandler refreshHandler) {
         mRefreshHandler = refreshHandler;
     }
 
     public void setOrientation(@Orientation int orientation){
-        mOrientation = orientation;
+        if(mOrientation != orientation){
+            mOrientation = orientation;
+        }
+    }
+
+    public int getOrientation() {
+        return mOrientation;
+    }
+
+    public float getScrollDifficult() {
+        return mScrollDifficult;
+    }
+
+    public void setScrollDifficult(float scrollDifficult) {
+        mScrollDifficult = scrollDifficult;
     }
 
     public boolean isRefreshEnable() {
@@ -211,7 +247,12 @@ public class RefreshControl extends ViewGroup{
     }
 
     public void setRefreshEnable(boolean refreshEnable) {
-        mRefreshEnable = refreshEnable;
+        if(mRefreshEnable != refreshEnable){
+            mRefreshEnable = refreshEnable;
+            if(mHeader != null){
+                mHeader.setVisibility(mRefreshEnable ? VISIBLE : INVISIBLE);
+            }
+        }
     }
 
     public boolean isLoadMoreEnable() {
@@ -219,7 +260,49 @@ public class RefreshControl extends ViewGroup{
     }
 
     public void setLoadMoreEnable(boolean loadMoreEnable) {
-        mLoadMoreEnable = loadMoreEnable;
+        if(loadMoreEnable != mLoadMoreEnable){
+            mLoadMoreEnable = loadMoreEnable;
+            if(mFooter != null){
+                mFooter.setVisibility((mHasMore && mLoadMoreEnable) ? VISIBLE : INVISIBLE);
+            }
+        }
+    }
+
+    public boolean isHasMore() {
+        return mHasMore;
+    }
+
+    public void setHasMore(boolean hasMore) {
+        if(hasMore != mHasMore){
+            mHasMore = hasMore;
+            if(mFooter != null){
+                mFooter.setVisibility((mHasMore && mLoadMoreEnable) ? VISIBLE : INVISIBLE);
+            }
+        }
+    }
+
+    public boolean isShouldAutoLoadMore() {
+        return mShouldAutoLoadMore;
+    }
+
+    public void setShouldAutoLoadMore(boolean shouldAutoLoadMore) {
+        mShouldAutoLoadMore = shouldAutoLoadMore;
+    }
+
+    public int getmRefreshStayDelay() {
+        return mRefreshStayDelay;
+    }
+
+    public void setmRefreshStayDelay(int mRefreshStayDelay) {
+        this.mRefreshStayDelay = mRefreshStayDelay;
+    }
+
+    public int getmLoadMoreDelay() {
+        return mLoadMoreDelay;
+    }
+
+    public void setmLoadMoreDelay(int mLoadMoreDelay) {
+        this.mLoadMoreDelay = mLoadMoreDelay;
     }
 
     @Override
@@ -353,8 +436,6 @@ public class RefreshControl extends ViewGroup{
                 }
             }
         }
-
-        Log.d(TAG, "mHeader.top = " + mHeader.getTop() + "," + "mContentView.top = " + mContentView.getTop());
     }
 
     @Override
@@ -379,13 +460,18 @@ public class RefreshControl extends ViewGroup{
         if(mContentView == null)
             return super.dispatchTouchEvent(ev);
 
+        ///手动刷新动画过程中不然用户点击
+        if(mRefreshingManually)
+            return true;
+
         int action = ev.getAction();
+
         switch (action){
             case MotionEvent.ACTION_CANCEL :
             case MotionEvent.ACTION_UP :
             {
                 release();
-                return true;
+                return super.dispatchTouchEvent(ev);
             }
             case MotionEvent.ACTION_MOVE :
             {
@@ -396,6 +482,16 @@ public class RefreshControl extends ViewGroup{
                 }
 
                 int offset = mScrollHelper.onMove(position);
+                ///自动加载更多
+                if(mScrollHelper.getScrollState() == RefreshControlScrollHelper
+                        .SCROLL_STATE_LOADMORE){
+                    if(mShouldAutoLoadMore && mLoadMoreEnable && mHasMore && !mLoadingMore && !mWillLoadingMore){
+                        mScrollHelper.scrollTo(mLoadMoreCriticalOffset, 0);
+                       // setState(STATE_LOADING_MORE);
+                        return super.dispatchTouchEvent(ev);
+                    }
+                }
+
                 move(offset);
 
                 mScrollHelper.setTouchY(position);
@@ -404,6 +500,11 @@ public class RefreshControl extends ViewGroup{
             }
             case MotionEvent.ACTION_DOWN :
             {
+                //取消刷新停留延迟
+                if(mState == STATE_REFRESH_WILL_FINISH){
+                    mDelayHandler.removeCallbacksAndMessages(null);
+                    setState(STATE_REFRESH_FINISH);
+                }
                 float position = mOrientation == ORIENTATION_VERTICAL ? ev.getY() : ev.getX();
 
                 mScrollHelper.finishScroll();
@@ -440,6 +541,8 @@ public class RefreshControl extends ViewGroup{
                     int offset = (int) (mScrollHelper.getOffset() - mRefreshCriticalOffset);
                     mScrollHelper.scrollTo(offset, mAnimateDuration);
 
+                    cancelLoadMore();
+
                     setState(STATE_REFRESHING);
                     return;
                 }
@@ -452,7 +555,11 @@ public class RefreshControl extends ViewGroup{
                     int offset = (int)(mScrollHelper.getOffset() + mLoadMoreCriticalOffset);
                     mScrollHelper.scrollTo(offset, mAnimateDuration);
 
-                    setState(STATE_LOADING_MORE);
+                    //刷新中 取消刷新
+                    if(mRefreshing && mRefreshHandler != null){
+                        mRefreshHandler.onRefreshCancel(this);
+                    }
+                    setState(mLoadMoreDelay > 0 ? STATE_WILL_LOADING_MORE : STATE_LOADING_MORE);
                     return;
                 }
                 break;
@@ -460,15 +567,29 @@ public class RefreshControl extends ViewGroup{
         }
 
         ///没有在加载，回到原来位置
-        if(mState != STATE_REFRESH_FINISH){
-            backToOrigin();
+        if(mState != STATE_REFRESH_FINISH && mState != STATE_LOAD_MORE_FINISH){
+            backToOrigin(0, mAnimateDuration);
+        }
+    }
+
+    ///取消加载更多
+    private void cancelLoadMore(){
+        //加载更多中 取消加载
+        if(mLoadingMore && mRefreshHandler != null){
+            mRefreshHandler.onLoadMoreCancel(this);
+        }
+
+        //将要加载更多种
+        if(mWillLoadingMore){
+            mWillLoadingMore = false;
+            mDelayHandler.removeCallbacksAndMessages(null);
         }
     }
 
     ///是否可以刷新
     private boolean enableRefresh(){
 
-        if(!mRefreshEnable)
+        if(!mRefreshEnable || mState == STATE_REFRESHING)
             return false;
 
         ///滑动到达临界点， 并且刷新完成后允许刷新
@@ -484,7 +605,7 @@ public class RefreshControl extends ViewGroup{
     ///是否可以加载更多
     private boolean enableLoadMore(){
 
-        if(!mLoadMoreEnable)
+        if(!mLoadMoreEnable || !mHasMore || mState == STATE_LOADING_MORE || mState == STATE_WILL_LOADING_MORE)
             return false;
 
         return isReachLoadMoreCritical();
@@ -500,50 +621,98 @@ public class RefreshControl extends ViewGroup{
         return -mScrollHelper.getOffset() >= mLoadMoreCriticalOffset;
     }
 
-    ///完成刷新
-    public void refreshComplete(){
-
-        if(mState != STATE_REFRESHING)
+    ///手动刷新
+    public void startRefresh(){
+        if(mState == STATE_REFRESHING || !mRefreshEnable)
             return;
 
-        setState(STATE_REFRESH_FINISH);
-        if(!mTouching){
+        mHeaderHandler.onRefresh(this);
+        cancelLoadMore();
+        mContentView.scrollTo(0, 0);
+        mRefreshingManually = true;
+        mScrollHelper.scrollTo(-mRefreshCriticalOffset, mAnimateDuration);
+    }
 
-            backToOrigin();
+    ///完成刷新
+    public void refreshComplete(){
+        this.refreshComplete(true);
+    }
+    ///完成刷新
+    public void refreshComplete(boolean success){
+
+        if(!mRefreshing)
+            return;
+
+        mRefreshing = false;
+
+        if(!mTouching){
+            boolean delay = backToOrigin(mRefreshStayDelay, mAnimateDuration);
+            setState(delay ? STATE_REFRESH_WILL_FINISH : STATE_REFRESH_FINISH);
         }else if(mShouldRefreshBeforeScrollComplete && mTouching){
             ///刷新完成后 没回到顶部也可以继续刷新
             setState(isReachRefreshCritical() ? STATE_REACH_REFRESH_CRITICAL : STATE_NORMAL);
+        }else {
+            setState(STATE_REFRESH_FINISH);
         }
     }
 
     ///加载更多完成
-    public void loadMoreComplete(){
-        if(mState != STATE_LOADING_MORE)
+    public void loadMoreComplete(boolean hasMore){
+        if(!mLoadingMore)
             return;
 
+        setHasMore(hasMore);
+        mLoadingMore = false;
         setState(STATE_LOAD_MORE_FINISH);
-        if(!mTouching){
-            backToOrigin();
-        }else {
-            setState(isReachLoadMoreCritical() ? STATE_REACH_LOAD_MORE_CRITICAL : STATE_NORMAL);
+        backToOrigin(0, 0);
+    }
+
+    ///自动滚动完成
+    protected void scrollComplete(){
+        ///回到原来的位置，把状态改成正常的
+        if(mState == STATE_REFRESH_FINISH || mState == STATE_LOAD_MORE_FINISH){
+            setState(STATE_NORMAL);
+        }
+
+        ///手动刷新
+        if(mRefreshingManually){
+            mRefreshingManually = false;
+            setState(STATE_REFRESHING);
         }
     }
 
-    ///回到原来位置
-    private void backToOrigin(){
+    /**
+     * 回到原来位置
+     * @param delay 延迟
+     * @param duration 动画时间
+     * @return 是否延迟
+     */
+    private boolean backToOrigin(int delay, final int duration){
 
-        int offset = mScrollHelper.onRelease();
+        final int offset = mScrollHelper.onRelease();
         if(offset != 0){
-            mScrollHelper.scrollTo(-offset, mAnimateDuration);
+            if(delay > 0){
+                mDelayHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScrollHelper.scrollTo(-offset, duration);
+                    }
+                }, delay);
+
+                return true;
+            }else {
+                mScrollHelper.scrollTo(-offset, duration);
+            }
         }else {
             setState(STATE_NORMAL);
         }
+
+        return false;
     }
 
     ///移动
-    private void move(int offset){
+    protected void move(int offset){
 
-        Log.v(TAG, "offset = " + offset);
         int state = mScrollHelper.getScrollState();
 
         switch (mOrientation){
@@ -591,6 +760,56 @@ public class RefreshControl extends ViewGroup{
         }
     }
 
+    ///设置状态
+    private void setState(int state){
+        if(mState != state){
+            mState = state;
+
+            switch (mState){
+                case STATE_LOADING_MORE :
+                    if(mRefreshing && mHeaderHandler != null){
+                        mHeaderHandler.onPull(this, mScrollHelper.getOffset());
+                    }
+                    mRefreshing = false;
+                    mLoadingMore = true;
+                    mWillLoadingMore = false;
+                    break;
+                case STATE_REFRESHING :
+                    mRefreshing = true;
+                    if(mLoadingMore && mFooterHandler != null){
+                        mFooterHandler.onPull(this, mScrollHelper.getOffset());
+                    }
+                    mLoadingMore = false;
+                    mWillLoadingMore = false;
+                    break;
+                case STATE_WILL_LOADING_MORE :
+                    if(mRefreshing && mHeaderHandler != null){
+                        mHeaderHandler.onPull(this, mScrollHelper.getOffset());
+                    }
+                    mRefreshing = false;
+                    mWillLoadingMore = true;
+
+                    ///延迟加载更多
+                    if(mRefreshHandler != null){
+                        mDelayHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mState = STATE_LOADING_MORE;
+                                mWillLoadingMore = false;
+                                mLoadingMore = true;
+                                int state = mScrollHelper.getScrollState();
+                                mRefreshHandler.onLoadMore(RefreshControl.this);
+                                mFooterHandler.onLoadMore(RefreshControl.this);
+                            }
+                        }, mLoadMoreDelay);
+                    }
+                    break;
+            }
+
+            refreshUI();
+        }
+    }
+
     ///刷新UI
     private void refreshUI(){
 
@@ -601,7 +820,7 @@ public class RefreshControl extends ViewGroup{
 
                     switch (mState) {
                         case STATE_NORMAL:
-                            mHeaderHandler.onPull(this);
+                            mHeaderHandler.onPull(this, mScrollHelper.getOffset());
                             break;
                         case STATE_REACH_REFRESH_CRITICAL:
                             mHeaderHandler.onReachCriticalPoint(this);
@@ -615,6 +834,9 @@ public class RefreshControl extends ViewGroup{
                         case STATE_REFRESH_FINISH:
                             mHeaderHandler.onRefreshFinish(this, true);
                             break;
+                        case STATE_REFRESH_WILL_FINISH:
+                            mHeaderHandler.onRefreshWillFinish(this, true, mRefreshStayDelay);
+                            break;
                     }
                 }
                 break;
@@ -625,13 +847,16 @@ public class RefreshControl extends ViewGroup{
 
                     switch (mState){
                         case STATE_NORMAL :
-                            mFooterHandler.onPull(this);
+                            mFooterHandler.onPull(this, mScrollHelper.getOffset());
                             break;
                         case STATE_LOADING_MORE :
                             mFooterHandler.onLoadMore(this);
                             if(mRefreshHandler != null){
                                 mRefreshHandler.onLoadMore(this);
                             }
+                            break;
+                        case STATE_WILL_LOADING_MORE :
+                            mFooterHandler.onWillLoadMore(this, mLoadMoreDelay);
                             break;
                         case STATE_LOAD_MORE_FINISH :
                             mFooterHandler.onLoadMoreFinish(this, true);
@@ -642,171 +867,22 @@ public class RefreshControl extends ViewGroup{
             }
             case RefreshControlScrollHelper.SCROLL_STATE_NORMAL : {
                 if(mHeaderHandler != null){
-                    mHeaderHandler.onPull(this);
+                    mHeaderHandler.onPull(this, mScrollHelper.getOffset());
                 }
 
                 if(mFooterHandler != null){
-                    mFooterHandler.onPull(this);
+                    mFooterHandler.onPull(this, mScrollHelper.getOffset());
                 }
                 break;
             }
         }
     }
 
+    //刷新完成 或 滑动释放后动画地回到原位
     @Override
     public void computeScroll() {
 
         mScrollHelper.computeScroll();
         super.computeScroll();
-    }
-
-    /**
-     * 刷新控制器 滑动帮助类
-     */
-    private class RefreshControlScrollHelper{
-
-        ///当前偏移的距离
-        private int mOffset;
-
-        ///当前触摸的位置，y轴
-        private float mTouchY;
-
-        ///
-        Scroller mScroller;
-
-        /// mScroller 当前y
-        int mCurY;
-
-        /// 当前滑动的状态
-        public static final int SCROLL_STATE_NORMAL = 0; //正常
-        public static final int SCROLL_STATE_REFRESH = 1; //刷新
-        public static final int SCROLL_STATE_LOADMORE = 2; //加载更多
-//        @IntDef({SCROLL_STATE_NORMAL, SCROLL_STATE_REFRESH, SCROLL_STATE_LOADMORE})
-//        @Retention(RetentionPolicy.SOURCE)
-//        public @interface ScrollState{}
-
-        private int mScrollState = SCROLL_STATE_NORMAL;
-
-        RefreshControlScrollHelper(RefreshControl refreshControl) {
-
-            mScroller = new Scroller(refreshControl.getContext());
-        }
-
-        void setTouchY(float touchY) {
-            mTouchY = touchY;
-        }
-
-        public int getOffset() {
-            return mOffset;
-        }
-
-        ///获取滑动的距离
-        private int getDistance(float y){
-            int distance = (int)(y - mTouchY);
-            if(mOffset > 0){
-                ///下拉刷新，恢复时不需要难度系数
-                if(y > mTouchY){
-                    distance /= mScrollDifficult + Math.abs(mOffset) * 5 / getHeight();
-                }
-            }else if(mOffset < 0){
-                ///上拉加载，恢复时不需要难度系数
-                if(y < mTouchY){
-                    distance /= mScrollDifficult + Math.abs(mOffset) * 5 / getHeight();
-                }
-            }
-
-            return distance;
-        }
-
-        ///获取需要滑动的距离
-        int onMove(float y){
-
-            int distance = getDistance(y);
-            mTouchY = y;
-
-            //防止上拉过程中 加载更多出现
-            int offset = mOffset + distance;
-            if(offset < 0 && mOffset > 0){
-                offset = 0;
-            }else if(offset > 0 && mOffset < 0){
-                offset = 0;
-            }
-
-            mOffset = offset;
-            return distance;
-        }
-
-        ///判断头部或底部是否能滑动
-        public boolean isHeaderOrFooterScrollEnable(float y){
-            return mOffset != 0;
-        }
-
-        ///松开回到原来的位置
-        int onRelease(){
-            return -mOffset;
-        }
-
-        //获取当前滑动状态
-        public int getScrollState(){
-            if(mOffset > 0)
-                return SCROLL_STATE_REFRESH;
-            else if(mOffset < 0)
-                return SCROLL_STATE_LOADMORE;
-            else
-                return SCROLL_STATE_NORMAL;
-        }
-
-        ///滑动方向 正数为 右、下  负数为左、上
-        int getDirection(float cur){
-            return (int)(mTouchY - cur);
-        }
-
-        ///是否已在顶部
-        public boolean atTheTop(){
-            return mOffset == 0;
-        }
-
-        ///滑动到某个位置
-        void scrollTo(int to, int duration){
-
-            finishScroll();
-            if(to != 0){
-                mCurY = 0;
-                mScroller.startScroll(0, 0, 0, to, duration);
-                invalidate();
-            }
-        }
-
-        ///滑动计算
-        void computeScroll(){
-            if(mScroller.computeScrollOffset() && !mScroller.isFinished()){
-
-                int offset = 0;
-                if(mOrientation == ORIENTATION_VERTICAL){
-                    offset = mCurY - mScroller.getCurrY();
-                    mCurY = mScroller.getCurrY();
-                }else {
-                    offset = mCurY - mScroller.getCurrY();
-                    mCurY = mScroller.getCurrY();
-                }
-                move(offset);
-                mOffset += offset;
-                postInvalidate();
-            }else {
-
-                ///回到原来的位置，把状态改成正常的
-             if(mState == STATE_REFRESH_FINISH || mState == STATE_LOAD_MORE_FINISH){
-                    setState(STATE_NORMAL);
-                }
-            }
-        }
-
-        ///完成滚动
-        void finishScroll(){
-
-            if(!mScroller.isFinished()){
-                mScroller.forceFinished(true);
-            }
-        }
     }
 }

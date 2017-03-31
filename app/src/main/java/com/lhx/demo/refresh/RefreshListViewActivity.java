@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 public class RefreshListViewActivity extends AppCompatActivity {
 
+    final static String TAG = "RefreshListViewActivity";
     private ArrayList<String> strings = new ArrayList<>();
     private ListView listView;
     private BaseAdapter adapter;
@@ -39,11 +41,13 @@ public class RefreshListViewActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(final RefreshControl refreshControl) {
 
+                Log.d(TAG, "onLoadMore");
+
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-//                        addItems(20);
-                        refreshControl.loadMoreComplete();
+                        addItems(10);
+                        refreshControl.loadMoreComplete(strings.size() < 100);
                     }
                 }, 2000);
             }
@@ -51,6 +55,9 @@ public class RefreshListViewActivity extends AppCompatActivity {
             @Override
             public void onRefresh(final RefreshControl refreshControl) {
 
+
+                addItems(20);
+                Log.d(TAG, "onRefresh");
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -62,11 +69,13 @@ public class RefreshListViewActivity extends AppCompatActivity {
             @Override
             public void onLoadMoreCancel(RefreshControl refreshControl) {
 
+                Log.d(TAG, "onLoadMoreCancel");
             }
 
             @Override
             public void onRefreshCancel(RefreshControl refreshControl) {
 
+                Log.d(TAG, "onRefreshCancel");
             }
         });
 
@@ -104,13 +113,15 @@ public class RefreshListViewActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                strings.clear();
+                adapter.notifyDataSetChanged();
+                refreshControl.startRefresh();
             }
         });
 
         setContentView(refreshControl);
 
-        addItems(30);
+        addItems(10);
     }
 
     //添加信息
