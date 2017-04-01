@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * 循环轮播器
+ * 循环轮播器 view可复用
  */
 public abstract class CyclePagerAdapter extends PagerAdapter {
 

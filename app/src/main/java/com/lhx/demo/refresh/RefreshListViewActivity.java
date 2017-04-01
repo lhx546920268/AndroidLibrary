@@ -37,6 +37,7 @@ public class RefreshListViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         refreshControl = (RefreshControl)View.inflate(getBaseContext(), R.layout.refresh_list_view_activity, null);
+        refreshControl.setRefreshEnable(false);
         refreshControl.setRefreshHandler(new RefreshHandler() {
             @Override
             public void onLoadMore(final RefreshControl refreshControl) {
@@ -47,7 +48,9 @@ public class RefreshListViewActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         addItems(10);
+                        adapter.notifyDataSetChanged();
                         refreshControl.loadMoreComplete(strings.size() < 100);
+                        refreshControl.setRefreshEnable(true);
                     }
                 }, 2000);
             }
@@ -56,11 +59,13 @@ public class RefreshListViewActivity extends AppCompatActivity {
             public void onRefresh(final RefreshControl refreshControl) {
 
 
-                addItems(20);
                 Log.d(TAG, "onRefresh");
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        strings.clear();
+                        addItems(30);
+                        adapter.notifyDataSetChanged();
                         refreshControl.refreshComplete();
                     }
                 }, 2000);
@@ -113,8 +118,6 @@ public class RefreshListViewActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                strings.clear();
-                adapter.notifyDataSetChanged();
                 refreshControl.startRefresh();
             }
         });

@@ -16,6 +16,9 @@ public class RefreshControlScrollHelper{
     ///当前触摸的位置，y轴
     private float mTouchY;
 
+    ///初始的点击位置
+    private float mTouchDownY;
+
     ///
     private Scroller mScroller;
 
@@ -45,8 +48,18 @@ public class RefreshControlScrollHelper{
         mTouchY = touchY;
     }
 
+    void setTouchDownY(float touchDownY){
+        mTouchDownY = touchDownY;
+        setTouchY(touchDownY);
+    }
+
     public int getOffset() {
         return mOffset;
+    }
+
+    ///点击的位置是否改变
+    public boolean isTouchChange(){
+       return mTouchDownY != mTouchY;
     }
 
     ///获取滑动的距离
@@ -70,8 +83,10 @@ public class RefreshControlScrollHelper{
         int offset = mOffset + distance;
         if(offset < 0 && mOffset > 0){
             offset = 0;
+            distance = - mOffset;
         }else if(offset > 0 && mOffset < 0){
             offset = 0;
+            distance = - mOffset;
         }
 
         mOffset = offset;
