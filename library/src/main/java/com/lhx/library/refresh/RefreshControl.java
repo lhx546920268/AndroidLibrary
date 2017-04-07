@@ -493,7 +493,8 @@ public class RefreshControl extends ViewGroup{
             case MotionEvent.ACTION_UP :
             {
                 mTouching = false;
-                if(mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL && mScrollHelper.isTouchChange){
+                if(mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL && mScrollHelper
+                        .isTouchChange()){
                     release();
 
                     //当松开手时要告诉父view是取消的，否则会触发contentView上的点击事件

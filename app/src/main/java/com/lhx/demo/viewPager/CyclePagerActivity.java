@@ -10,10 +10,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.lhx.demo.R;
 import com.lhx.library.viewPager.CyclePagerAdapter;
@@ -64,10 +67,14 @@ public class CyclePagerActivity extends AppCompatActivity {
             public Object instantiateItemForRealPosition(View convertView, int position, int viewType) {
 
                 if(convertView == null){
-                    convertView = new View(getBaseContext());
-                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+
+                    LinearLayout linearLayout = new LinearLayout(getBaseContext());
+                    linearLayout.setWeightSum(4);
+                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams
+                            .MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
-                    convertView.setLayoutParams(layoutParams);
+                    linearLayout.setLayoutParams(layoutParams);
+                    convertView = linearLayout;
                 }
 
                 switch (position){
@@ -89,6 +96,31 @@ public class CyclePagerActivity extends AppCompatActivity {
                 }
 
                 return convertView;
+            }
+
+            @Override
+            public int numberOfSubviewInPage(int position) {
+                return 4;
+            }
+
+            @Override
+            public View getSubview(View convertView, int position, int subviewPosition, int subviewType) {
+                if(convertView == null){
+                    TextView textView = new TextView(getBaseContext());
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0,
+                            50);
+                    layoutParams.weight = 1;
+                    layoutParams.gravity = Gravity.CENTER_VERTICAL;
+                    layoutParams.setMargins(10, 0, 10, 0);
+                    textView.setLayoutParams(layoutParams);
+                    textView.setBackgroundColor(Color.GRAY);
+                    convertView = textView;
+                }
+
+                TextView textView = (TextView)convertView;
+                textView.setText("第" + subviewPosition + "个");
+
+                return textView;
             }
         };
         adapter.setShouldAutoPlay(true);
