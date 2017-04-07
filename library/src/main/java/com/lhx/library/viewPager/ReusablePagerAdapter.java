@@ -204,12 +204,6 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
 
 
     /**
-     * 获取真实的数量
-     * @return 真实的数量
-     */
-    public abstract int getRealCount();
-
-    /**
      * 显示真实的页面
      * @param convertView 和listView中的一样 如果不为空，则该视图可重用
      * @param position {@link #instantiateItem(ViewGroup, int)}

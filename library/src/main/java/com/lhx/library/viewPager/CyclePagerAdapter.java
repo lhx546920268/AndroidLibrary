@@ -175,4 +175,10 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
             mHandler.removeCallbacks(mRunnable);
         }
     }
+
+    /**
+     * 获取真实的数量
+     * @return 真实的数量
+     */
+    public abstract int getRealCount();
 }
