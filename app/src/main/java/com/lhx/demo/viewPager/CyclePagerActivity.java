@@ -72,7 +72,7 @@ public class CyclePagerActivity extends AppCompatActivity {
                     linearLayout.setWeightSum(4);
                     ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams
                             .MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT);
+                            100);
                     linearLayout.setLayoutParams(layoutParams);
                     convertView = linearLayout;
                 }

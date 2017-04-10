@@ -37,7 +37,8 @@ public class RefreshListViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         refreshControl = (RefreshControl)View.inflate(getBaseContext(), R.layout.refresh_list_view_activity, null);
-        refreshControl.setRefreshEnable(false);
+//        refreshControl.setRefreshEnable(false);
+//        refreshControl.setLoadMoreEnable(false);
         refreshControl.setRefreshHandler(new RefreshHandler() {
             @Override
             public void onLoadMore(final RefreshControl refreshControl) {

@@ -5,12 +5,16 @@ import android.content.res.TypedArray;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.GridView;
+import android.widget.ScrollView;
 import android.widget.Scroller;
 import com.lhx.library.R;
 import java.lang.annotation.Retention;
@@ -84,6 +88,9 @@ public class RefreshControl extends ViewGroup{
 
     ///最新按下事件
     private MotionEvent mLastDownEvent;
+
+    ///是否需要分发取消事件，比如在listView中 down事件会使item有按下效果，如果不分发，会导致按下效果一直存在
+    private boolean mShouldDispatchCancelEvent;
 
     ///是否在手动刷新
     private boolean mRefreshingManually = false;
@@ -471,7 +478,8 @@ public class RefreshControl extends ViewGroup{
         if(mLastDownEvent == null)
             return;
 
-        MotionEvent event = MotionEvent.obtain(mLastDownEvent.getDownTime(), mLastDownEvent.getEventTime(),
+        MotionEvent event = MotionEvent.obtain(mLastDownEvent.getDownTime(), mLastDownEvent.getEventTime() +
+                        ViewConfiguration.getLongPressTimeout(),
                 MotionEvent.ACTION_CANCEL, mLastDownEvent.getX(), mLastDownEvent.getY(), mLastDownEvent.getMetaState());
         super.dispatchTouchEvent(event);
     }
@@ -493,8 +501,7 @@ public class RefreshControl extends ViewGroup{
             case MotionEvent.ACTION_UP :
             {
                 mTouching = false;
-                if(mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL && mScrollHelper
-                        .isTouchChange()){
+                if(mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL){
                     release();
 
                     //当松开手时要告诉父view是取消的，否则会触发contentView上的点击事件
@@ -506,6 +513,11 @@ public class RefreshControl extends ViewGroup{
             }
             case MotionEvent.ACTION_MOVE :
             {
+                //分发取消手势
+                if(mShouldDispatchCancelEvent && mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL){
+                    dispatchCancelEvent();
+                    mShouldDispatchCancelEvent = false;
+                }
                 mTouching = true;
                 float position = mOrientation == ORIENTATION_VERTICAL ? ev.getY() : ev.getX();
                 if(isChildrenScrollEnable(mScrollHelper.getDirection(position))){
@@ -534,6 +546,8 @@ public class RefreshControl extends ViewGroup{
             }
             case MotionEvent.ACTION_DOWN :
             {
+                mLastDownEvent = ev;
+                mShouldDispatchCancelEvent = true;
                 //取消刷新停留延迟
                 if(mState == STATE_REFRESH_WILL_FINISH){
                     mDelayHandler.removeCallbacksAndMessages(null);
@@ -543,7 +557,7 @@ public class RefreshControl extends ViewGroup{
 
 
                 mScrollHelper.finishScroll();
-                mScrollHelper.setTouchY(position);
+                mScrollHelper.setTouchDownY(position);
                 super.dispatchTouchEvent(ev);
                 return true;
             }
@@ -656,13 +670,39 @@ public class RefreshControl extends ViewGroup{
         return -mScrollHelper.getOffset() >= mLoadMoreCriticalOffset;
     }
 
-    ///手动刷新
     public void startRefresh(){
+        startRefresh(true);
+    }
+
+    /**
+     * 手动刷新
+     * @param scrollToTop 是否回到顶部
+     */
+    public void startRefresh(boolean scrollToTop){
         if(mState == STATE_REFRESHING || !mRefreshEnable || mContentView == null || mHeaderHandler == null)
             return;
 
         cancelLoadMore();
-        mContentView.scrollTo(0, 0);
+
+        //回到d
+        if(scrollToTop){
+            if(mContentView instanceof AbsListView){
+                AbsListView listView = (AbsListView)mContentView;
+                if(listView.getChildCount() > 0){
+                    listView.smoothScrollToPosition(0);
+                }
+            }else if(mContentView instanceof ScrollView){
+                ScrollView scrollView = (ScrollView)mContentView;
+                scrollView.smoothScrollTo(0, 0);
+            }else if(mContentView instanceof RecyclerView){
+                RecyclerView recyclerView = (RecyclerView)mContentView;
+                if(recyclerView.getChildCount() > 0){
+                    recyclerView.smoothScrollToPosition(0);
+                }
+            }else {
+                mContentView.scrollTo(0, 0);
+            }
+        }
 
         mHeaderHandler.onRefresh(this);
         mRefreshingManually = true;
@@ -752,6 +792,8 @@ public class RefreshControl extends ViewGroup{
     ///移动
     protected void move(int offset){
 
+        if(offset == 0)
+            return;
         int state = mScrollHelper.getScrollState();
 
         switch (mOrientation){
