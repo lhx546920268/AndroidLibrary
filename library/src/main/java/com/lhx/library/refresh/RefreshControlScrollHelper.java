@@ -28,6 +28,9 @@ public class RefreshControlScrollHelper{
     ///关联刷新控制器
     private RefreshControl mRefreshControl;
 
+    //滑动回调
+    private RefreshControlScrollHandler mScrollHandler;
+
     /// 当前滑动的状态
     public static final int SCROLL_STATE_NORMAL = 0; //正常
     public static final int SCROLL_STATE_REFRESH = 1; //刷新
@@ -51,6 +54,10 @@ public class RefreshControlScrollHelper{
     void setTouchDownY(float touchDownY){
         mTouchDownY = touchDownY;
         setTouchY(touchDownY);
+    }
+
+    void setScrollHandler(RefreshControlScrollHandler handler){
+        mScrollHandler = handler;
     }
 
     public int getOffset() {
@@ -81,12 +88,20 @@ public class RefreshControlScrollHelper{
 
         //防止上拉过程中 加载更多出现
         int offset = mOffset + distance;
+
         if(offset < 0 && mOffset > 0){
             offset = 0;
             distance = - mOffset;
         }else if(offset > 0 && mOffset < 0){
             offset = 0;
             distance = - mOffset;
+        }
+
+        //状态改变
+        if(mOffset > 0 && offset <= 0 && mScrollHandler != null){
+            mScrollHandler.onStateChange(SCROLL_STATE_REFRESH, SCROLL_STATE_NORMAL);
+        }else if(mOffset < 0 && offset >= 0 && mScrollHandler != null){
+            mScrollHandler.onStateChange(SCROLL_STATE_LOADMORE, SCROLL_STATE_NORMAL);
         }
 
         mOffset = offset;
@@ -166,5 +181,13 @@ public class RefreshControlScrollHelper{
         if(!mScroller.isFinished()){
             mScroller.forceFinished(true);
         }
+    }
+
+
+    //滑动回调
+    public interface RefreshControlScrollHandler{
+
+        //状态过度
+        void onStateChange(int oldState, int newState);
     }
 }

@@ -73,7 +73,7 @@ public class RefreshActivity extends AppCompatActivity {
                 Class clazz = null;
                 switch (position){
                     case 0 :
-
+                        clazz = SwipeRefreshListActivity.class;
                         break;
                     case 1 :
                         clazz = RefreshListViewActivity.class;

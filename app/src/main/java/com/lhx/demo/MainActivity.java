@@ -2,8 +2,11 @@ package com.lhx.demo;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,8 +16,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.viewPager.CyclePagerActivity;
+import com.lhx.library.activity.AppBaseActivity;
+import com.lhx.library.util.ColorUtil;
 import com.lhx.library.viewHoler.ViewHolder;
 
 import java.util.ArrayList;
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         infos.add("cycleViewPager(无限轮播viewPager)");
         infos.add("refreshControl(下拉刷新、上拉加载)");
+        infos.add("alertController(弹窗 dialog)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView textView = ViewHolder.get(convertView, R.id.text);
                 textView.setText(infos.get(position));
+                textView.setBackgroundColor(ColorUtil.whitePercentColor(0.9f, 1.0f));
 
                 return convertView;
             }
@@ -70,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 1 :
                         clazz = RefreshActivity.class;
+                        break;
+                    case 2 :
+                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, DialogFragment.class));
                         break;
                 }
 

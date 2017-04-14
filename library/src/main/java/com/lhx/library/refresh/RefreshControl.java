@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
  * 刷新控制器
  */
 
-public class RefreshControl extends ViewGroup{
+public class RefreshControl extends ViewGroup implements RefreshControlScrollHelper.RefreshControlScrollHandler{
 
     public static final String TAG = "RefreshControl";
 
@@ -88,6 +88,9 @@ public class RefreshControl extends ViewGroup{
 
     ///最新按下事件
     private MotionEvent mLastDownEvent;
+
+    ///最新移动手势
+    private MotionEvent mLastMoveEvent;
 
     ///是否需要分发取消事件，比如在listView中 down事件会使item有按下效果，如果不分发，会导致按下效果一直存在
     private boolean mShouldDispatchCancelEvent;
@@ -157,6 +160,7 @@ public class RefreshControl extends ViewGroup{
 
         if(!isInEditMode()){
             mScrollHelper = new RefreshControlScrollHelper(this);
+            mScrollHelper.setScrollHandler(this);
         }
     }
 
@@ -455,6 +459,8 @@ public class RefreshControl extends ViewGroup{
                 }
             }
         }
+
+        Log.d(TAG, "onLayout mHeader.top = " + mHeader.getTop());
     }
 
     @Override
@@ -484,6 +490,28 @@ public class RefreshControl extends ViewGroup{
         super.dispatchTouchEvent(event);
     }
 
+    //分发按下手势
+    private void dispatchTouchDownEvent(){
+        if(mLastDownEvent == null || !mTouching)
+            return;
+
+        MotionEvent event = MotionEvent.obtain(mLastMoveEvent.getDownTime(), mLastMoveEvent.getEventTime(),
+                MotionEvent.ACTION_DOWN, mLastMoveEvent.getX(), mLastMoveEvent.getY(), mLastMoveEvent.getMetaState());
+        super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void onStateChange(int oldState, int newState) {
+
+        //状态从刷新到正常 或者从加载更多到正常，要发送按下手势，否则contentView将无法滑动
+        if((oldState == RefreshControlScrollHelper.SCROLL_STATE_REFRESH && newState == RefreshControlScrollHelper
+                .SCROLL_STATE_NORMAL) ||
+                (oldState == RefreshControlScrollHelper.SCROLL_STATE_LOADMORE && newState ==
+                        RefreshControlScrollHelper.SCROLL_STATE_NORMAL)){
+            dispatchTouchDownEvent();
+        }
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
 
@@ -500,30 +528,31 @@ public class RefreshControl extends ViewGroup{
             case MotionEvent.ACTION_CANCEL :
             case MotionEvent.ACTION_UP :
             {
+                mLastMoveEvent = null;
                 mTouching = false;
                 if(mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL){
                     release();
 
                     //当松开手时要告诉父view是取消的，否则会触发contentView上的点击事件
                     dispatchCancelEvent();
+                    mLastDownEvent = null;
                     return true;
                 }else {
+                    mLastDownEvent = null;
                     return super.dispatchTouchEvent(ev);
                 }
             }
             case MotionEvent.ACTION_MOVE :
             {
-                //分发取消手势
-                if(mShouldDispatchCancelEvent && mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL){
-                    dispatchCancelEvent();
-                    mShouldDispatchCancelEvent = false;
-                }
                 mTouching = true;
                 float position = mOrientation == ORIENTATION_VERTICAL ? ev.getY() : ev.getX();
+
                 if(isChildrenScrollEnable(mScrollHelper.getDirection(position))){
                     mScrollHelper.setTouchY(position);
                     return super.dispatchTouchEvent(ev);
                 }
+
+                mLastMoveEvent = ev;
 
                 int offset = mScrollHelper.onMove(position);
 
@@ -537,6 +566,11 @@ public class RefreshControl extends ViewGroup{
 //                    }
                 }
 
+                //分发取消手势
+                if(mShouldDispatchCancelEvent && mScrollHelper.getScrollState() != RefreshControlScrollHelper.SCROLL_STATE_NORMAL){
+                    dispatchCancelEvent();
+                    mShouldDispatchCancelEvent = false;
+                }
 
                 move(offset);
 
@@ -805,10 +839,13 @@ public class RefreshControl extends ViewGroup{
 
                 mContentView.offsetTopAndBottom(offset);
 
+
                 if(mFooter != null && (state == RefreshControlScrollHelper.SCROLL_STATE_LOADMORE || mFooter.getTop()
                         != mContentView.getBottom())){
                     mFooter.offsetTopAndBottom(offset);
                 }
+
+                Log.d(TAG, "move mHeader.top = " + mHeader.getTop());
 
                 break;
             }
@@ -850,6 +887,7 @@ public class RefreshControl extends ViewGroup{
 
             switch (mState){
                 case STATE_LOADING_MORE :
+                    //刷新 下拉刷新的ui
                     if(mRefreshing && mHeaderHandler != null){
                         mHeaderHandler.onPull(this, mScrollHelper.getOffset());
                     }
@@ -858,6 +896,7 @@ public class RefreshControl extends ViewGroup{
                     mWillLoadingMore = false;
                     break;
                 case STATE_REFRESHING :
+                    //刷新加载更多的ui
                     mRefreshing = true;
                     if(mLoadingMore && mFooterHandler != null){
                         mFooterHandler.onPull(this, mScrollHelper.getOffset());
@@ -966,6 +1005,5 @@ public class RefreshControl extends ViewGroup{
     public void computeScroll() {
 
         mScrollHelper.computeScroll();
-        super.computeScroll();
     }
 }
