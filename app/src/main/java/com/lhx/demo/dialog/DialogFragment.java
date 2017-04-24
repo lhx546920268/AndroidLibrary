@@ -35,7 +35,7 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
                 break;
             case R.id.sheet_btn : {
                 AlertController controller = new AlertController(mActivity, AlertController.STYLE_ACTION_SHEET, "弹窗显示了",
-                        "弹窗真的显示了", 0, "确定", "取消");
+                        "弹窗真的显示了", 0, "确定", "删除");
                 controller.show();
             }
                 break;
