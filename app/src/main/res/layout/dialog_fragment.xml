@@ -23,4 +23,40 @@
         android:id="@+id/sheet_btn"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="alert_btn1"
+        android:textColor="@color/black"
+        android:id="@+id/alert_btn1"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sheet_btn1"
+        android:textColor="@color/black"
+        android:id="@+id/sheet_btn1"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="alert_btn2"
+        android:textColor="@color/black"
+        android:id="@+id/alert_btn2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sheet_btn2"
+        android:textColor="@color/black"
+        android:id="@+id/sheet_btn2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
 </LinearLayout>

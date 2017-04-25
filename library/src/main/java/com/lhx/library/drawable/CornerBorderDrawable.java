@@ -26,10 +26,22 @@ import android.view.View;
 
 public class CornerBorderDrawable extends Drawable {
 
-    public static final String TAG = "CornerBorderDrawable";
+    private static final String TAG = "CornerBorderDrawable";
 
-    ///圆角半径 dip
-    private float mCornerRadius = 0;
+    ///圆角半径 px 设置这个会设置以下4个相同的数值
+    private int mCornerRadius = 0;
+
+    ///左上角圆角 px
+    private int mLeftTopCornerRadius = 0;
+
+    ///右上角圆角 px
+    private int mRightTopCornerRadius = 0;
+
+    ///左下角圆角 px
+    private int mLeftBottomCornerRadius = 0;
+
+    ///右下角圆角 px
+    private int mRightBottomCornerRadius = 0;
 
     ///是否全圆
     private boolean mShouldAbsoluteCircle = false;
@@ -114,6 +126,48 @@ public class CornerBorderDrawable extends Drawable {
         drawBitmap(canvas);
     }
 
+    //获取绘制路径
+    private Path getPath(RectF bounds){
+        Path path = new Path();
+
+        if(mShouldAbsoluteCircle){
+            //全员
+            float radius = Math.max(bounds.width(), bounds.height()) / 2.0f;
+            path.addCircle(mRectF.width() / 2.0f, mRectF.height() / 2.0f, radius, Path.Direction.CW);
+        }else {
+            //从左上角开始 绕一圈
+            path.moveTo(bounds.left, bounds.top + mLeftTopCornerRadius);
+            path.lineTo(bounds.left, bounds.bottom - mLeftBottomCornerRadius);
+            if(mLeftBottomCornerRadius > 0){
+                path.arcTo(new RectF(bounds.left, bounds.bottom - mLeftBottomCornerRadius * 2, bounds.left +
+                        mLeftBottomCornerRadius * 2,
+                        bounds.bottom), 180, -90, false);
+            }
+
+            path.lineTo(bounds.right - mRightBottomCornerRadius, bounds.bottom);
+            if(mRightBottomCornerRadius > 0){
+                path.arcTo(new RectF(bounds.right - mRightBottomCornerRadius * 2, bounds.bottom -
+                        mRightBottomCornerRadius * 2,
+                        bounds.right, bounds.bottom), 90, -90, false);
+            }
+
+            path.lineTo(bounds.right, bounds.top + mRightTopCornerRadius);
+            if(mRightTopCornerRadius > 0){
+                path.arcTo(new RectF(bounds.right - mRightTopCornerRadius * 2, bounds.top,
+                        bounds.right, bounds.top + mRightTopCornerRadius * 2), 0, -90, false);
+            }
+
+            path.lineTo(bounds.left + mLeftTopCornerRadius, bounds.top);
+            if(mLeftTopCornerRadius > 0){
+                path.arcTo(new RectF(bounds.left, bounds.top,
+                        bounds.left + mLeftTopCornerRadius * 2, bounds.top + mLeftTopCornerRadius * 2), -90, -90,
+                        false);
+            }
+        }
+
+        return path;
+    }
+
     ///是否完全是一个圆，设置这个为true时会忽略 cornerRadius
     public void setShouldAbsoluteCircle(boolean shouldAbsoluteCircle){
         if(shouldAbsoluteCircle != mShouldAbsoluteCircle){
@@ -122,10 +176,53 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
+    //设置圆角半径
+    public void setCornerRadius(int leftTopCornerRadius, int leftBottomCornerRadius, int rightTopCornerRadius, int
+            rightBottomCornerRadius){
+        mCornerRadius = 0;
+        mLeftTopCornerRadius = leftTopCornerRadius;
+        mLeftBottomCornerRadius = leftBottomCornerRadius;
+        mRightTopCornerRadius = rightTopCornerRadius;
+        mRightBottomCornerRadius = rightBottomCornerRadius;
+        invalidateSelf();
+    }
+
     ///设置圆角半径
-    public void setCornerRadius(float cornerRadius) {
+    public void setCornerRadius(int cornerRadius) {
         if(mCornerRadius != cornerRadius){
             mCornerRadius = cornerRadius;
+            mLeftBottomCornerRadius = mCornerRadius;
+            mLeftTopCornerRadius = mCornerRadius;
+            mRightBottomCornerRadius = mCornerRadius;
+            mRightTopCornerRadius = mCornerRadius;
+            invalidateSelf();
+        }
+    }
+
+    public void setLeftTopCornerRadius(int leftTopCornerRadius) {
+        if(mLeftTopCornerRadius != leftTopCornerRadius){
+            mLeftTopCornerRadius = leftTopCornerRadius;
+            invalidateSelf();
+        }
+    }
+
+    public void setRightTopCornerRadius(int rightTopCornerRadius) {
+        if(mRightTopCornerRadius != rightTopCornerRadius){
+            mRightTopCornerRadius = rightTopCornerRadius;
+            invalidateSelf();
+        }
+    }
+
+    public void setLeftBottomCornerRadius(int leftBottomCornerRadius) {
+        if(mLeftBottomCornerRadius != leftBottomCornerRadius){
+            mLeftBottomCornerRadius = leftBottomCornerRadius;
+            invalidateSelf();
+        }
+    }
+
+    public void setRightBottomCornerRadius(int rightBottomCornerRadius) {
+        if(mRightBottomCornerRadius != rightBottomCornerRadius){
+            mRightBottomCornerRadius = rightBottomCornerRadius;
             invalidateSelf();
         }
     }
@@ -152,6 +249,10 @@ public class CornerBorderDrawable extends Drawable {
             mBackgroundColor = backgroundColor;
             invalidateSelf();
         }
+    }
+
+    public void attatchView(View view){
+        attatchView(view, false);
     }
 
     ///如果drawable用于多个view, 使用这个方法 关联view 将copy一份
@@ -189,18 +290,12 @@ public class CornerBorderDrawable extends Drawable {
         if(existBorder){
 
             RectF bounds = new RectF(mRectF);
-            bounds.inset(mBorderWidth, mBorderWidth);
-
-            float radius = mCornerRadius;
-            ///是个圆
-            if(mShouldAbsoluteCircle){
-                radius = Math.max(bounds.width(), bounds.height()) / 2.0f;
-            }
+            bounds.inset(mBorderWidth / 2.0f, mBorderWidth / 2.0f);
 
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setStrokeWidth(mBorderWidth);
             mPaint.setColor(mBorderColor);
-            canvas.drawRoundRect(bounds, radius, radius, mPaint);
+            canvas.drawPath(getPath(bounds), mPaint);
         }
     }
 
@@ -214,17 +309,12 @@ public class CornerBorderDrawable extends Drawable {
             float radius = mCornerRadius;
 
             boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
-            int margin = existBorder ? mBorderWidth / 2 : 0;
+            int margin = existBorder ? mBorderWidth : 0;
             bounds.inset(margin, margin);
-
-            ///是个圆
-            if(mShouldAbsoluteCircle){
-                radius = Math.max(bounds.width(), bounds.height()) / 2.0f;
-            }
 
             mPaint.setColor(mBackgroundColor);
             mPaint.setStyle(Paint.Style.FILL);
-            canvas.drawRoundRect(new RectF(bounds), radius, radius, mPaint);
+            canvas.drawPath(getPath(bounds), mPaint);
         }
     }
 
@@ -235,7 +325,6 @@ public class CornerBorderDrawable extends Drawable {
         if(mBitmapPaint != null){
 
             RectF bounds = new RectF(mRectF);
-            float radius = mCornerRadius;
 
             boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
             int margin = existBorder ? mBorderWidth / 2 : 0;
@@ -247,7 +336,8 @@ public class CornerBorderDrawable extends Drawable {
                 matrix.setScale(bounds.width() / mBitmap.getWidth(), bounds.height() / mBitmap.getHeight());
                 mBitmapShader.setLocalMatrix(matrix);
             }
-            canvas.drawRoundRect(new RectF(bounds), radius, radius, mBitmapPaint);
+
+            canvas.drawPath(getPath(bounds), mBitmapPaint);
         }
     }
 

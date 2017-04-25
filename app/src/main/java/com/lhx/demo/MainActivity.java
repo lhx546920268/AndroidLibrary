@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lhx.demo.dialog.DialogFragment;
+import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.library.activity.AppBaseActivity;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("cycleViewPager(无限轮播viewPager)");
         infos.add("refreshControl(下拉刷新、上拉加载)");
         infos.add("alertController(弹窗 dialog)");
+        infos.add("cornerDrawable(圆角 corner)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -81,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2 :
                         startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, DialogFragment.class));
+                        break;
+                    case 3 :
+                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this,
+                                CornerDrawableFragment.class));
                         break;
                 }
 

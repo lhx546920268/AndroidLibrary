@@ -98,7 +98,7 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     ///获取子视图
-    public View findViewById(int resId){
-        return mContentView.findViewById(resId);
+    public <T extends View> T findViewById(int resId){
+        return (T)mContentView.findViewById(resId);
     }
 }

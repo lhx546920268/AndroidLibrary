@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -33,12 +35,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 /**
- * 弹出控制器
+ * 弹窗控制器
  */
 
 public class AlertController implements DialogInterface.OnDismissListener, View.OnClickListener {
 
-    //警告框
+    //警告框 类似IOS中的  UIAlertView
     public static final int STYLE_ALERT = 0;
 
     //类似IOS中的 UIActionSheet，从底部向上弹出
@@ -64,13 +66,13 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private int mCornerRadius = 10;
 
     //标题字体颜色
-    private int mTitleColor = Color.BLACK;
+    private @ColorInt int mTitleColor = Color.BLACK;
 
     //标题字体大小
-    private int mTitleSize = 17;
+    private @ColorInt int mTitleSize = 17;
 
     //副标题字体颜色
-    private int mSubtitleColor = Color.GRAY;
+    private @ColorInt int mSubtitleColor = Color.GRAY;
 
     //副标题字体大小
     private int mSubtitleSize = 12;
@@ -79,13 +81,13 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private int mButtonTextSize = 15;
 
     //按钮字体颜色
-    private int mButtonTextColor;
+    private @ColorInt int mButtonTextColor;
 
     //警示按钮字体颜色 如删除
-    private int mDestructiveButtonTextColor = Color.RED;
+    private @ColorInt int mDestructiveButtonTextColor = Color.RED;
 
     //无法点击的按钮字体颜色
-    private int mDisableButtonTextColor = Color.GRAY;
+    private @ColorInt int mDisableButtonTextColor = Color.GRAY;
 
     //内容视图
     private LinearLayout mContentView;
@@ -111,6 +113,15 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //分割线大小px
     private int mDividerHeight;
 
+    //标题
+    String mTitle;
+
+    //副标题
+    private String mSubtitle;
+
+    //图标
+    private Drawable mIcon;
+
     //按钮信息
     private String[] mButtonTitles;
 
@@ -126,24 +137,153 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //UI回调
     private AlertUIHandler mAlertUIHander;
 
-    public AlertController(@NonNull Context context, @Style int style, String title, String subtitle, int iconResId,
-                           @NonNull String ... otherButtonTitles) {
+    public static AlertController showAlert(@NonNull Context context, String title, String subtitle, Drawable icon,
+                                            @NonNull String ... otherButtonTitles){
+        return new AlertController(context, STYLE_ALERT, title, subtitle, icon, otherButtonTitles);
+    }
 
+    public static AlertController showAlert(@NonNull Context context, String title,
+                                            @NonNull String ... otherButtonTitles){
+        return new AlertController(context, STYLE_ALERT, title, null, null, otherButtonTitles);
+    }
+
+    public static AlertController showActionSheet(@NonNull Context context, String title, String subtitle, Drawable icon,
+                                                  @NonNull String ... otherButtonTitles){
+        return new AlertController(context, STYLE_ACTION_SHEET, title, subtitle, icon, otherButtonTitles);
+    }
+
+    public static AlertController showActionSheet(@NonNull Context context, String title,
+                                                  @NonNull String ... otherButtonTitles){
+        return new AlertController(context, STYLE_ACTION_SHEET, title, null, null, otherButtonTitles);
+    }
+
+    public AlertController(@NonNull Context context, @Style int style, String title, String subtitle, Drawable icon,
+                           @NonNull String ... otherButtonTitles) {
 
         mContext = context;
         mStyle = style;
+        mTitle = title;
+        mSubtitle = subtitle;
+        mIcon = icon;
         mButtonTitles = otherButtonTitles;
 
         mDividerHeight = SizeUtil.pxFormDip(0.5f, mContext);
         mButtonTextColor = ContextCompat.getColor(mContext, R.color.light_blue);
-        mHighlightBackgroundColor = Color.RED;
+        mHighlightBackgroundColor = ColorUtil.whitePercentColor(0.80f, 1.0f);
+    }
+
+    public void setDialogBackgroundColor(int dialogBackgroundColor) {
+        mDialogBackgroundColor = dialogBackgroundColor;
+    }
+
+    public void setHighlightBackgroundColor(int highlightBackgroundColor) {
+        mHighlightBackgroundColor = highlightBackgroundColor;
+    }
+
+    public void setCornerRadius(int cornerRadius) {
+        mCornerRadius = cornerRadius;
+    }
+
+    public void setTitleColor(@ColorInt int titleColor) {
+        mTitleColor = titleColor;
+    }
+
+    public void setTitleSize(int titleSize) {
+        mTitleSize = titleSize;
+    }
+
+    public void setSubtitleColor(int subtitleColor) {
+        mSubtitleColor = subtitleColor;
+    }
+
+    public void setSubtitleSize(int subtitleSize) {
+        mSubtitleSize = subtitleSize;
+    }
+
+    public void setButtonTextSize(int buttonTextSize) {
+        mButtonTextSize = buttonTextSize;
+    }
+
+    public void setButtonTextColor(int buttonTextColor) {
+        mButtonTextColor = buttonTextColor;
+    }
+
+    public void setDestructiveButtonTextColor(int destructiveButtonTextColor) {
+        mDestructiveButtonTextColor = destructiveButtonTextColor;
+    }
+
+    public void setDisableButtonTextColor(int disableButtonTextColor) {
+        mDisableButtonTextColor = disableButtonTextColor;
+    }
+
+    public void setDividerHeight(int dividerHeight) {
+        mDividerHeight = dividerHeight;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public void setSubtitle(String subtitle) {
+        mSubtitle = subtitle;
+    }
+
+    public void setIcon(Drawable icon) {
+        mIcon = icon;
+    }
+
+    public void setButtonTitles(String[] buttonTitles) {
+        mButtonTitles = buttonTitles;
+    }
+
+    public void setShouldDismissAfterClickItem(boolean shouldDismissAfterClickItem) {
+        mShouldDismissAfterClickItem = shouldDismissAfterClickItem;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    public void setAlertUIHander(AlertUIHandler alertUIHander) {
+        mAlertUIHander = alertUIHander;
+    }
+
+    public LinearLayout getmContentView() {
+        return mContentView;
+    }
+
+    public ImageView getmLogoImageView() {
+        return mLogoImageView;
+    }
+
+    public TextView getmTitleTextView() {
+        return mTitleTextView;
+    }
+
+    public TextView getmSubtitleTextView() {
+        return mSubtitleTextView;
+    }
+
+    public TextView getmCancelTextView() {
+        return mCancelTextView;
+    }
+
+    public LinearLayout getmTopContainer() {
+        return mTopContainer;
+    }
+
+    public RecyclerView getmRecyclertView() {
+        return mRecyclertView;
+    }
+
+    //初始化视图
+    private void initView(){
 
         mContentView = (LinearLayout)View.inflate(mContext, mStyle == STYLE_ALERT ? R.layout.alert_dialog : R.layout
                 .action_sheet_dialog, null);
-
         mLogoImageView = (ImageView)mContentView.findViewById(R.id.logo);
-        if(iconResId != 0){
-            mLogoImageView.setImageResource(iconResId);
+        if(mIcon != null){
+            mLogoImageView.setImageDrawable(mIcon);
         }else {
             mLogoImageView.setVisibility(View.GONE);
         }
@@ -151,19 +291,19 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mTitleTextView = (TextView)mContentView.findViewById(R.id.title);
         mTitleTextView.setTextColor(mTitleColor);
         mTitleTextView.setTextSize(mTitleSize);
-        if(title == null){
+        if(mTitle == null){
             mTitleTextView.setVisibility(View.GONE);
         }else {
-            mTitleTextView.setText(title);
+            mTitleTextView.setText(mTitle);
         }
 
         mSubtitleTextView = (TextView)mContentView.findViewById(R.id.subtitle);
         mSubtitleTextView.setTextColor(mSubtitleColor);
         mSubtitleTextView.setTextSize(mSubtitleSize);
-        if(subtitle == null){
+        if(mSubtitle == null){
             mSubtitleTextView.setVisibility(View.GONE);
         }else {
-            mSubtitleTextView.setText(subtitle);
+            mSubtitleTextView.setText(mSubtitle);
         }
 
         //actionSheet 样式不一样
@@ -175,7 +315,13 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             mCancelTextView.setTextColor(mButtonTextColor);
 
             setBackground(mTopContainer);
-            setHighlightBackground(mCancelTextView);
+            setBackgroundSelector(mCancelTextView);
+
+            //隐藏顶部分割线
+            if(!hasTopContent()){
+                mContentView.findViewById(R.id.divider).setVisibility(View.GONE);
+            }
+
         }else {
             mContentView.setBackgroundColor(mDialogBackgroundColor);
             setBackground(mContentView);
@@ -213,6 +359,9 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     //显示弹窗
     public void show(){
+        if(mContentView == null){
+            initView();
+        }
         if(!mDialog.isShowing()){
             mDialog.show();
         }
@@ -251,6 +400,11 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         return 0;
     }
 
+    //是否有头部内容
+    private boolean hasTopContent(){
+        return mTitle != null || mSubtitle != null || mIcon != null;
+    }
+
     //设置背景
     private void setBackground(View view){
         CornerBorderDrawable drawable = new CornerBorderDrawable();
@@ -260,18 +414,23 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     }
 
     //设置点击效果
-    private void setHighlightBackground(View view){
+    private CornerBorderDrawable[] setBackgroundSelector(View view){
         StateListDrawable stateListDrawable = new StateListDrawable();
 
-        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, new ColorDrawable(mHighlightBackgroundColor));
+        CornerBorderDrawable drawablePressed = new CornerBorderDrawable();
+        drawablePressed.setCornerRadius(mCornerRadius);
+        drawablePressed.setBackgroundColor(mHighlightBackgroundColor);
+        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawablePressed);
+
         CornerBorderDrawable drawable = new CornerBorderDrawable();
         drawable.setCornerRadius(mCornerRadius);
         drawable.setBackgroundColor(mDialogBackgroundColor);
-        drawable.attatchView(view, false);
         stateListDrawable.addState(new int[]{}, drawable);
 
         view.setClickable(true);
         view.setBackground(stateListDrawable);
+
+        return new CornerBorderDrawable[]{drawablePressed, drawable};
     }
 
     //按钮列表适配器
@@ -302,16 +461,43 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             holder.textView.setTextSize(mButtonTextSize);
 
             int color = mButtonTextColor;
+            boolean enable = true;
             //刷新UI
             if(mAlertUIHander != null){
                 if(!mAlertUIHander.shouldEnable(AlertController.this, position)){
                     color = mDisableButtonTextColor;
+                    enable = false;
                 }else if(mAlertUIHander.shouldDestructive(AlertController.this, position)){
                     color = mDestructiveButtonTextColor;
                 }
             }
-
+            holder.itemView.setEnabled(enable);
             holder.textView.setTextColor(color);
+
+            //设置点击效果
+            if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
+                //垂直
+                if(position == 0 && !hasTopContent()){
+                    holder.drawablePressed.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
+                    holder.drawable.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
+                }else if(position == mButtonTitles.length - 1){
+                    holder.drawablePressed.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
+                    holder.drawable.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
+                }else {
+                    holder.drawablePressed.setCornerRadius(0);
+                    holder.drawable.setCornerRadius(0);
+                }
+            }else {
+
+                //水平
+                if(position == 0){
+                    holder.drawablePressed.setCornerRadius(0, mCornerRadius, 0, 0);
+                    holder.drawable.setCornerRadius(0, mCornerRadius, 0, 0);
+                }else {
+                    holder.drawablePressed.setCornerRadius(0, 0, 0, mCornerRadius);
+                    holder.drawable.setCornerRadius(0, 0, 0, mCornerRadius);
+                }
+            }
         }
 
         @Override
@@ -324,11 +510,18 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView textView;
+        CornerBorderDrawable drawable;
+        CornerBorderDrawable drawablePressed;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             textView = (TextView)itemView.findViewById(R.id.text);
+            CornerBorderDrawable[] drawables = setBackgroundSelector(itemView);
+            drawable = drawables[0];
+            drawable.setCornerRadius(0);
+            drawablePressed = drawables[1];
+            drawablePressed.setCornerRadius(0);
         }
     }
 
@@ -350,12 +543,12 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
             super.onDraw(c, parent, state);
 
+            //绘制按钮分割线
             int count = parent.getChildCount();
             for(int i = 0;i < count;i ++){
                 View child = parent.getChildAt(i);
                 int position = parent.getChildAdapterPosition(child);
                 if(position < mButtonTitles.length - 1){
-                    GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams)child.getLayoutParams();
 
                     //垂直排列
                     if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
@@ -365,6 +558,21 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                         mDivider.setBounds(child.getRight(), 0, child.getRight() + mDividerHeight, child.getBottom());
                     }
                     mDivider.draw(c);
+                }
+            }
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            //设置item的偏移量 大小为item+分割线
+            int position = parent.getChildAdapterPosition(view);
+            if(position < mButtonTitles.length - 1){
+                if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
+                    //垂直排列
+                    outRect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom() + mDividerHeight);
+                }else {
+                    //水平
+                    outRect.set(view.getLeft(), view.getTop(), view.getRight() + mDividerHeight, view.getBottom());
                 }
             }
         }
