@@ -16,6 +16,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -50,10 +51,10 @@ public class CornerBorderDrawable extends Drawable {
     private int mBorderWidth = 0;
 
     ///边框线条颜色
-    private int mBorderColor = Color.TRANSPARENT;
+    private @ColorInt int mBorderColor = Color.TRANSPARENT;
 
     ///背景填充颜色
-    private int mBackgroundColor = Color.TRANSPARENT;
+    private @ColorInt int mBackgroundColor = Color.TRANSPARENT;
 
     ///画笔
     private Paint mPaint;
@@ -69,6 +70,21 @@ public class CornerBorderDrawable extends Drawable {
 
     ///范围
     private RectF mRectF;
+
+    public static CornerBorderDrawable setDrawable(View targetView, int cornerRadius, @ColorInt int backgroundColor){
+        return setDrawable(targetView, cornerRadius, backgroundColor, 0, 0);
+    }
+
+    public static CornerBorderDrawable setDrawable(View targetView, int cornerRadius, @ColorInt int backgroundColor,
+                                                   int borderWidth, @ColorInt int borderColor){
+        CornerBorderDrawable drawable = new CornerBorderDrawable();
+        drawable.setCornerRadius(cornerRadius);
+        drawable.setBackgroundColor(backgroundColor);
+        drawable.setBorderWidth(borderWidth);
+        drawable.setBorderColor(borderColor);
+        drawable.attatchView(targetView, false);
+        return drawable;
+    }
 
     public CornerBorderDrawable() {
         initialize();
@@ -236,7 +252,7 @@ public class CornerBorderDrawable extends Drawable {
     }
 
     ///设置边框线条颜色
-    public void setBorderColor(int borderColor) {
+    public void setBorderColor(@ColorInt int borderColor) {
         if(mBorderColor != borderColor){
             mBorderColor = borderColor;
             invalidateSelf();
@@ -244,7 +260,7 @@ public class CornerBorderDrawable extends Drawable {
     }
 
     ///设置背景填充颜色
-    public void setBackgroundColor(int backgroundColor){
+    public void setBackgroundColor(@ColorInt int backgroundColor){
         if(backgroundColor != mBackgroundColor){
             mBackgroundColor = backgroundColor;
             invalidateSelf();

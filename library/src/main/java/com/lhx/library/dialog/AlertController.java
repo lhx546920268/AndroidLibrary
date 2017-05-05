@@ -165,6 +165,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mTitle = title;
         mSubtitle = subtitle;
         mIcon = icon;
+
         mButtonTitles = otherButtonTitles;
 
         mDividerHeight = SizeUtil.pxFormDip(0.5f, mContext);
@@ -232,7 +233,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mIcon = icon;
     }
 
-    public void setButtonTitles(String[] buttonTitles) {
+    public void setButtonTitles(@NonNull String[] buttonTitles) {
         mButtonTitles = buttonTitles;
     }
 
@@ -279,6 +280,10 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //初始化视图
     private void initView(){
 
+        if((mButtonTitles == null || mButtonTitles.length == 0) && mStyle == STYLE_ALERT){
+            mButtonTitles = new String[]{"确定"};
+        }
+
         mContentView = (LinearLayout)View.inflate(mContext, mStyle == STYLE_ALERT ? R.layout.alert_dialog : R.layout
                 .action_sheet_dialog, null);
         mLogoImageView = (ImageView)mContentView.findViewById(R.id.logo);
@@ -320,15 +325,18 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             //隐藏顶部分割线
             if(!hasTopContent()){
                 mContentView.findViewById(R.id.divider).setVisibility(View.GONE);
+            }else {
+                mTopContainer.setPadding(0, SizeUtil.pxFormDip(10, mContext), 0, 0);
             }
 
         }else {
+            mContentView.setPadding(0, SizeUtil.pxFormDip(10, mContext), 0, 0);
             mContentView.setBackgroundColor(mDialogBackgroundColor);
             setBackground(mContentView);
         }
 
         mRecyclertView = (RecyclerView)mContentView.findViewById(R.id.recycler_view);
-        int spanCount = (mButtonTitles.length > 2 || mStyle == STYLE_ACTION_SHEET) ? 1 : 2;
+        int spanCount = (mButtonTitles.length != 2 || mStyle == STYLE_ACTION_SHEET) ? 1 : 2;
         GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
         layoutManager.setOrientation(GridLayoutManager.VERTICAL);
         mRecyclertView.setLayoutManager(layoutManager);
@@ -475,9 +483,9 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             holder.textView.setTextColor(color);
 
             //设置点击效果
-            if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
+            if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
                 //垂直
-                if(position == 0 && !hasTopContent()){
+                if(position == 0 && !hasTopContent() && mStyle == STYLE_ACTION_SHEET){
                     holder.drawablePressed.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
                     holder.drawable.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
                 }else if(position == mButtonTitles.length - 1){
@@ -551,7 +559,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 if(position < mButtonTitles.length - 1){
 
                     //垂直排列
-                    if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
+                    if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
                         mDivider.setBounds(0, child.getBottom(), child.getRight(), child.getBottom() + mDividerHeight);
                     }else {
                         //水平排列
@@ -567,7 +575,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             //设置item的偏移量 大小为item+分割线
             int position = parent.getChildAdapterPosition(view);
             if(position < mButtonTitles.length - 1){
-                if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length > 2){
+                if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
                     //垂直排列
                     outRect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom() + mDividerHeight);
                 }else {

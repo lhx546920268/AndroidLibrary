@@ -2,61 +2,76 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
 
     <!--弹窗demo-->
+    <android.support.design.widget.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        android:id="@+id/tab_layout"
+        app:tabIndicatorHeight="3dp"
+        app:tabIndicatorColor="@color/red"
+        app:tabSelectedTextColor="@color/red"
+        app:tabTextColor="@color/black"/>
+
+    <CheckedTextView
+        android:id="@+id/subtitle_checkbox"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="是否有副标题"
+        android:textColor="@color/black"
+        android:checked="true"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:checkMark="?android:listChoiceIndicatorMultiple"/>
+
+    <CheckedTextView
+        android:id="@+id/title_checkbox"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="是否有标题"
+        android:textColor="@color/black"
+        android:checked="true"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:checkMark="?android:listChoiceIndicatorMultiple"/>
+
+    <CheckedTextView
+        android:id="@+id/logo_checkbox"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="是否有logo"
+        android:textColor="@color/black"
+        android:checked="true"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:checkMark="?android:listChoiceIndicatorMultiple"/>
+
+    <EditText
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_count"
+        android:hint="按钮数量"
+        android:inputType="number"
+        android:textColor="@color/black"
+        android:maxLength="2"
+        />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="alert"
-        android:textColor="@color/black"
-        android:id="@+id/alert_btn"
+        android:id="@+id/show_btn"
+        android:text="show"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
-
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="action_sheet"
-        android:textColor="@color/black"
-        android:id="@+id/sheet_btn"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="alert_btn1"
-        android:textColor="@color/black"
-        android:id="@+id/alert_btn1"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="sheet_btn1"
-        android:textColor="@color/black"
-        android:id="@+id/sheet_btn1"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="alert_btn2"
-        android:textColor="@color/black"
-        android:id="@+id/alert_btn2"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="sheet_btn2"
-        android:textColor="@color/black"
-        android:id="@+id/sheet_btn2"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="10dp"/>
 </LinearLayout>

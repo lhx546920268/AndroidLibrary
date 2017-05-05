@@ -1,0 +1,53 @@
+package com.lhx.library.section;
+
+import android.database.DataSetObserver;
+import android.support.annotation.IntDef;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+
+/**
+ * AbsListView 、RecyclerView 分块
+ */
+public interface SectionHandler {
+
+    ///itemView类型 行
+    int ITEM_TYPE_VIEW = 0;
+
+    ///itemView类型 header
+    int ITEM_TYPE_HEADER = 1;
+
+    ///itemView类型 footer
+    int ITEM_TYPE_FOOTER = 2;
+
+    @IntDef({ITEM_TYPE_VIEW, ITEM_TYPE_HEADER, ITEM_TYPE_FOOTER})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface ItemType{}
+
+    ///section数量
+    int numberOfSection();
+
+    /**
+     * 每个section中的item数量
+     * @param section section下标
+     * @return 该section中item的数量
+     */
+    int numberOfItemInSection(int section);
+
+    /**
+     * 是否需要section的头部
+     * @param section section下标
+     * @return 是否需要
+     */
+    boolean shouldExistSectionHeaderForSection(int section);
+
+    /**
+     * 是否需要section的底部
+     * @param section section下标
+     * @return 是否需要
+     */
+    boolean shouldExistSectionFooterForSection(int section);
+}

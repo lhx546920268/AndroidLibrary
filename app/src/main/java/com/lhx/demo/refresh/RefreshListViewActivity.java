@@ -1,9 +1,9 @@
 package com.lhx.demo.refresh;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,11 +14,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lhx.demo.R;
+import com.lhx.library.listView.AbsListViewSectionAdapter;
 import com.lhx.library.refresh.RefreshControl;
 import com.lhx.library.refresh.RefreshHandler;
 import com.lhx.library.viewHoler.ViewHolder;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * listView下拉刷新 上拉加载
@@ -27,7 +29,7 @@ import java.util.ArrayList;
 public class RefreshListViewActivity extends AppCompatActivity {
 
     final static String TAG = "RefreshListViewActivity";
-    private ArrayList<String> strings = new ArrayList<>();
+    private ArrayList<ArrayList<String>> strings = new ArrayList<>();
     private ListView listView;
     private BaseAdapter adapter;
     private RefreshControl refreshControl;
@@ -87,34 +89,7 @@ public class RefreshListViewActivity extends AppCompatActivity {
         });
 
         listView = (ListView)refreshControl.findViewById(R.id.list_view);
-        adapter = new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return strings.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return 0;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if(convertView == null){
-                    convertView = View.inflate(getBaseContext(), R.layout.main_list_item, null);
-                }
-
-                TextView textView = ViewHolder.get(convertView, R.id.text);
-                textView.setText(strings.get(position));
-
-                return convertView;
-            }
-        };
+        adapter = new Adapter();
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -131,10 +106,91 @@ public class RefreshListViewActivity extends AppCompatActivity {
 
     //添加信息
     private void addItems(int size){
+
+        Random random = new Random();
         for(int i = 0;i < size;i ++){
-            strings.add(Math.random() * 10000 + "");
+            int count = random.nextInt() % 9;
+            ArrayList<String> list = new ArrayList<>();
+            for(int j = 0;j < count;j ++){
+                list.add(Math.random() * 10000 + "");
+            }
+            strings.add(list);
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    private class Adapter extends AbsListViewSectionAdapter {
+
+        @Override
+        public int numberOfSection() {
+            return strings.size();
+        }
+
+        @Override
+        public int numberOfItemInSection(int section) {
+            ArrayList list = strings.get(section);
+            return list.size();
+        }
+
+        @Override
+        public View getViewForIndexPath(int indexInSection, int section, View convertView, ViewGroup parent) {
+            if(convertView == null){
+                convertView = View.inflate(getBaseContext(), R.layout.main_list_item, null);
+            }
+
+            ArrayList<String> list = strings.get(section);
+
+            TextView textView = ViewHolder.get(convertView, R.id.text);
+            textView.setText(list.get(indexInSection));
+
+            return convertView;
+        }
+
+        @Override
+        public boolean shouldExistSectionHeaderForSection(int section) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldExistSectionFooterForSection(int section) {
+            return true;
+        }
+
+        @Override
+        public View getSectionHeaderForSection(int section, View convertView, ViewGroup parent) {
+            if(convertView == null){
+                convertView = View.inflate(getBaseContext(), R.layout.main_list_item, null);
+                convertView.setBackgroundColor(Color.RED);
+            }
+
+            TextView textView = ViewHolder.get(convertView, R.id.text);
+            textView.setText("第" + section + "个 section header");
+
+            return convertView;
+        }
+
+        @Override
+        public View getSectionFooterForSection(int section, View convertView, ViewGroup parent) {
+            if(convertView == null){
+                convertView = View.inflate(getBaseContext(), R.layout.main_list_item, null);
+                convertView.setBackgroundColor(Color.CYAN);
+            }
+
+            TextView textView = ViewHolder.get(convertView, R.id.text);
+            textView.setText("第" + section + "个 section footer");
+
+            return convertView;
+        }
+
+        @Override
+        public int getItemViewTypeForIndexPath(int indexInSection, int section, int type) {
+            return type;
+        }
+
+        @Override
+        public int numberItemViewTypes() {
+            return 3;
+        }
     }
 }

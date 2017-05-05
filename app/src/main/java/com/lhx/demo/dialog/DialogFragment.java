@@ -1,13 +1,19 @@
 package com.lhx.demo.dialog;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
+import android.widget.EditText;
 
 import com.lhx.demo.R;
 import com.lhx.library.dialog.AlertController;
 import com.lhx.library.fragment.AppBaseFragment;
+
+import java.util.ArrayList;
 
 /**
  * 弹窗demo
@@ -15,90 +21,103 @@ import com.lhx.library.fragment.AppBaseFragment;
 
 public class DialogFragment extends AppBaseFragment implements View.OnClickListener {
 
+    CheckedTextView subtitleCheckedTextView;
+    CheckedTextView titleCheckedTextView;
+    CheckedTextView logoCheckedTextView;
+    TabLayout tabLayout;
+    EditText countEditText;
+
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
         mContentView = inflater.inflate(R.layout.dialog_fragment, null);
 
-        findViewById(R.id.alert_btn).setOnClickListener(this);
-        findViewById(R.id.sheet_btn).setOnClickListener(this);
-        findViewById(R.id.sheet_btn1).setOnClickListener(this);
-        findViewById(R.id.alert_btn1).setOnClickListener(this);
-        findViewById(R.id.sheet_btn2).setOnClickListener(this);
-        findViewById(R.id.alert_btn2).setOnClickListener(this);
+        findViewById(R.id.show_btn).setOnClickListener(this);
+
+        tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+        tabLayout.addTab(tabLayout.newTab().setText("alert"));
+        tabLayout.addTab(tabLayout.newTab().setText("actionSheet"));
+        countEditText = findViewById(R.id.btn_count);
+        subtitleCheckedTextView = findViewById(R.id.subtitle_checkbox);
+        titleCheckedTextView = findViewById(R.id.title_checkbox);
+        logoCheckedTextView = findViewById(R.id.logo_checkbox);
+        subtitleCheckedTextView.setOnClickListener(this);
+        titleCheckedTextView.setOnClickListener(this);
+        logoCheckedTextView.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id){
-            case R.id.alert_btn : {
-                AlertController controller = new AlertController(mActivity, AlertController.STYLE_ALERT, "弹窗显示了",
-                        "弹窗真的显示了", null, "确定", "取消");
-                controller.show();
+            case R.id.show_btn : {
+                String title = null;
+                if(titleCheckedTextView.isChecked()){
+                    title = "标题";
+                }
+
+                String subtitle = null;
+                if(subtitleCheckedTextView.isChecked()){
+                    subtitle = "副标题";
+                }
+
+                int count = 0;
+                try {
+                    count = Integer.parseInt(countEditText.getText().toString());
+                }catch (NumberFormatException e){
+
+                }
+                String[] strings = null;
+                if(count > 0){
+                    strings = new String[count];
+                    for(int i = 0;i < count;i ++){
+                        strings[i] = "按钮" + (i + 1);
+                    }
+                }
+
+                switch (tabLayout.getSelectedTabPosition()){
+                    case 0 : {
+                        AlertController controller = AlertController.showAlert(mActivity, title, subtitle,
+                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
+                                        .ic_launcher) : null, strings);
+                        controller.show();
+                    }
+                    break;
+                    case 1 : {
+                        AlertController controller = AlertController.showActionSheet(mActivity, title, subtitle,
+                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
+                                        .ic_launcher) : null, strings);
+                        controller.show();
+                    }
+                    break;
+                }
             }
+            break;
+            case R.id.title_checkbox :
+                titleCheckedTextView.setChecked(!titleCheckedTextView.isChecked());
                 break;
-            case R.id.sheet_btn : {
-                AlertController controller = new AlertController(mActivity, AlertController.STYLE_ACTION_SHEET, "弹窗显示了",
-                        "弹窗真的显示了", null, "确定", "删除");
-                controller.show();
-            }
+            case R.id.subtitle_checkbox :
+                subtitleCheckedTextView.setChecked(!subtitleCheckedTextView.isChecked());
                 break;
-            case R.id.sheet_btn1 :{
-                AlertController controller = AlertController.showActionSheet(mActivity, "弹窗显示了", "确定", "删除");
-                controller.show();
-            }
-            break;
-
-            case R.id.alert_btn1 :{
-                AlertController controller = AlertController.showAlert(mActivity, "弹窗显示了", "确定");
-                controller.show();
-            }
-            break;
-
-            case R.id.sheet_btn2 :{
-                AlertController controller = AlertController.showActionSheet(mActivity, null, "确定", "删除");
-                controller.setAlertUIHander(new AlertController.AlertUIHandler() {
-                    @Override
-                    public void onDismiss(AlertController controller) {
-
-                    }
-
-                    @Override
-                    public boolean shouldDestructive(AlertController controller, int index) {
-                        return index == 1;
-                    }
-
-                    @Override
-                    public boolean shouldEnable(AlertController controller, int index) {
-                        return index == 0;
-                    }
-                });
-                controller.show();
-            }
-            break;
-
-            case R.id.alert_btn2 :{
-                AlertController controller = AlertController.showActionSheet(mActivity, null, "弹窗真的显示了", "确定", "删除");
-                controller.setAlertUIHander(new AlertController.AlertUIHandler() {
-                    @Override
-                    public void onDismiss(AlertController controller) {
-
-                    }
-
-                    @Override
-                    public boolean shouldDestructive(AlertController controller, int index) {
-                        return index == 1;
-                    }
-
-                    @Override
-                    public boolean shouldEnable(AlertController controller, int index) {
-                        return index == 0;
-                    }
-                });
-                controller.show();
-            }
-            break;
+            case R.id.logo_checkbox :
+                logoCheckedTextView.setChecked(!logoCheckedTextView.isChecked());
+                break;
         }
     }
 
