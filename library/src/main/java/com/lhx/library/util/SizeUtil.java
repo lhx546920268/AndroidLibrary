@@ -33,7 +33,7 @@ public class SizeUtil{
      * @param spValue 要转换的sp值
      * @return sp值
      */
-    public static int pxFromSp( float spValue, Context context) {
+    public static int pxFromSp(float spValue, Context context) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }

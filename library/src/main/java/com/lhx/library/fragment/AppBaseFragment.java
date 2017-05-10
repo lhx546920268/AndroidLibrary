@@ -1,6 +1,7 @@
 package com.lhx.library.fragment;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
 import com.lhx.library.util.SizeUtil;
 
@@ -101,4 +103,18 @@ public abstract class AppBaseFragment extends Fragment {
     public <T extends View> T findViewById(int resId){
         return (T)mContentView.findViewById(resId);
     }
+
+    //启动一个带activity的fragment
+    public void startActivity(Class fragmentClass){
+        startActivity(fragmentClass, null);
+    }
+
+    public void startActivity(Class fragmentClass, Bundle bundle){
+        Intent intent = AppBaseActivity.openActivityWithFragment(mActivity, fragmentClass);
+        if(bundle != null){
+            intent.putExtras(bundle);
+        }
+        startActivity(intent);
+    }
+
 }

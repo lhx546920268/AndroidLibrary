@@ -38,7 +38,7 @@ public class CyclePagerActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TabLayout
+
         setContentView(R.layout.cycle_pager_activity);
         viewPager = (ViewPager)findViewById(R.id.view_pager);
 
