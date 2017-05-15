@@ -11,10 +11,13 @@ import android.util.Log;
 import com.lhx.library.util.FileUtil;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
@@ -23,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -175,6 +179,8 @@ public class HttpRequest {
             mConn = (HttpURLConnection) url.openConnection();
             mConn.setReadTimeout(mTimeoutInterval);
             mConn.setConnectTimeout(mTimeoutInterval);
+            mConn.setRequestProperty("Connection", "Keep-Alive");
+
             if (mParams.size() > 0) {
                 mConn.setRequestMethod("POST");
                 buildPostBody();
@@ -188,9 +194,8 @@ public class HttpRequest {
                 fail(ERROR_CODE_HTTP, code);
             }
 
-            mConn.getContentLength()
             InputStream is = mConn.getInputStream();
-
+            byte[] bytes = readInputStream(is);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             fail(ERROR_CODE_BAD_URL, 0);
@@ -394,6 +399,27 @@ public class HttpRequest {
         inputStream.close();
 
         return len;
+    }
+
+    //把输入流转成字节流
+    private byte[] readInputStream(InputStream inputStream){
+        try {
+            byte[] bytes = new byte[1024 * 256];
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            while (inputStream.read(bytes) != -1){
+                outputStream.write(bytes);
+            }
+
+            bytes = outputStream.toByteArray();
+            outputStream.close();
+
+            return bytes;
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     //判断是否存在文件
