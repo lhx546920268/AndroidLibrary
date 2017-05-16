@@ -2,5 +2,10 @@
 <resources>
     <item name="left_navigation_item" type="id"/>
     <item name="right_navigation_item" type="id"/>
+
+    <!--listView-->
     <integer name="list_view_tag_key">999988</integer>
+
+    <!--viewpager-->
+    <integer name="view_pager_position_tag_key">999987</integer>
 </resources>

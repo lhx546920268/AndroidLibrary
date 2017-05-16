@@ -9,6 +9,8 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lhx.library.R;
+
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -89,6 +91,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             }
 
             View view = (View)object;
+            view.setTag(R.integer.view_pager_position_tag_key, position);
             container.addView(view);
             views.add(view);
 
@@ -197,6 +200,40 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
         if(getCount() > 0){
             mViewPager.setCurrentItem(0, false);
         }
+    }
+
+    //获取当前已预载的view
+    public HashSet<View> getReloadingViews(){
+
+        HashSet<View> views = new HashSet<>();
+        for(int i = 0;i < mVisibleViews.size();i ++){
+            HashSet<View> viewHashSet = mVisibleViews.get(mVisibleViews.keyAt(i));
+            views.addAll(viewHashSet);
+        }
+
+        return views;
+    }
+
+    //获取对应position的view，如果不存在，则返回null
+    public View getViewForPosition(int position){
+        for(int i = 0;i < mVisibleViews.size();i ++){
+            HashSet<View> viewHashSet = mVisibleViews.get(mVisibleViews.keyAt(i));
+            Iterator<View> iterator = viewHashSet.iterator();
+            while (iterator.hasNext()){
+                View view = iterator.next();
+                int tag = (int)view.getTag(R.integer.view_pager_position_tag_key);
+                if(tag == position)
+                    return view;
+            }
+        }
+
+        return null;
+    }
+
+    //获取当前显示的view
+    public View getCurrentView(){
+
+        return getViewForPosition(mViewPager.getCurrentItem());
     }
 
     /**
