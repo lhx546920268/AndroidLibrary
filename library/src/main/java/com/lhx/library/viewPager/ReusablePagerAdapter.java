@@ -38,6 +38,13 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     //可重用的view中的 subview
     private SparseArray<HashSet<View>> mReusedSubviews = new SparseArray<>();
 
+    //是否有子视图
+    private boolean mExistSubview = false;
+
+    public void setExistSubview(boolean existSubview) {
+        mExistSubview = existSubview;
+    }
+
     public ReusablePagerAdapter(ViewPager viewPager) {
         this.mViewPager = viewPager;
 
@@ -86,7 +93,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             views.add(view);
 
             //获取可重用的子视图
-            if(view instanceof ViewGroup) {
+            if(mExistSubview && view instanceof ViewGroup) {
                 int count = numberOfSubviewInPage(realPosition);
                 ViewGroup viewGroup = (ViewGroup)view;
                 for(int i = 0;i < count;i ++){
@@ -146,7 +153,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             destroyItemForRealPosition(view, realPosition, type, object);
 
             //子视图
-            if(view instanceof ViewGroup){
+            if(mExistSubview && view instanceof ViewGroup){
                 ViewGroup viewGroup = (ViewGroup)view;
                 int count = numberOfSubviewInPage(realPosition);
                 for(int i = 0;i < count;i ++){
