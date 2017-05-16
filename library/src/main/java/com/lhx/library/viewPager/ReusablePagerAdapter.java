@@ -181,7 +181,6 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     public void notifyDataSetChanged() {
         mChildCount = getCount();
         super.notifyDataSetChanged();
-        scrollToFirstPosition();
     }
 
     @Override
