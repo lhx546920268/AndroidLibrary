@@ -25,9 +25,6 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     //关联的viewPager
     protected ViewPager mViewPager;
 
-    //子视图数量，用于notify刷新
-    protected int mChildCount = 0;
-
     //当前显示出来的view
     private SparseArray<HashSet<View>> mVisibleViews = new SparseArray<>();
 
@@ -91,7 +88,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             }
 
             View view = (View)object;
-            view.setTag(R.integer.view_pager_position_tag_key, position);
+            view.setTag(R.integer.view_pager_position_tag_key, realPosition);
             container.addView(view);
             views.add(view);
 
@@ -182,17 +179,18 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
 
     @Override
     public void notifyDataSetChanged() {
-        mChildCount = getCount();
         super.notifyDataSetChanged();
-    }
 
-    @Override
-    public int getItemPosition(Object object) {
-        if ( mChildCount > 0) {
-            mChildCount --;
-            return POSITION_NONE;
+        //viewPager 本身是不会刷新的，要手动刷新可见视图
+        for(int i = 0;i < mVisibleViews.size();i ++){
+            HashSet<View> viewHashSet = mVisibleViews.get(mVisibleViews.keyAt(i));
+            Iterator<View> iterator = viewHashSet.iterator();
+            while (iterator.hasNext()){
+                View view = iterator.next();
+                int position = (int)view.getTag(R.integer.view_pager_position_tag_key);
+                instantiateItemForRealPosition(view, position, getViewType(position));
+            }
         }
-        return super.getItemPosition(object);
     }
 
     //移动到第一个位置
@@ -316,5 +314,6 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     public void destorySubview(View convertView, int position, int subviewPosition, int subviewType){
 
     }
+
 
 }

@@ -16,6 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +37,8 @@ public class CyclePagerActivity extends AppCompatActivity {
     ViewPager viewPager;
     CyclePagerAdapter adapter;
     int count = 3;
+
+    boolean show = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,13 +77,66 @@ public class CyclePagerActivity extends AppCompatActivity {
 
                 if(convertView == null){
 
-                    LinearLayout linearLayout = new LinearLayout(getBaseContext());
-                    linearLayout.setWeightSum(4);
-                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams
-                            .MATCH_PARENT,
-                            100);
-                    linearLayout.setLayoutParams(layoutParams);
-                    convertView = linearLayout;
+//                    LinearLayout linearLayout = new LinearLayout(getBaseContext());
+//                    linearLayout.setWeightSum(4);
+//                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams
+//                            .MATCH_PARENT,
+//                            100);
+//                    linearLayout.setLayoutParams(layoutParams);
+//                    convertView = linearLayout;
+                    convertView = View.inflate(getBaseContext(), R.layout.page_item, null);
+                    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(720, 1280);
+                    convertView.setLayoutParams(params);
+
+                    final GridView gridView = (GridView)convertView.findViewById(R.id.grid_view);
+
+                    final BaseAdapter baseAdapter = new BaseAdapter() {
+                        @Override
+                        public int getCount() {
+                            return 20;
+                        }
+
+                        @Override
+                        public Object getItem(int position) {
+                            return null;
+                        }
+
+                        @Override
+                        public long getItemId(int position) {
+                            return 0;
+                        }
+
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            if(convertView == null){
+                                TextView textView = new TextView(getBaseContext());
+
+                                convertView = textView;
+                            }
+
+                            TextView textView = (TextView)convertView;
+                            textView.setText("第" + position + "个");
+                            if(show){
+                                textView.setBackgroundColor(Color.LTGRAY);
+                            }else {
+                                textView.setBackgroundColor(Color.GRAY);
+                            }
+
+                            return textView;
+                        }
+                    };
+                    gridView.setAdapter(baseAdapter);
+
+                    gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            show = !show;
+                            adapter.notifyDataSetChanged();
+                            return true;
+                        }
+                    });
                 }
 
                 switch (position){
@@ -98,6 +157,10 @@ public class CyclePagerActivity extends AppCompatActivity {
                         break;
                 }
 
+                GridView gridView = (GridView)convertView.findViewById(R.id.grid_view);
+                BaseAdapter baseAdapter = (BaseAdapter)gridView.getAdapter();
+                baseAdapter.notifyDataSetChanged();
+
                 return convertView;
             }
 
@@ -116,17 +179,23 @@ public class CyclePagerActivity extends AppCompatActivity {
                     layoutParams.gravity = Gravity.CENTER_VERTICAL;
                     layoutParams.setMargins(10, 0, 10, 0);
                     textView.setLayoutParams(layoutParams);
-                    textView.setBackgroundColor(Color.GRAY);
+
                     convertView = textView;
                 }
 
                 TextView textView = (TextView)convertView;
                 textView.setText("第" + subviewPosition + "个");
+                if(show){
+                    textView.setBackgroundColor(Color.LTGRAY);
+                }else {
+                    textView.setBackgroundColor(Color.GRAY);
+                }
 
                 return textView;
             }
         };
-        adapter.setShouldAutoPlay(true);
+
+        adapter.setShouldAutoPlay(false);
 
         viewPager.setAdapter(adapter);
 
