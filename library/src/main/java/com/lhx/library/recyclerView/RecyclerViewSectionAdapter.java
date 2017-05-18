@@ -1,16 +1,12 @@
 package com.lhx.library.recyclerView;
 
-import android.support.annotation.IntDef;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.lhx.library.section.RecyclerViewSectionHandler;
 import com.lhx.library.section.SectionInfo;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 /**

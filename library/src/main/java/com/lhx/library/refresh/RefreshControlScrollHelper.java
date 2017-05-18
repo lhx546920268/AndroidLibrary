@@ -2,6 +2,7 @@ package com.lhx.library.refresh;
 
 import android.support.annotation.IntDef;
 import android.widget.Scroller;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

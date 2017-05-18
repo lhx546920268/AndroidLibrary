@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.drawable.CornerDrawableFragment;
+import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("alertController(弹窗 dialog)");
         infos.add("cornerDrawable(圆角 corner)");
         infos.add("TabLayout(横向条形菜单)");
+        infos.add("HttpAsyncTask");
 
 
         ListView listView = (ListView)findViewById(R.id.list_view);
@@ -93,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4 :
                         startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, TabLayoutFragment.class));
+                        break;
+                    case 5 :
+                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, HttpFragment.class));
                         break;
                 }
 

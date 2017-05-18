@@ -7,11 +7,11 @@ package com.lhx.library.http;
 public interface HttpRequestHandler {
 
     //请求成功
-    void onSuccess(String result);
+    void onSuccess(HttpAsyncTask task, byte[] result);
 
     //请求失败
-    void onFail(int errorCode, int httpCode);
+    void onFail(HttpAsyncTask task, int errorCode, int httpCode);
 
     //请求完成，无论是成功还是失败都会调用
-    void onComplete();
+    void onComplete(HttpAsyncTask task);
 }

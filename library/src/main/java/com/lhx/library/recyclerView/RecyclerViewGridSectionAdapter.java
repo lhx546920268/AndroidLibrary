@@ -10,7 +10,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.lhx.library.section.EdgeInsets;
 import com.lhx.library.section.GridSectionInfo;

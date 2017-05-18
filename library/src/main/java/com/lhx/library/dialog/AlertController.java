@@ -29,10 +29,8 @@ import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.ColorUtil;
 import com.lhx.library.util.SizeUtil;
 
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
 
 /**
  * 弹窗控制器

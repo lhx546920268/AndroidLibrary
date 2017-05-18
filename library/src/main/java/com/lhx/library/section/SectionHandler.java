@@ -1,13 +1,9 @@
 package com.lhx.library.section;
 
-import android.database.DataSetObserver;
 import android.support.annotation.IntDef;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
 
 /**
  * AbsListView 、RecyclerView 分块

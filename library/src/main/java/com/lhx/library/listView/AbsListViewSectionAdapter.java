@@ -4,13 +4,14 @@ import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 
 import com.lhx.library.R;
 import com.lhx.library.section.AbsListViewSectionHandler;
-import com.lhx.library.section.SectionInfo;;
+import com.lhx.library.section.SectionInfo;
 
 import java.util.ArrayList;
+
+;
 
 /**
  * 把AbsListView 分成多个section

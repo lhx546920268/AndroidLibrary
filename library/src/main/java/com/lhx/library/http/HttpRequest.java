@@ -1,23 +1,18 @@
 package com.lhx.library.http;
 
-import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.lhx.library.util.FileUtil;
-
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
@@ -26,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -39,11 +33,13 @@ public class HttpRequest {
     private static final String TAG = "HttpRequest";
 
     //请求失败错误码
-    public static final int ERROR_CODE_HTTP = -1; //http错误
-    public static final int ERROR_CODE_TIME_OUT = 0; //请求超时
-    public static final int ERROR_CODE_BAD_URL = 1; //url 不合法
-    public static final int ERROR_CODE_IO = 2; //输入输出流异常
-    public static final int ERROR_CODE_FILE_NOT_EXIST = 3; //上传文件文件不存在
+    public static final int ERROR_CODE_NONE = 0; //请求成功 没有错误
+    public static final int ERROR_CODE_HTTP = 1; //http错误
+    public static final int ERROR_CODE_TIME_OUT = 2; //请求超时
+    public static final int ERROR_CODE_BAD_URL = 3; //url 不合法
+    public static final int ERROR_CODE_IO = 4; //输入输出流异常
+    public static final int ERROR_CODE_FILE_NOT_EXIST = 5; //上传文件文件不存在
+    public static final int ERROR_CODE_NOT_KNOW = 6; //未知错误
 
     //postBody 默认格式
     protected static final String URL_ENCODE = "application/x-www-form-urlencoded";
@@ -68,28 +64,49 @@ public class HttpRequest {
     protected HttpURLConnection mConn;
 
     //请求URL
-    String mURL;
-
-    //请求回调
-    HttpRequestHandler mHttpRequestHandler;
+    protected String mURL;
 
     //参数信息
-    ArrayList<Param> mParams = new ArrayList<>();
+    protected ArrayList<Param> mParams = new ArrayList<>();
 
-    //参数编码类型
-    String mStringEncoding = "utf-8";
-
-    //post body
-    String mPostBody;
+    //编码类型
+    protected String mStringEncoding = "utf-8";
 
     //超时 毫秒
-    int mTimeoutInterval = 30000;
+    protected int mTimeoutInterval = 30000;
 
     //上传总大小
-    int mUploadTotalSize = 0;
+    protected long mTotalSizeToUpload = 0;
 
     //下载总大小
-    int mDownloadTotalSize = 0;
+    protected long mTotalSizeToDownload = 0;
+
+    //http响应码
+    protected int mHttpResponseCode;
+
+    //错误码
+    protected int mErrorCode = ERROR_CODE_NONE;
+
+    //请求返回的数据
+    protected byte[] mResponseData;
+
+    //下载路径 如果已设置，下载完成后将会把文件移到这里
+    private String mDownloadDestinationPath;
+
+    //下载临时文件，下载的内容将保存在这里，如果没有设置，下载后的数据将保存在内存中 ,文件类型会根据 contentType 中的mimeType来设置
+    private String mDownloadTemporayPath;
+
+    //是否根据下载内容的大小自动判断使用临时文件保存下载数据
+    private boolean mUseDownTemporayFileAutomatically = true;
+
+    //当下载的内容达到这个值时将使用临时文件
+    private long mUseDownTemporayFileSize = 1024 * 256;
+
+    //当请求完成时是否删除临时文件
+    private boolean mShouldDeleteDownloadTemporayFileAfterFinish = true;
+
+    //是否已经关闭
+    private boolean mClose;
 
     //post 请求参数格式
     private
@@ -126,8 +143,63 @@ public class HttpRequest {
         mTimeoutInterval = timeoutInterval;
     }
 
-    public void setHttpRequestHandler(HttpRequestHandler httpRequestHandler) {
-        mHttpRequestHandler = httpRequestHandler;
+    public byte[] getResponseData(){
+        if(mResponseData == null){
+            if(mDownloadTemporayPath != null){
+                mResponseData = FileUtil.readFile(mDownloadTemporayPath);
+            }else if(mDownloadDestinationPath != null) {
+                mResponseData = FileUtil.readFile(mDownloadDestinationPath);
+            }
+        }
+        return mResponseData;
+    }
+
+    public int getErrorCode(){
+        return mErrorCode;
+    }
+
+    public int getHttpResponseCode(){
+        return mHttpResponseCode;
+    }
+
+    public String getDownloadDestinationPath() {
+        return mDownloadDestinationPath;
+    }
+
+    public void setDownloadDestinationPath(String path) {
+        mDownloadDestinationPath = path;
+    }
+
+    public String getDownloadTemporayPath() {
+        return mDownloadTemporayPath;
+    }
+
+    public void setDownloadTemporayPath(String filePath) {
+        mDownloadTemporayPath = filePath;
+    }
+
+    public boolean isUseDownTemporayFileAutomatically() {
+        return mUseDownTemporayFileAutomatically;
+    }
+
+    public void setUseDownTemporayFileAutomatically(boolean flag) {
+        mUseDownTemporayFileAutomatically = flag;
+    }
+
+    public long getUseDownTemporayFileSize() {
+        return mUseDownTemporayFileSize;
+    }
+
+    public void setUseDownTemporayFileSize(long size) {
+        mUseDownTemporayFileSize = size;
+    }
+
+    public boolean shouldDeleteDownloadTemporayFileAfterFinish() {
+        return mShouldDeleteDownloadTemporayFileAfterFinish;
+    }
+
+    public void setShouldDeleteDownloadTemporayFileAfterFinish(boolean flag) {
+        mShouldDeleteDownloadTemporayFileAfterFinish = flag;
     }
 
     public HttpRequest(String URL) {
@@ -172,8 +244,13 @@ public class HttpRequest {
         }
     }
 
-    //开启请求任务
-    public void startRequest() {
+    /**开启请求任务
+     * @return 是否成功
+     */
+    public boolean startRequest() {
+        if(mClose){
+            throw new IllegalStateException("HttpRequest have been close");
+        }
         try {
             URL url = new URL(mURL);
             mConn = (HttpURLConnection) url.openConnection();
@@ -188,14 +265,25 @@ public class HttpRequest {
                 mConn.setRequestMethod("GET");
             }
 
-            int code = mConn.getResponseCode();
+            mHttpResponseCode = mConn.getResponseCode();
             //http 304 是读本地缓存时返回的
-            if ((code < 200 || code > 299) && code != 304) {
-                fail(ERROR_CODE_HTTP, code);
+            if ((mHttpResponseCode < 200 || mHttpResponseCode > 299) && mHttpResponseCode != 304) {
+                fail(ERROR_CODE_HTTP, mHttpResponseCode);
+                return false;
             }
 
+            mTotalSizeToDownload = mConn.getContentLength();
             InputStream is = mConn.getInputStream();
-            byte[] bytes = readInputStream(is);
+            if(mDownloadTemporayPath != null){
+                writeToFile(is);
+            }else {
+                if(mUseDownTemporayFileAutomatically && mTotalSizeToDownload >= mUseDownTemporayFileSize){
+                    writeToFile(is);
+                }else {
+                    mResponseData = readInputStream(is);
+                }
+            }
+            return true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
             fail(ERROR_CODE_BAD_URL, 0);
@@ -203,13 +291,26 @@ public class HttpRequest {
             ioe.printStackTrace();
             fail(ERROR_CODE_IO, 0);
         }
+
+        fail(ERROR_CODE_NOT_KNOW, 0);
+        return false;
     }
 
     //请求失败
     private void fail(int code, int httpCode) {
-        if (mHttpRequestHandler != null) {
-            mHttpRequestHandler.onFail(code, httpCode);
-            mHttpRequestHandler.onComplete();
+        mHttpResponseCode = httpCode;
+        code = code;
+    }
+
+    //关闭 http 释放资源
+    public void close(){
+        if(mClose)
+            return;
+        mClose = true;
+        mConn = null;
+        mResponseData = null;
+        if(mShouldDeleteDownloadTemporayFileAfterFinish && mDownloadTemporayPath != null){
+            FileUtil.deleteFile(mDownloadTemporayPath);
         }
     }
 
@@ -258,7 +359,7 @@ public class HttpRequest {
     }
 
     //构建post body
-    private void buildPostBody() {
+    private void buildPostBody() throws IOException {
         if (mParams.size() == 0 || mConn == null)
             return;
         switch (mPostBodyFormat) {
@@ -279,7 +380,12 @@ public class HttpRequest {
     }
 
     //构建 URL encode 类型的
-    private void buildURLEncodePostBody() {
+    private void buildURLEncodePostBody() throws IOException{
+        mConn.setDoOutput(true);
+        OutputStream outputStream = mConn.getOutputStream();
+
+        mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s", URL_ENCODE, CHAR_SET,
+                mStringEncoding));
         StringBuilder builder = new StringBuilder();
 
         int i = 0;
@@ -293,93 +399,92 @@ public class HttpRequest {
             i++;
         }
 
-        mPostBody = builder.toString();
-        mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s", URL_ENCODE, CHAR_SET,
-                mStringEncoding));
-        Log.d(TAG, mPostBody);
+        String postBody = builder.toString();
+        byte[] bytes = postBody.getBytes(mStringEncoding);
+        outputStream.write(bytes);
+
+        mConn.setRequestProperty("Content-Length", bytes.length + "");
+        mTotalSizeToUpload = bytes.length;
+
+        outputStream.flush();
+        outputStream.close();
     }
 
     //构建multi part form data 类型的，上传文件必须用此类型
-    private void buildMultiPartFormDataPostBody() {
+    private void buildMultiPartFormDataPostBody() throws IOException, FileNotFoundException{
+        mConn.setDoOutput(true);
+        OutputStream outputStream = mConn.getOutputStream();
 
-        try {
-            mConn.setDoOutput(true);
-            OutputStream outputStream = mConn.getOutputStream();
+        ///form data 边界
+        String boundary = "0xKhTmLbOuNdArY-" + Build.SERIAL;
 
-            ///form data 边界
-            String boundary = "0xKhTmLbOuNdArY-" + Build.SERIAL;
-
-            //格式类型
-            mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s; boundary=%s", MULTI_PART_FORM_DATA,
-                    CHAR_SET, mStringEncoding, boundary));
-            if (isExistFile()) {
-                mConn.setChunkedStreamingMode(0); //分块上传，防止内存过大
-            }
-
-            //每个参数的分隔符
-            String paramSeparator = String.format(Locale.getDefault(), "\r\n--%s\r\n", boundary);
-
-            //数据总长度
-            int totalSize = 0;
-
-            //添加开始边界
-            byte[] bytes = String.format(Locale.getDefault(), "--%s\r\n", boundary).getBytes(mStringEncoding);
-            outputStream.write(bytes);
-            totalSize += bytes.length;
-
-            int i = 0;
-
-            for(Param param : mParams){
-                StringBuilder builder = new StringBuilder();
-                switch (param.type){
-                    case Param.PARAM_TYPE_NORMAL : {
-                        builder.append("Content-Disposition: form-data; name=\"");
-                        builder.append(param.key);
-                        builder.append("\"\r\n");
-                        builder.append(param.value);
-                        bytes = builder.toString().getBytes(mStringEncoding);
-                        outputStream.write(bytes);
-                        totalSize += bytes.length;
-
-                        break;
-                    }
-                    case Param.PARAM_TYPE_FILE : {
-                        builder.append("Content-Disposition: form-data; name=\"");
-                        builder.append(param.key);
-                        builder.append("\"; filename=\"");
-                        builder.append(param.file.getName());
-                        builder.append("\"\r\n");
-                        builder.append("Content-Type: ");
-                        builder.append(FileUtil.getMimeType(param.file.getAbsolutePath()));
-                        builder.append("\r\n");
-
-                        bytes = builder.toString().getBytes(mStringEncoding);
-                        outputStream.write(bytes);
-                        totalSize += bytes.length;
-                        totalSize += readFile(param.file, outputStream);
-
-                        break;
-                    }
-                }
-                if(i != mParams.size() - 1){
-                    outputStream.write(paramSeparator.getBytes());
-                }
-            }
-
-            //添加结束边界
-            outputStream.write(String.format(Locale.getDefault(), "\r\n--%s--\r\n", boundary).getBytes
-                    (mStringEncoding));
-
-            mConn.setRequestProperty("Content-Length", totalSize + "");
-            mUploadTotalSize = totalSize;
-
-            outputStream.flush();
-            outputStream.close();
-
-        }catch (IOException ioe){
-            ioe.printStackTrace();
-            fail(ERROR_CODE_IO, 0);
+        //格式类型
+        mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s; boundary=%s",
+                MULTI_PART_FORM_DATA,
+                CHAR_SET, mStringEncoding, boundary));
+        if (isExistFile()) {
+            mConn.setChunkedStreamingMode(0); //分块上传，防止内存过大
         }
+
+        //每个参数的分隔符
+        String paramSeparator = String.format(Locale.getDefault(), "\r\n--%s\r\n", boundary);
+
+        //数据总长度
+        int totalSize = 0;
+
+        //添加开始边界
+        byte[] bytes = String.format(Locale.getDefault(), "--%s\r\n", boundary).getBytes(mStringEncoding);
+        outputStream.write(bytes);
+        totalSize += bytes.length;
+
+        int i = 0;
+
+        for (Param param : mParams) {
+            StringBuilder builder = new StringBuilder();
+            switch (param.type) {
+                case Param.PARAM_TYPE_NORMAL: {
+                    builder.append("Content-Disposition: form-data; name=\"");
+                    builder.append(param.key);
+                    builder.append("\"\r\n");
+                    builder.append(param.value);
+                    bytes = builder.toString().getBytes(mStringEncoding);
+                    outputStream.write(bytes);
+                    totalSize += bytes.length;
+
+                    break;
+                }
+                case Param.PARAM_TYPE_FILE: {
+                    builder.append("Content-Disposition: form-data; name=\"");
+                    builder.append(param.key);
+                    builder.append("\"; filename=\"");
+                    builder.append(param.file.getName());
+                    builder.append("\"\r\n");
+                    builder.append("Content-Type: ");
+                    builder.append(FileUtil.getMimeType(param.file.getAbsolutePath()));
+                    builder.append("\r\n");
+
+                    bytes = builder.toString().getBytes(mStringEncoding);
+                    outputStream.write(bytes);
+                    totalSize += bytes.length;
+                    totalSize += readFile(param.file, outputStream);
+
+                    break;
+                }
+            }
+            if (i != mParams.size() - 1) {
+                outputStream.write(paramSeparator.getBytes());
+            }
+        }
+
+        //添加结束边界
+        outputStream.write(String.format(Locale.getDefault(), "\r\n--%s--\r\n", boundary).getBytes
+                (mStringEncoding));
+
+        mConn.setRequestProperty("Content-Length", totalSize + "");
+        mTotalSizeToUpload = totalSize;
+
+        outputStream.flush();
+        outputStream.close();
     }
 
     //读取文件
@@ -390,11 +495,11 @@ public class HttpRequest {
         do {
             byte[] bytes = new byte[1024 * 256];
             result = inputStream.read(bytes);
-            outputStream.write(bytes);
-            if(result != -1){
+            outputStream.write(bytes, 0, result); //写入实际大小
+            if (result != -1) {
                 len += result;
             }
-        }while (result != -1);
+        } while (result != -1);
 
         inputStream.close();
 
@@ -402,24 +507,53 @@ public class HttpRequest {
     }
 
     //把输入流转成字节流
-    private byte[] readInputStream(InputStream inputStream){
-        try {
-            byte[] bytes = new byte[1024 * 256];
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private byte[] readInputStream(InputStream inputStream) throws IOException{
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        byte[] bytes = new byte[1024 * 256];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            while (inputStream.read(bytes) != -1){
-                outputStream.write(bytes);
-            }
-
-            bytes = outputStream.toByteArray();
-            outputStream.close();
-
-            return bytes;
-        }catch (IOException e){
-            e.printStackTrace();
+        int len = 0;
+        while ((len = bufferedInputStream.read(bytes)) != -1) {
+            //不一定每次读取都有 1024 * 256
+            outputStream.write(bytes, 0, len);
         }
 
-        return null;
+        bufferedInputStream.close();
+        bytes = outputStream.toByteArray();
+        outputStream.close();
+
+        return bytes;
+    }
+
+    //把数据写入文件
+    private void writeToFile(InputStream inputStream, String contentType) throws IOException{
+
+
+
+        File file = new File(mDownloadTemporayPath);
+        if(!file.exists()){
+            file.mkdirs();
+            file.createNewFile();
+        }
+        FileOutputStream outputStream = new FileOutputStream(file);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+
+        byte[] bytes = new byte[1024 * 256];
+
+        int len = 0;
+        while ((len = bufferedInputStream.read(bytes)) != -1) {
+            //不一定每次读取都有 1024 * 256
+            outputStream.write(bytes, 0, len);
+        }
+
+        bufferedInputStream.close();
+        outputStream.flush();
+        outputStream.close();
+
+        //把文件移到其他位置
+        if(mDownloadDestinationPath != null && file.exists()){
+            FileUtil.moveFile(file, mDownloadDestinationPath);
+        }
     }
 
     //判断是否存在文件

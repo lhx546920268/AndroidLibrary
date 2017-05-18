@@ -1,7 +1,6 @@
 package com.lhx.library.refresh;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -13,10 +12,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.GridView;
 import android.widget.ScrollView;
-import android.widget.Scroller;
-import com.lhx.library.R;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

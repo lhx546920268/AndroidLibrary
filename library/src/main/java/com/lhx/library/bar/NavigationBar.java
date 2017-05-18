@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.lhx.library.R;
 import com.lhx.library.util.SizeUtil;
 
