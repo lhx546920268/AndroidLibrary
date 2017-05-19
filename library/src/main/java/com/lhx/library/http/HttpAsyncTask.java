@@ -3,6 +3,7 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * http 异步任务
  */
-public abstract class HttpAsyncTask extends AsyncTask<Void, Integer, byte[]> {
+public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> implements HttpProgressHandler<HttpRequest> {
 
     ///请求URL
     protected String mURL;
@@ -32,9 +33,18 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Integer, byte[]> {
     //请求完成回调
     protected HttpRequestHandler mHttpRequestHandler;
 
+    //请求进度回调 必须在 onConfigure 设置 httpRequest showUploadProgress showDownloadProgress 为true
+    protected HttpProgressHandler<HttpAsyncTask> mHttpProgressHandler;
+
     //编码类型
     protected String mStringEncoding = "utf-8";
 
+    //http请求
+    protected HttpRequest mHttpRequest;
+
+    //进度类型
+    private static final float PROGRESS_UPLOAD = 0.0f;
+    private static final float PROGRESS_DOWNLOAD = 1.0f;
 
     public HttpAsyncTask(String URL, ContentValues params, HashMap<String, File> files) {
         mURL = URL;
@@ -53,6 +63,10 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Integer, byte[]> {
 
     public void setHttpRequestHandler(HttpRequestHandler httpRequestHandler) {
         mHttpRequestHandler = httpRequestHandler;
+    }
+
+    public void setHttpProgressHandler(HttpProgressHandler<HttpAsyncTask> httpProgressHandler) {
+        mHttpProgressHandler = httpProgressHandler;
     }
 
     public String getStringEncoding() {
@@ -79,27 +93,38 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Integer, byte[]> {
     @Override
     protected byte[] doInBackground(Void... params) {
         if(!TextUtils.isEmpty(mURL) && !isCancelled()){
-            HttpRequest httpRequest = new HttpRequest(mURL);
-            onConfigure(httpRequest);
-            httpRequest.setStringEncoding(mStringEncoding);
+            mHttpRequest = new HttpRequest(mURL);
+            onConfigure(mHttpRequest);
+
+            if(mHttpRequest.isShowDownloadProgress() || mHttpRequest.isShowUploadProgress()){
+                mHttpRequest.setHttpProgressHandler(this);
+            }
+
+            mHttpRequest.setStringEncoding(mStringEncoding);
             if(mParams != null){
                 for(Map.Entry<String, Object> entry : mParams.valueSet()){
-                    httpRequest.addPostValue(entry.getKey(), entry.getValue().toString());
+                    mHttpRequest.addPostValue(entry.getKey(), entry.getValue().toString());
                 }
             }
 
             if(mFiles != null){
                 for(Map.Entry<String, File> entry : mFiles.entrySet()){
-                    httpRequest.addFile(entry.getKey(), entry.getValue());
+                    mHttpRequest.addFile(entry.getKey(), entry.getValue());
                 }
             }
 
-            boolean result = httpRequest.startRequest();
-            mHttpResponseCode = httpRequest.getHttpResponseCode();
-            mErrorCode = httpRequest.mErrorCode;
+            boolean result = mHttpRequest.startRequest();
+            mHttpResponseCode = mHttpRequest.getHttpResponseCode();
+            mErrorCode = mHttpRequest.mErrorCode;
+            byte[] data = null;
             if(result){
-                return httpRequest.getResponseData();
+                data = mHttpRequest.getResponseData();
             }
+
+            publishProgress();
+            mHttpRequest.close();
+            mHttpRequest = null;
+            return data;
         }
 
         return null;
@@ -121,7 +146,34 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Integer, byte[]> {
     }
 
     @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+    protected void onProgressUpdate(Float... values) {
+
+        //更新进度条
+        if(mHttpProgressHandler != null && values.length > 1){
+            float type = values[1];
+            if(type == PROGRESS_UPLOAD){
+                mHttpProgressHandler.onUpdateUploadProgress(this, values[0]);
+            }else if(type == PROGRESS_DOWNLOAD){
+                mHttpProgressHandler.onUpdateDownloadProgress(this, values[0]);
+            }
+        }
+    }
+
+    @Override
+    final public void onUpdateUploadProgress(HttpRequest target, float progress) {
+        publishProgress(progress, PROGRESS_UPLOAD);
+    }
+
+    @Override
+    final public void onUpdateDownloadProgress(HttpRequest target, float progress) {
+        publishProgress(progress, PROGRESS_DOWNLOAD);
+    }
+
+    @Override
+    protected void onCancelled() {
+        if(mHttpRequest != null){
+            mHttpRequest.close();
+            mHttpRequest = null;
+        }
     }
 }

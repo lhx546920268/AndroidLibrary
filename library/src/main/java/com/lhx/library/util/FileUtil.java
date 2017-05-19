@@ -3,6 +3,8 @@ package com.lhx.library.util;
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,8 +41,63 @@ public class FileUtil {
         return mine;
     }
 
+    /**
+     * 通过 mimeType 获取文件扩展名称
+     * @param mimeType 文件的mimeType
+     * @return 文件拓展名
+     */
     public static String getFileExtensionFromMimeType(@NonNull String mimeType){
 
+        MimeTypeMap map = MimeTypeMap.getSingleton();
+        String extension = map.getExtensionFromMimeType(mimeType);
+
+        if(extension == null){
+            extension = "";
+        }else{
+            int pointIndex = extension.indexOf(".");
+            if(pointIndex < 0){
+                extension = "." + extension;
+            }
+        }
+
+        return extension;
+    }
+
+    /**
+     * 为文件路径添加拓展名
+     * @param filePath 文件路径
+     * @param extension 拓展名
+     * @param replace 如果已存在拓展名，是否替换
+     * @return 新的文件路径
+     */
+    public static String appendFileExtension(@NonNull String filePath, String extension, boolean replace){
+        if(!TextUtils.isEmpty(extension)){
+            int index = filePath.lastIndexOf("/");
+
+            //通过文件名称获取 拓展名，防止文件路径里面有 .
+            if(index != -1){
+                String fileName = filePath.substring(index);
+                int extensionIndex = fileName.lastIndexOf(".");
+                if(extensionIndex != -1){
+                    if(replace){
+                        return filePath.substring(0, index + extensionIndex) + extension;
+                    }
+                }else {
+                    return filePath + extension;
+                }
+            }else {
+                int extensionIndex = filePath.lastIndexOf(".");
+                if(extensionIndex != -1){
+                    if(replace){
+                        return filePath.substring(0, extensionIndex) + extension;
+                    }
+                }else {
+                    return filePath + extension;
+                }
+            }
+        }
+
+        return filePath;
     }
 
     public static boolean moveFile(@NonNull String filePath, @NonNull String destFilePath){
@@ -48,7 +105,7 @@ public class FileUtil {
     }
 
     public static boolean moveFile(@NonNull File file, @NonNull String destFilePath){
-        return moveFile(file, destFilePath);
+        return moveFile(file, new File(destFilePath));
     }
 
     public static boolean moveFile(@NonNull String filePath, @NonNull File destFile){
@@ -66,9 +123,8 @@ public class FileUtil {
             return false;
 
         try {
-            if(!destFile.exists())
-                destFile.mkdirs();
 
+            createDirectoryIfNotEixist(destFile);
             return file.renameTo(destFile);
         }catch (SecurityException e){
             e.printStackTrace();
@@ -137,16 +193,84 @@ public class FileUtil {
     }
 
     /**
-     * 创建一个临时文件
+     * 获取临时文件夹
      * @param context 上下文
-     * @param fileType 文件类型
-     * @return 临时文件
+     * @return 临时文件夹
      */
-    public static String getTemporaryFilePath(@NonNull Context context, String fileType){
+    public static String getTemporaryDirectory(@NonNull Context context){
         File file = context.getExternalCacheDir();
         if(file == null){
             file = context.getCacheDir();
         }
-        return file.getAbsolutePath() + "/temp/" + getUniqueFileName() + "." + fileType;
+        return file.getAbsolutePath() + "/temp";
+    }
+
+
+    /**
+     * 获取一个临时文件名称
+     * @param context 上下文
+     * @param extension 文件类型 包含 .
+     * @return 临时文件
+     */
+    public static String getTemporaryFilePath(@NonNull Context context, String extension){
+
+        String path = getTemporaryDirectory(context) + "/" + getUniqueFileName();
+        if(!TextUtils.isEmpty(extension)){
+            path += extension;
+        }
+
+        return path;
+    }
+
+    public static boolean createNewFileIfNotExist(@NonNull String filePath){
+        return createNewFileIfNotExist(new File(filePath));
+    }
+
+    /**
+     * 创建一个文件，如果文件的上级目录不存在，会创建，防止创建文件失败
+     * @param file 文件路径
+     * @return 是否成功， 如果文件存在，也返回成功
+     */
+    public static boolean createNewFileIfNotExist(@NonNull File file){
+        if(file.exists() && file.isFile())
+            return true;
+        try {
+            String parent = file.getParent();
+
+            //创建文件夹
+            File directory = new File(parent);
+            if(!directory.exists() || !directory.isDirectory()){
+                if(!directory.mkdirs()){
+                    return false;
+                }
+            }
+
+            return file.createNewFile();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public static boolean createDirectoryIfNotEixist(@NonNull String filePath){
+        return createDirectoryIfNotEixist(new File(filePath));
+    }
+
+    /**
+     * 创建文件路径 中的文件夹
+     * @param file 必须是一个文件路径 而不是文件夹路径
+     * @return 是否成功 如果文件夹存在，也返回成功
+     */
+    public static boolean createDirectoryIfNotEixist(@NonNull File file){
+        String parent = file.getParent();
+
+        //创建文件夹
+        File directory = new File(parent);
+        if(!directory.exists() || !directory.isDirectory()){
+            return directory.mkdirs();
+        }
+
+        return true;
     }
 }
