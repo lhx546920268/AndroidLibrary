@@ -48,7 +48,6 @@ public class CyclePagerActivity extends AppCompatActivity {
         setContentView(R.layout.cycle_pager_activity);
         viewPager = (ViewPager)findViewById(R.id.view_pager);
 
-
         PageControl pageControl = (PageControl)findViewById(R.id.page_control);
 
         pageControl.setNormalColor(Color.CYAN);
@@ -64,6 +63,7 @@ public class CyclePagerActivity extends AppCompatActivity {
                 viewPager.getAdapter().notifyDataSetChanged();
             }
         });
+
 
         adapter = new CyclePagerAdapter(viewPager) {
             @Override
@@ -114,8 +114,9 @@ public class CyclePagerActivity extends AppCompatActivity {
                                 convertView = textView;
                             }
 
+                            int page = (int)gridView.getTag();
                             TextView textView = (TextView)convertView;
-                            textView.setText("第" + position + "个");
+                            textView.setText("第" + position + "个，在第" + page + "页");
                             if(show){
                                 textView.setBackgroundColor(Color.LTGRAY);
                             }else {
@@ -157,8 +158,11 @@ public class CyclePagerActivity extends AppCompatActivity {
                         break;
                 }
 
+                Log.d("tag", "position = " + position);
+
                 GridView gridView = (GridView)convertView.findViewById(R.id.grid_view);
                 BaseAdapter baseAdapter = (BaseAdapter)gridView.getAdapter();
+                gridView.setTag(position);
                 baseAdapter.notifyDataSetChanged();
 
                 return convertView;

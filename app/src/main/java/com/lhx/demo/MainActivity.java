@@ -21,6 +21,8 @@ import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
+import com.lhx.demo.text.TextBoundsFragment;
+import com.lhx.demo.toast.ToastFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.util.ColorUtil;
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
         infos.add("cornerDrawable(圆角 corner)");
         infos.add("TabLayout(横向条形菜单)");
         infos.add("HttpAsyncTask");
-
+        infos.add("Toast");
+        infos.add("text bounds(字体范围)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -98,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 5 :
                         startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, HttpFragment.class));
+                        break;
+                    case 6 :
+                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, ToastFragment.class));
+                        break;
+                    case 7 :
+                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, TextBoundsFragment
+                                .class));
                         break;
                 }
 

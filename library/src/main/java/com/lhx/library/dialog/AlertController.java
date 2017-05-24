@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -15,6 +16,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +25,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.lhx.library.R;
 import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.ColorUtil;
 import com.lhx.library.util.SizeUtil;
+import com.lhx.library.util.StringUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -63,6 +68,21 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //圆角半径
     private int mCornerRadius = 10;
 
+    //按钮高度padding
+    private int mButtonTopBottomPadding;
+
+    //按钮左右padding
+    private int mButtonLeftRightPadding;
+
+    //内容垂直间隔
+    private int mContentVerticalSpace;
+
+    //内容上下边距
+    private int mContentPadding;
+
+    //弹窗边距
+    private int mDialogPadding;
+
     //标题字体颜色
     private @ColorInt int mTitleColor = Color.BLACK;
 
@@ -88,7 +108,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private @ColorInt int mDisableButtonTextColor = Color.GRAY;
 
     //内容视图
-    private LinearLayout mContentView;
+    private View mContentView;
 
     //logo
     private ImageView mLogoImageView;
@@ -102,11 +122,17 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //actionSheet的取消按钮
     private TextView mCancelTextView;
 
+    //actionSheet的 顶部透明视图，用来点击取消
+    private View mTopTranparentView;
+
     //actionSheet 顶部容器
     private LinearLayout mTopContainer;
 
     //按钮列表
-    private RecyclerView mRecyclertView;
+    private RecyclerView mRecyclerView;
+
+    //内容分割线
+    private View mContentDivider;
 
     //分割线大小px
     private int mDividerHeight;
@@ -135,28 +161,36 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //UI回调
     private AlertUIHandler mAlertUIHander;
 
-    public static AlertController showAlert(@NonNull Context context, String title, String subtitle, Drawable icon,
-                                            @NonNull String ... otherButtonTitles){
+    //防止内容过多无法看完
+    private ScrollView mScrollView;
+    private LinearLayout mScrollContainer;
+
+    //是否需要计算内容高度 当内容或者按钮数量过多时可设置，防止内容显示不完
+    private boolean mShouldMesureContentHeight = false;
+
+
+    public static AlertController buildAlert(@NonNull Context context, String title, String subtitle, Drawable icon,
+                                            String ... otherButtonTitles){
         return new AlertController(context, STYLE_ALERT, title, subtitle, icon, otherButtonTitles);
     }
 
-    public static AlertController showAlert(@NonNull Context context, String title,
-                                            @NonNull String ... otherButtonTitles){
+    public static AlertController buildAlert(@NonNull Context context, String title,
+                                            String ... otherButtonTitles){
         return new AlertController(context, STYLE_ALERT, title, null, null, otherButtonTitles);
     }
 
-    public static AlertController showActionSheet(@NonNull Context context, String title, String subtitle, Drawable icon,
-                                                  @NonNull String ... otherButtonTitles){
+    public static AlertController buildActionSheet(@NonNull Context context, String title, String subtitle, Drawable
+            icon,
+                                                  String ... otherButtonTitles){
         return new AlertController(context, STYLE_ACTION_SHEET, title, subtitle, icon, otherButtonTitles);
     }
 
-    public static AlertController showActionSheet(@NonNull Context context, String title,
-                                                  @NonNull String ... otherButtonTitles){
+    public static AlertController buildActionSheet(@NonNull Context context, String title, String ... otherButtonTitles){
         return new AlertController(context, STYLE_ACTION_SHEET, title, null, null, otherButtonTitles);
     }
 
     public AlertController(@NonNull Context context, @Style int style, String title, String subtitle, Drawable icon,
-                           @NonNull String ... otherButtonTitles) {
+                           String ... otherButtonTitles) {
 
         mContext = context;
         mStyle = style;
@@ -165,10 +199,34 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mIcon = icon;
 
         mButtonTitles = otherButtonTitles;
+        if(mButtonTitles == null){
+            mButtonTitles = new String[]{};
+        }
 
         mDividerHeight = SizeUtil.pxFormDip(0.5f, mContext);
         mButtonTextColor = ContextCompat.getColor(mContext, R.color.light_blue);
         mHighlightBackgroundColor = ColorUtil.whitePercentColor(0.80f, 1.0f);
+        mButtonTopBottomPadding = SizeUtil.pxFormDip(13, mContext);
+        mButtonLeftRightPadding = SizeUtil.pxFormDip(10, mContext);
+        mContentVerticalSpace = SizeUtil.pxFormDip(5, mContext);
+        mContentPadding = SizeUtil.pxFormDip(15, mContext);
+        mDialogPadding = SizeUtil.pxFormDip(10, context);
+
+        mContentView = View.inflate(mContext, mStyle == STYLE_ALERT ? R.layout.alert_dialog : R.layout
+                .action_sheet_dialog, null);
+
+        mScrollView = (ScrollView)mContentView.findViewById(R.id.scrollView);
+        mScrollContainer = (LinearLayout)mContentView.findViewById(R.id.scroll_container);
+        mLogoImageView = (ImageView)mContentView.findViewById(R.id.logo);
+        mTitleTextView = (TextView)mContentView.findViewById(R.id.title);
+        mSubtitleTextView = (TextView)mContentView.findViewById(R.id.subtitle);
+        mContentDivider = mContentView.findViewById(R.id.divider);
+
+        if(mStyle == STYLE_ACTION_SHEET){
+            mTopContainer = (LinearLayout)mContentView.findViewById(R.id.top_container);
+            mCancelTextView = (TextView)mContentView.findViewById(R.id.cancel);
+        }
+        mRecyclerView = (RecyclerView)mContentView.findViewById(R.id.recycler_view);
     }
 
     public void setDialogBackgroundColor(int dialogBackgroundColor) {
@@ -181,6 +239,26 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     public void setCornerRadius(int cornerRadius) {
         mCornerRadius = cornerRadius;
+    }
+
+    public void setButtonTopBottomPadding(int buttonTopBottomPadding) {
+        mButtonTopBottomPadding = buttonTopBottomPadding;
+    }
+
+    public void setButtonLeftRightPadding(int buttonLeftRightPadding) {
+        mButtonLeftRightPadding = buttonLeftRightPadding;
+    }
+
+    public void setContentVerticalSpace(int contentVerticalSpace) {
+        mContentVerticalSpace = contentVerticalSpace;
+    }
+
+    public void setContentPadding(int contentPadding) {
+        mContentPadding = contentPadding;
+    }
+
+    public void setDialogPadding(int dialogPadding) {
+        mDialogPadding = dialogPadding;
     }
 
     public void setTitleColor(@ColorInt int titleColor) {
@@ -239,6 +317,10 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mShouldDismissAfterClickItem = shouldDismissAfterClickItem;
     }
 
+    public void setShouldMesureContentHeight(boolean shouldMesureContentHeight){
+        mShouldMesureContentHeight = shouldMesureContentHeight;
+    }
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
@@ -247,32 +329,32 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mAlertUIHander = alertUIHander;
     }
 
-    public LinearLayout getmContentView() {
+    public View getContentView() {
         return mContentView;
     }
 
-    public ImageView getmLogoImageView() {
+    public ImageView getLogoImageView() {
         return mLogoImageView;
     }
 
-    public TextView getmTitleTextView() {
+    public TextView getTitleTextView() {
         return mTitleTextView;
     }
 
-    public TextView getmSubtitleTextView() {
+    public TextView getSubtitleTextView() {
         return mSubtitleTextView;
     }
 
-    public TextView getmCancelTextView() {
+    public TextView getCancelTextView() {
         return mCancelTextView;
     }
 
-    public LinearLayout getmTopContainer() {
+    public LinearLayout getTopContainer() {
         return mTopContainer;
     }
 
-    public RecyclerView getmRecyclertView() {
-        return mRecyclertView;
+    public RecyclerView getRecyclertView() {
+        return mRecyclerView;
     }
 
     //初始化视图
@@ -282,73 +364,78 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             mButtonTitles = new String[]{"确定"};
         }
 
-        mContentView = (LinearLayout)View.inflate(mContext, mStyle == STYLE_ALERT ? R.layout.alert_dialog : R.layout
-                .action_sheet_dialog, null);
-        mLogoImageView = (ImageView)mContentView.findViewById(R.id.logo);
         if(mIcon != null){
             mLogoImageView.setImageDrawable(mIcon);
+            mLogoImageView.setPadding(0, mContentVerticalSpace, 0, 0);
         }else {
             mLogoImageView.setVisibility(View.GONE);
         }
 
-        mTitleTextView = (TextView)mContentView.findViewById(R.id.title);
-        mTitleTextView.setTextColor(mTitleColor);
-        mTitleTextView.setTextSize(mTitleSize);
         if(mTitle == null){
             mTitleTextView.setVisibility(View.GONE);
         }else {
+            mTitleTextView.setTextColor(mTitleColor);
+            mTitleTextView.setTextSize(mTitleSize);
             mTitleTextView.setText(mTitle);
+            mTitleTextView.setPadding(0, mContentVerticalSpace, 0, 0);
         }
 
-        mSubtitleTextView = (TextView)mContentView.findViewById(R.id.subtitle);
-        mSubtitleTextView.setTextColor(mSubtitleColor);
-        mSubtitleTextView.setTextSize(mSubtitleSize);
         if(mSubtitle == null){
             mSubtitleTextView.setVisibility(View.GONE);
         }else {
+            mSubtitleTextView.setTextColor(mSubtitleColor);
+            mSubtitleTextView.setTextSize(mSubtitleSize);
             mSubtitleTextView.setText(mSubtitle);
+            mSubtitleTextView.setPadding(0, mContentVerticalSpace, 0, 0);
         }
 
         //actionSheet 样式不一样
         if(mStyle == STYLE_ACTION_SHEET){
-            mTopContainer = (LinearLayout)mContentView.findViewById(R.id.top_container);
-            mCancelTextView = (TextView)mContentView.findViewById(R.id.cancel);
             mCancelTextView.setOnClickListener(this);
             mCancelTextView.setTextSize(mButtonTextSize);
             mCancelTextView.setTextColor(mButtonTextColor);
+            mCancelTextView.setPadding(mButtonLeftRightPadding, mButtonTopBottomPadding,
+                    mButtonLeftRightPadding, mButtonTopBottomPadding);
 
             setBackground(mTopContainer);
             setBackgroundSelector(mCancelTextView);
 
-            //隐藏顶部分割线
-            if(!hasTopContent()){
-                mContentView.findViewById(R.id.divider).setVisibility(View.GONE);
-            }else {
-                mTopContainer.setPadding(0, SizeUtil.pxFormDip(10, mContext), 0, 0);
+            mTopTranparentView = mContentView.findViewById(R.id.top_tranparent_view);
+            mTopTranparentView.setOnClickListener(this);
+
+            boolean has = hasTopContent();
+            //隐藏顶部分割线 没有按钮也隐藏
+            if(!has || mButtonTitles.length == 0){
+                mContentDivider.setVisibility(View.GONE);
             }
 
+            mScrollContainer.setPadding(0, has ? mContentPadding - mContentVerticalSpace : 0, 0,
+                    has ? mContentPadding : 0);
+
         }else {
-            mContentView.setPadding(0, SizeUtil.pxFormDip(10, mContext), 0, 0);
+            mScrollContainer.setPadding(0, mContentPadding - mContentVerticalSpace, 0, mContentPadding);
             mContentView.setBackgroundColor(mDialogBackgroundColor);
             setBackground(mContentView);
         }
 
-        mRecyclertView = (RecyclerView)mContentView.findViewById(R.id.recycler_view);
+        if(mShouldMesureContentHeight){
+            mesureContentHeight();
+        }
+
         int spanCount = (mButtonTitles.length != 2 || mStyle == STYLE_ACTION_SHEET) ? 1 : 2;
         GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
         layoutManager.setOrientation(GridLayoutManager.VERTICAL);
-        mRecyclertView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
 
         if(mButtonTitles.length > 1){
             //添加分割线
-            mRecyclertView.addItemDecoration(new ItemDecoration());
+            mRecyclerView.addItemDecoration(new ItemDecoration());
         }
-        mRecyclertView.setAdapter(new Adapter());
+
+        mRecyclerView.setAdapter(new Adapter());
 
         mDialog = new Dialog(mContext, R.style.Theme_dialog_noTitle_noBackground);
         mDialog.setOnDismissListener(this);
-        mDialog.setCancelable(mStyle == STYLE_ACTION_SHEET);
-
         mDialog.setContentView(mContentView);
 
         //设置弹窗大小
@@ -357,15 +444,142 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         layoutParams.gravity = mStyle == STYLE_ALERT ? Gravity.CENTER : Gravity.BOTTOM;
         layoutParams.width = getContentViewWidth();
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        if(mStyle == STYLE_ACTION_SHEET){
-            window.setWindowAnimations(R.style.action_sheet_animate);
+
+        switch (mStyle){
+            case STYLE_ACTION_SHEET :
+                window.getDecorView().setPadding(mDialogPadding, mDialogPadding, mDialogPadding, mDialogPadding);
+                window.setWindowAnimations(R.style.action_sheet_animate);
+                mDialog.setCancelable(true);
+                mDialog.setCanceledOnTouchOutside(true);
+                break;
+            case STYLE_ALERT :
+                window.getDecorView().setPadding(0, mDialogPadding, 0 , mDialogPadding);
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                break;
         }
+
         mDialog.getWindow().setAttributes(layoutParams);
+    }
+
+    //计算内容高度
+    private void mesureContentHeight(){
+
+        //按钮内容高度
+        int buttonContentHeight = 0;
+
+        //顶部内容高度
+        int topContentHeight = 0;
+
+        //取消按钮高度 STYLE_ALERT 为 0
+        int cancelButtonHeight = 0;
+
+        //图标高度
+        if(mIcon != null){
+            topContentHeight += mIcon.getIntrinsicHeight();
+            topContentHeight += mContentVerticalSpace;
+        }
+
+        int contentWidth = getContentViewWidth();
+        if(mTitle != null || mSubtitle != null){
+
+            //标题高度
+            if(mTitle != null){
+                topContentHeight += mContentVerticalSpace;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)mTitleTextView.getLayoutParams();
+                int maxWidth = contentWidth - params.leftMargin - params.rightMargin;
+                topContentHeight += StringUtil.mesureTextHeight(mTitle, mTitleTextView.getPaint(), maxWidth);
+            }
+
+            //副标题高度
+            if(mSubtitle != null){
+                topContentHeight += mContentVerticalSpace;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)mSubtitleTextView.getLayoutParams();
+                int maxWidth = contentWidth - params.leftMargin - params.rightMargin;
+                topContentHeight += StringUtil.mesureTextHeight(mSubtitle, mSubtitleTextView.getPaint(), maxWidth);
+            }
+        }
+
+        int maxWidth = contentWidth - mButtonLeftRightPadding * 2;
+        //加上边距和分割线
+        switch (mStyle){
+            case STYLE_ACTION_SHEET :
+                if(hasTopContent()){
+                    topContentHeight += mContentPadding * 2 - mContentVerticalSpace;
+                }
+                if(mButtonTitles.length > 0){
+
+                    TextView textView = (TextView)View.inflate(mContext, R.layout.alert_button_item, null);
+                    textView.setTextSize(mButtonTextSize);
+
+                    for(int i = 0;i < mButtonTitles.length; i ++){
+                        String title = mButtonTitles[i];
+                        buttonContentHeight += StringUtil.mesureTextHeight(title, textView.getPaint(),
+                                maxWidth) + mButtonTopBottomPadding * 2 + mDividerHeight;
+                    }
+                    buttonContentHeight -= mDividerHeight;
+                }
+
+                //取消按钮高度
+                cancelButtonHeight += StringUtil.mesureTextHeight(mCancelTextView.getText(), mCancelTextView
+                        .getPaint(), maxWidth) + mButtonTopBottomPadding * 2 + mDialogPadding;
+
+                break;
+            case STYLE_ALERT :
+                topContentHeight += mContentPadding * 2 - mContentVerticalSpace;
+                TextView textView = (TextView)View.inflate(mContext, R.layout.alert_button_item, null);
+                textView.setTextSize(mButtonTextSize);
+
+                for(int i = 0;i < mButtonTitles.length; i ++){
+                    String title = mButtonTitles[i];
+                    buttonContentHeight += StringUtil.mesureTextHeight(title, textView.getPaint(),
+                            maxWidth) + mButtonTopBottomPadding * 2 + mDividerHeight;
+                    if(mButtonTitles.length <= 2)
+                        break;
+                }
+                if(buttonContentHeight > 0){
+                    buttonContentHeight -= mDividerHeight;
+                }
+                break;
+        }
+
+        int maxHeight = mContext.getResources().getDisplayMetrics().heightPixels - mDialogPadding * 2 -
+                cancelButtonHeight - mScrollContainer.getPaddingBottom() - mScrollContainer.getPaddingTop();
+        if(mContentDivider.getVisibility() == View.VISIBLE){
+            maxHeight -= mDividerHeight;
+        }
+
+        if(topContentHeight + buttonContentHeight > maxHeight){
+            //内容太多了
+            int half = maxHeight / 2;
+            if(topContentHeight > half && buttonContentHeight < half){
+                setScrollViewHeight(maxHeight - buttonContentHeight);
+            }else if(topContentHeight < half && buttonContentHeight > half){
+                setRecyclerViewHeight(maxHeight - topContentHeight);
+            }else {
+                setRecyclerViewHeight(half);
+                setScrollViewHeight(half);
+            }
+        }
+    }
+
+    //设置scrollview
+    private void setScrollViewHeight(int height){
+        ViewGroup.LayoutParams params = mScrollView.getLayoutParams();
+        params.height = height;
+        mScrollView.setLayoutParams(params);
+    }
+
+    //设置recyclerView
+    private void setRecyclerViewHeight(int height){
+        ViewGroup.LayoutParams params = mRecyclerView.getLayoutParams();
+        params.height = height;
+        mRecyclerView.setLayoutParams(params);
     }
 
     //显示弹窗
     public void show(){
-        if(mContentView == null){
+        if(mDialog == null){
             initView();
         }
         if(!mDialog.isShowing()){
@@ -389,7 +603,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     @Override
     public void onClick(View v) {
-        if(v == mCancelTextView){
+        if(v == mCancelTextView || v == mTopTranparentView){
             dismiss();
         }
     }
@@ -400,7 +614,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             case STYLE_ALERT :
                 return SizeUtil.pxFormDip(280, mContext);
             case STYLE_ACTION_SHEET :
-                return ViewGroup.LayoutParams.MATCH_PARENT;
+                return mContext.getResources().getDisplayMetrics().widthPixels;
         }
 
         return 0;
@@ -458,13 +672,17 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 }
             });
 
+            holder.textView.setTextSize(mButtonTextSize);
+            holder.textView.setPadding(mButtonLeftRightPadding, mButtonTopBottomPadding,
+                    mButtonLeftRightPadding, mButtonTopBottomPadding);
+
             return holder;
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+
             holder.textView.setText(mButtonTitles[position]);
-            holder.textView.setTextSize(mButtonTextSize);
 
             int color = mButtonTextColor;
             boolean enable = true;
@@ -483,16 +701,22 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             //设置点击效果
             if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
                 //垂直
-                if(position == 0 && !hasTopContent() && mStyle == STYLE_ACTION_SHEET){
-                    holder.drawablePressed.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
-                    holder.drawable.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
-                }else if(position == mButtonTitles.length - 1){
-                    holder.drawablePressed.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
-                    holder.drawable.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
+                if(mButtonTitles.length == 1 && mStyle == STYLE_ACTION_SHEET && !hasTopContent()){
+                    holder.drawablePressed.setCornerRadius(mCornerRadius);
+                    holder.drawable.setCornerRadius(mCornerRadius);
                 }else {
-                    holder.drawablePressed.setCornerRadius(0);
-                    holder.drawable.setCornerRadius(0);
+                    if(position == 0 && !hasTopContent() && mStyle == STYLE_ACTION_SHEET){
+                        holder.drawablePressed.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
+                        holder.drawable.setCornerRadius(mCornerRadius, 0, mCornerRadius, 0);
+                    }else if(position == mButtonTitles.length - 1){
+                        holder.drawablePressed.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
+                        holder.drawable.setCornerRadius(0, mCornerRadius, 0, mCornerRadius);
+                    }else {
+                        holder.drawablePressed.setCornerRadius(0);
+                        holder.drawable.setCornerRadius(0);
+                    }
                 }
+
             }else {
 
                 //水平
@@ -522,7 +746,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         public ViewHolder(View itemView) {
             super(itemView);
 
-            textView = (TextView)itemView.findViewById(R.id.text);
+            textView = (TextView)itemView;
             CornerBorderDrawable[] drawables = setBackgroundSelector(itemView);
             drawable = drawables[0];
             drawable.setCornerRadius(0);
@@ -570,15 +794,16 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+
             //设置item的偏移量 大小为item+分割线
             int position = parent.getChildAdapterPosition(view);
             if(position < mButtonTitles.length - 1){
                 if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
                     //垂直排列
-                    outRect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom() + mDividerHeight);
+                    outRect.bottom = mDividerHeight;
                 }else {
                     //水平
-                    outRect.set(view.getLeft(), view.getTop(), view.getRight() + mDividerHeight, view.getBottom());
+                    outRect.right = mDividerHeight;
                 }
             }
         }

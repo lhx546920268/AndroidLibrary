@@ -3,7 +3,6 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

@@ -13,12 +13,6 @@
         android:id="@+id/download_img"
         android:layout_gravity="center_horizontal"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/img"/>
-
-
     <ProgressBar
         android:layout_width="200dp"
         android:layout_height="10dp"
@@ -27,4 +21,13 @@
         android:layout_marginTop="20dp"
         android:max="100"
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"/>
+
+    <ImageView
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/img"/>
+
+
+
 </LinearLayout>

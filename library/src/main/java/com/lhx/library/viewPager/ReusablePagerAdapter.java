@@ -73,6 +73,8 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             Iterator<View> iterator = views.iterator();
             convertView = iterator.next();
             views.remove(convertView);
+            //必须加入，否则重用时会导致某些视图 刷新延迟
+            container.addView(convertView);
         }
 
         int realPosition = getRealPosition(position);
@@ -88,7 +90,9 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
 
             View view = (View)object;
             view.setTag(R.integer.view_pager_position_tag_key, realPosition);
-            container.addView(view);
+            if(view.getParent() == null){
+                container.addView(view);
+            }
             views.add(view);
 
             //获取可重用的子视图

@@ -3,9 +3,10 @@ package com.lhx.library.http;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.lhx.library.util.FileUtil;
+import com.lhx.library.util.StringUtil;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -97,6 +98,9 @@ public class HttpRequest {
 
     //上传总大小
     protected long mTotalSizeToUpload = 0;
+
+    //已经上传的大小
+    protected long mTotalSizeDidUpload = 0;
 
     //下载总大小
     protected long mTotalSizeToDownload = 0;
@@ -329,7 +333,6 @@ public class HttpRequest {
 
             if (mParams.size() > 0) {
                 mConn.setRequestMethod("POST");
-                mConn.setChunkedStreamingMode(0); //分块上传，防止内存过大
                 buildPostBody();
             } else {
                 mConn.setRequestMethod("GET");
@@ -343,7 +346,8 @@ public class HttpRequest {
                 return false;
             }
 
-            mTotalSizeToDownload = mConn.getContentLengthLong();
+            /// 系统提供的方法要 java 7以上才能用
+            mTotalSizeToDownload = StringUtil.parseLong(mConn.getHeaderField("Content-Length"));
             InputStream is = mConn.getInputStream();
 
             if(mDownloadTemporayPath != null){
@@ -505,6 +509,8 @@ public class HttpRequest {
 
     //构建 URL encode 类型的
     private void buildURLEncodePostBody() throws IOException{
+
+        mTotalSizeDidUpload = 0;
         mConn.setDoOutput(true);
         OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
 
@@ -523,12 +529,14 @@ public class HttpRequest {
             i++;
         }
 
-        String postBody = builder.toString();
-        byte[] bytes = postBody.getBytes(mStringEncoding);
-        outputStream.write(bytes);
-
-        mConn.setRequestProperty("Content-Length", bytes.length + "");
+        byte[] bytes = builder.toString().getBytes(mStringEncoding);
         mTotalSizeToUpload = bytes.length;
+        mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
+        mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+
+        outputStream.write(bytes);
+        mTotalSizeDidUpload += bytes.length;
+        updateUploadProgress();
 
         outputStream.flush();
         outputStream.close();
@@ -536,6 +544,9 @@ public class HttpRequest {
 
     //构建multi part form data 类型的，上传文件必须用此类型
     private void buildMultiPartFormDataPostBody() throws IOException{
+
+        mTotalSizeDidUpload = 0;
+        mTotalSizeToUpload = 0;
         mConn.setDoOutput(true);
         OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
 
@@ -549,35 +560,35 @@ public class HttpRequest {
         //每个参数的分隔符
         byte[] paramSeparatorBytes = String.format(Locale.getDefault(), "\r\n--%s\r\n", boundary).getBytes(mStringEncoding);
 
-        //数据总长度
-        long totalSize = 0;
-
         //添加开始边界
         byte[] bytes = String.format(Locale.getDefault(), "--%s\r\n", boundary).getBytes(mStringEncoding);
         //结束边界
         byte[] endBytes = String.format(Locale.getDefault(), "\r\n--%s--\r\n", boundary).getBytes(mStringEncoding);
 
 
-        totalSize += bytes.length;
-        totalSize += endBytes.length;
+        mTotalSizeToUpload += bytes.length;
+        mTotalSizeToUpload += endBytes.length;
 
         int i = 0;
         //计算body大小
         for(Param param : mParams){
-            totalSize += param.getMultiPartBytes().length;
+            mTotalSizeToUpload += param.getMultiPartBytes().length;
             if(param.type == Param.PARAM_TYPE_FILE){
-                totalSize += param.file.length();
+                mTotalSizeToUpload += param.file.length();
             }
             if (i != mParams.size() - 1) {
-                totalSize += paramSeparatorBytes.length;
+                mTotalSizeToUpload += paramSeparatorBytes.length;
             }
+            i ++;
         }
 
         //设置上传长度
-        mConn.setRequestProperty("Content-Length", totalSize + "");
-        mTotalSizeToUpload = totalSize;
+        mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
+        mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
 
         outputStream.write(bytes);
+        mTotalSizeDidUpload += bytes.length;
+        updateUploadProgress();
 
         i = 0;
         for (Param param : mParams) {
@@ -585,17 +596,23 @@ public class HttpRequest {
             switch (param.type) {
                 case Param.PARAM_TYPE_NORMAL: {
                     outputStream.write(param.getMultiPartBytes());
+                    mTotalSizeDidUpload += param.getMultiPartBytes().length;
                     break;
                 }
                 case Param.PARAM_TYPE_FILE: {
                     outputStream.write(param.getMultiPartBytes());
+                    mTotalSizeDidUpload += paramSeparatorBytes.length;
                     readFile(param.file, outputStream);
+
                     break;
                 }
             }
             if (i != mParams.size() - 1) {
                 outputStream.write(paramSeparatorBytes);
+                mTotalSizeDidUpload += paramSeparatorBytes.length;
             }
+
+            updateUploadProgress();
 
             i ++;
         }
@@ -605,6 +622,13 @@ public class HttpRequest {
 
         outputStream.flush();
         outputStream.close();
+    }
+
+    //更新上传进度
+    private void updateUploadProgress(){
+        if(mShowUploadProgress && mHttpProgressHandler != null){
+            mHttpProgressHandler.onUpdateUploadProgress(this, (float)mTotalSizeDidUpload / (float)mTotalSizeToUpload);
+        }
     }
 
     //读取文件
@@ -618,6 +642,8 @@ public class HttpRequest {
             outputStream.write(bytes, 0, result); //写入实际大小
             if (result != -1) {
                 len += result;
+                mTotalSizeDidUpload += len;
+                updateUploadProgress();
             }
         } while (result != -1);
 

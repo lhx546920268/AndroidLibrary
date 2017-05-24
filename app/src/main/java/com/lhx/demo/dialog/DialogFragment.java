@@ -93,16 +93,34 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
 
                 switch (tabLayout.getSelectedTabPosition()){
                     case 0 : {
-                        AlertController controller = AlertController.showAlert(mActivity, title, subtitle,
+                        AlertController controller = AlertController.buildAlert(mActivity, title, subtitle,
                                 logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
-                                        .ic_launcher) : null, strings);
+                                        .checkboxmark) : null, strings);
+
+                        controller.setShouldMesureContentHeight(true);
+                        controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AlertController controller, int index) {
+
+                            }
+                        });
+
                         controller.show();
                     }
                     break;
                     case 1 : {
-                        AlertController controller = AlertController.showActionSheet(mActivity, title, subtitle,
+                        AlertController controller = AlertController.buildActionSheet(mActivity, title, subtitle,
                                 logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
-                                        .ic_launcher) : null, strings);
+                                        .checkboxmark) : null, strings);
+
+                        controller.setShouldMesureContentHeight(true);
+                        controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AlertController controller, int index) {
+
+                            }
+                        });
+
                         controller.show();
                     }
                     break;

@@ -6,41 +6,59 @@
 
     <!--弹窗-->
 
-    <!--logo-->
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/logo"
-        android:layout_marginTop="5dp"
-        android:layout_gravity="center_horizontal"/>
-
-    <!--标题-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:id="@+id/title"/>
-
-    <!--副标题-->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:id="@+id/subtitle"/>
+        android:id="@+id/scrollView"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scroll_container"
+            android:orientation="vertical">
+
+            <!--logo-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/logo"
+                android:paddingTop="5dp"
+                android:scaleType="centerInside"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <!--标题-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:paddingTop="5dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:id="@+id/title"/>
+
+            <!--副标题-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/subtitle"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <!--分割线-->
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/divider_color"
-        android:layout_marginTop="15dp"/>
+        android:background="@color/divider_color"/>
 
     <!--按钮列表-->
     <android.support.v7.widget.RecyclerView

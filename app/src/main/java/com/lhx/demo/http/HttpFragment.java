@@ -1,5 +1,6 @@
 package com.lhx.demo.http;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +42,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
 
         findViewById(R.id.download_img).setOnClickListener(this);
         mProgressBar = findViewById(R.id.progress_bar);
+
     }
 
     @Override

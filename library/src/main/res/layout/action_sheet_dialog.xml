@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:paddingBottom="10dp"
-              android:paddingLeft="10dp"
-              android:paddingRight="10dp"
+              android:layout_height="wrap_content"
     android:orientation="vertical">
     <!--卡片弹窗 从底部弹出-->
 
@@ -30,4 +27,10 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"/>
 
+    <!--顶部透明-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/top_container"
+        android:id="@+id/top_tranparent_view"/>
 </RelativeLayout>
