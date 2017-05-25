@@ -45,7 +45,7 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
         mContentView = inflater.inflate(R.layout.list_view_load_more_fragment, null);
         listView = findViewById(R.id.list_view);
 
-//        addData(20);
+        addData(20);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -123,7 +123,7 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
             }
         };
 
-//        adapter.loadMoreComplete(true);
+        adapter.loadMoreComplete(true);
 
 
 

@@ -3,6 +3,8 @@ package com.lhx.library.section;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.lhx.library.viewHoler.RecyclerViewHolder;
+
 /**
  * RecyclerView 分块
  */
@@ -16,7 +18,7 @@ public interface RecyclerViewSectionHandler extends SectionHandler {
      * @param parent   和onCreateViewHolder中一样
      * @return viewHolder
      */
-    RecyclerView.ViewHolder onCreateViewHolderForViewType(int viewType, ViewGroup parent);
+    RecyclerViewHolder onCreateViewHolderForViewType(int viewType, ViewGroup parent);
 
     /**
      * 给某个section的头部绑定数据
@@ -24,7 +26,7 @@ public interface RecyclerViewSectionHandler extends SectionHandler {
      * @param viewHolder onCreateHeaderViewHolderForSection 创建的 和 onBindViewHolder中的一样
      * @param section    section下标
      */
-    void onBindHeaderViewHolderForSection(final RecyclerView.ViewHolder viewHolder, int section);
+    void onBindHeaderViewHolderForSection(final RecyclerViewHolder viewHolder, int section);
 
     /**
      * 给某个section的底部绑定数据
@@ -32,7 +34,7 @@ public interface RecyclerViewSectionHandler extends SectionHandler {
      * @param viewHolder onCreateFooterViewHolderForSection 创建的 和 onBindViewHolder中的一样
      * @param section    section下标
      */
-    void onBindFooterViewHolderForSection(final RecyclerView.ViewHolder viewHolder, int section);
+    void onBindFooterViewHolderForSection(final RecyclerViewHolder viewHolder, int section);
 
     /**
      * 给某个item绑定数据
@@ -41,7 +43,7 @@ public interface RecyclerViewSectionHandler extends SectionHandler {
      * @param indexInSection section中的行下标
      * @param section        section下标
      */
-    void onBindItemViewHolderForIndexPath(final RecyclerView.ViewHolder viewHolder, int indexInSection, int section);
+    void onBindItemViewHolderForIndexPath(final RecyclerViewHolder viewHolder, int indexInSection, int section);
 
     /**
      * getItemId 的重写方法

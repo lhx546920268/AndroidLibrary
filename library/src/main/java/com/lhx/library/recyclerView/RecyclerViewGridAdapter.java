@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * 网格布局
  */
 @SuppressWarnings("unused")
-public abstract class RecyclerViewGridSectionAdapter extends RecyclerViewSectionAdapter<GridSectionInfo> {
+public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
     ///水平
     public static final int HORIZONTAL_LIST = 0;
@@ -64,7 +64,7 @@ public abstract class RecyclerViewGridSectionAdapter extends RecyclerViewSection
     public boolean mShouldDrawDivider = false;
 
     ///构造方法
-    public RecyclerViewGridSectionAdapter(@Orientation int orientation, RecyclerView recyclerView) {
+    public RecyclerViewGridAdapter(@Orientation int orientation, RecyclerView recyclerView) {
         super(recyclerView);
 
         mOrientation = orientation;
@@ -84,7 +84,7 @@ public abstract class RecyclerViewGridSectionAdapter extends RecyclerViewSection
             @Override
             public int getSpanSize(int position) {
 
-                return RecyclerViewGridSectionAdapter.this.spanCountForPosition(position);
+                return RecyclerViewGridAdapter.this.spanCountForPosition(position);
             }
 
             @Override
@@ -191,7 +191,7 @@ public abstract class RecyclerViewGridSectionAdapter extends RecyclerViewSection
     ///获取spanCount
     private int spanCountForPosition(int position){
 
-        GridSectionInfo sectionInfo = sectionInfoForPosition(position);
+        GridSectionInfo sectionInfo = (GridSectionInfo)sectionInfoForPosition(position);
 
         if(sectionInfo.isHeaderForPosition(position) || sectionInfo.isFooterForPosition(position)) {
             return mDifferentColumnProduct;
@@ -268,7 +268,7 @@ public abstract class RecyclerViewGridSectionAdapter extends RecyclerViewSection
 
         public LayoutInfo(int position) {
 
-            GridSectionInfo sectionInfo = sectionInfoForPosition(position);
+            GridSectionInfo sectionInfo = (GridSectionInfo)sectionInfoForPosition(position);
 
             onTheTop = isOnTheTop(sectionInfo, position);
             onTheLeft = isOnTheLeft(sectionInfo, position);

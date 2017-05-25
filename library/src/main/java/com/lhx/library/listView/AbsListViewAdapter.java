@@ -121,7 +121,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     }
 
     @Override
-    public void onClickLoadMore() {
+    public final void onClickLoadMore() {
         getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_LOADING);
         onLoadMore();
     }
@@ -289,9 +289,9 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     @Override
     public final View getView(int position, View convertView, ViewGroup parent) {
 
-        //显示加载更多
+        //触发加载更多
         if(loadMoreEnable() && getLoadMoreControl().loadMoreEnable()){
-            if(mCount - position - 2 <= getLoadMoreControl().getReciprocalToLoadMore()){
+            if(mRealCount - position - 1 <= getLoadMoreControl().getReciprocalToLoadMore()){
                 getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_LOADING);
                 onLoadMore();
             }

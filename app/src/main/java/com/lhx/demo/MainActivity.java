@@ -20,6 +20,7 @@ import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
+import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
 import com.lhx.demo.text.TextBoundsFragment;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         infos.add("HttpAsyncTask");
         infos.add("Toast");
         infos.add("text bounds(字体范围)");
-        infos.add("loadMore (加载更多)");
+        infos.add("loadMore (加载更多 listView)");
+        infos.add("loadMore (加载更多 recyclerView)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -114,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
                     case 8 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, ListViewLoadMoreFragment
                                 .class));
+                        break;
+                    case 9 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
+                                RecyclerViewLoadMoreFragment.class));
                         break;
                 }
 
