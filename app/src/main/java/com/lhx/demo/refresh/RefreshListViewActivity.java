@@ -1,8 +1,10 @@
 package com.lhx.demo.refresh;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,7 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lhx.demo.R;
-import com.lhx.library.listView.AbsListViewSectionAdapter;
+import com.lhx.library.listView.AbsListViewAdapter;
 import com.lhx.library.refresh.RefreshControl;
 import com.lhx.library.refresh.RefreshHandler;
 import com.lhx.library.viewHoler.ViewHolder;
@@ -89,7 +91,7 @@ public class RefreshListViewActivity extends AppCompatActivity {
         });
 
         listView = (ListView)refreshControl.findViewById(R.id.list_view);
-        adapter = new Adapter();
+        adapter = new Adapter(this);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,7 +122,11 @@ public class RefreshListViewActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private class Adapter extends AbsListViewSectionAdapter {
+    private class Adapter extends AbsListViewAdapter {
+
+        public Adapter(@NonNull Context context) {
+            super(context);
+        }
 
         @Override
         public int numberOfSection() {
@@ -191,6 +197,16 @@ public class RefreshListViewActivity extends AppCompatActivity {
         @Override
         public int numberItemViewTypes() {
             return 3;
+        }
+
+        @Override
+        public void onLoadMore() {
+
+        }
+
+        @Override
+        public boolean loadMoreEnable() {
+            return false;
         }
     }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+    android:paddingTop="13dp"
+    android:paddingBottom="13dp">
+
+    <!--通用加载更多-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <!--菊花-->
+        <ProgressBar
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/refresh_control_progress_bar_size"
+            android:minHeight="@dimen/refresh_control_progress_bar_size"
+            android:maxHeight="@dimen/refresh_control_progress_bar_size"
+            android:maxWidth="@dimen/refresh_control_progress_bar_size"
+            android:layout_marginRight="5dp"
+            android:id="@+id/progress_bar"/>
+
+        <!--文字-->
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="加载更多"
+            android:textSize="15sp"
+            android:textColor="@color/gray"
+            android:id="@+id/text_view"
+            />
+
+    </LinearLayout>
+</FrameLayout>

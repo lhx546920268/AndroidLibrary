@@ -32,17 +32,17 @@ public class TabLayoutFragment extends AppBaseFragment {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position, TabLayout tabLayout) {
-                Toast.makeText(mActivity, datas[position], Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, datas[position], Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onTabUnselected(int position, TabLayout tabLayout) {
-                Toast.makeText(mActivity, datas[position], Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, datas[position], Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onTabReselected(int position, TabLayout tabLayout) {
-                Toast.makeText(mActivity, datas[position], Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, datas[position], Toast.LENGTH_SHORT).show();
             }
         });
         tabLayout.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {

@@ -16,7 +16,10 @@
     <color name="gray">#808080</color>
     <!--浅灰色-->
     <color name="light_gray">#d3d3d3</color>
-    <color name="light_blue">#FF007AFF</color>
+    <!--超级浅灰色-->
+    <color name="super_light_gray">#f0f0f0</color>
+    
+    <color name="light_blue">#ff007aff</color>
 
     <!--分割线颜色-->
     <color name="divider_color">#c8c8c8</color>

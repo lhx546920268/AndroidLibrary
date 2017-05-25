@@ -1,12 +1,15 @@
 package com.lhx.library.fragment;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +33,8 @@ public abstract class AppBaseFragment extends Fragment {
     ///导航栏
     protected NavigationBar mNavigationBar;
 
-    ///关联的activity
-    protected FragmentActivity mActivity;
-
+    ///关联的context
+    protected Context mContext;
 
     public AppBaseFragment() {
         // Required empty public constructor
@@ -41,13 +43,58 @@ public abstract class AppBaseFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActivity = getActivity();
+        Log.d("AppBaseFragment", "onActivityCreated");
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("AppBaseFragment", "onStart");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("AppBaseFragment", "onStop");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("AppBaseFragment", "onResume");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        Log.d("AppBaseFragment", "onAttach");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("AppBaseFragment", "onDestroy");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("AppBaseFragment", "onDestroyView");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("AppBaseFragment", "onDetach");
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d("AppBaseFragment", "onCreateView");
         if(mContainer == null){
             ///创建容器视图
             mContainer = new LinearLayout(getContext());
@@ -110,7 +157,7 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void startActivity(Class fragmentClass, Bundle bundle){
-        Intent intent = AppBaseActivity.openActivityWithFragment(mActivity, fragmentClass);
+        Intent intent = AppBaseActivity.getIntentWithFragment(mContext, fragmentClass);
         if(bundle != null){
             intent.putExtras(bundle);
         }

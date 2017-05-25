@@ -93,8 +93,8 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
 
                 switch (tabLayout.getSelectedTabPosition()){
                     case 0 : {
-                        AlertController controller = AlertController.buildAlert(mActivity, title, subtitle,
-                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
+                        AlertController controller = AlertController.buildAlert(mContext, title, subtitle,
+                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mContext, R.mipmap
                                         .checkboxmark) : null, strings);
 
                         controller.setShouldMesureContentHeight(true);
@@ -109,8 +109,8 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
                     }
                     break;
                     case 1 : {
-                        AlertController controller = AlertController.buildActionSheet(mActivity, title, subtitle,
-                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mActivity, R.mipmap
+                        AlertController controller = AlertController.buildActionSheet(mContext, title, subtitle,
+                                logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mContext, R.mipmap
                                         .checkboxmark) : null, strings);
 
                         controller.setShouldMesureContentHeight(true);

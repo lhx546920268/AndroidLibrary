@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Window;
 
 import com.lhx.library.R;
 
@@ -20,6 +21,9 @@ public class AppBaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_app_base);
@@ -71,7 +75,7 @@ public class AppBaseActivity extends AppCompatActivity {
         transaction.commitAllowingStateLoss();
     }
 
-    public static Intent openActivityWithFragment(Context context, Class fragmentClass){
+    public static Intent getIntentWithFragment(Context context, Class fragmentClass){
 
         Intent intent = new Intent(context, AppBaseActivity.class);
         intent.putExtra(FRAGMENT_STRING, fragmentClass.getName());

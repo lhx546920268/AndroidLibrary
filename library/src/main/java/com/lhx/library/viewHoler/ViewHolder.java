@@ -1,5 +1,6 @@
 package com.lhx.library.viewHoler;
 
+import android.support.annotation.IdRes;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -16,7 +17,7 @@ public class ViewHolder {
      * @return 子视图
      */
     @SuppressWarnings("unchecked")
-    public static <T extends View> T get(View rootView, int id){
+    public static <T extends View> T get(View rootView, @IdRes int id){
 
         ///保存子视图的集合
         SparseArray<View> holder = (SparseArray<View>) rootView.getTag(R.string.view_holer_tag_key);

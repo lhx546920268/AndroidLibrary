@@ -1,11 +1,19 @@
 package com.lhx.library.listView;
 
+import android.content.Context;
 import android.database.DataSetObserver;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import com.lhx.library.R;
+import com.lhx.library.loadmore.LoadMoreControl;
+import com.lhx.library.loadmore.LoadMoreHandler;
 import com.lhx.library.section.AbsListViewSectionHandler;
 import com.lhx.library.section.SectionInfo;
 
@@ -14,9 +22,10 @@ import java.util.ArrayList;
 ;
 
 /**
- * 把AbsListView 分成多个section
+ * 把AbsListView 支持分成多个section，加载更多，没有数据是显示空视图
  */
-public abstract class AbsListViewSectionAdapter extends BaseAdapter implements AbsListViewSectionHandler {
+public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListViewSectionHandler,
+        LoadMoreHandler, LoadMoreControl.LoadMoreControlHandler{
 
     ///section信息数组
     private ArrayList<SectionInfo> mSections = new ArrayList<>();
@@ -27,20 +36,58 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
     ///item数量
     private int mCount = 0;
 
-    public AbsListViewSectionAdapter() {
+    ///数据源item的数量
+    private int mRealCount = 0;
 
-        //注册数据改变监听
-        registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                mShouldReloadData = true;
-            }
+    //加载更多控制器
+    LoadMoreControl mLoadMoreControl;
 
-            @Override
-            public void onInvalidated() {
-                super.onInvalidated();
-            }
-        });
+    //空视图
+    private View mEmptyView;
+
+    ///上下文
+    private Context mContext;
+
+    public AbsListViewAdapter(@NonNull Context context) {
+
+        mContext = context;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        mShouldReloadData = true;
+        super.notifyDataSetChanged();
+    }
+
+    public LoadMoreControl getLoadMoreControl() {
+        if(mLoadMoreControl == null){
+            mLoadMoreControl = new LoadMoreControl(mContext);
+            mLoadMoreControl.setLoadMoreControlHandler(this);
+        }
+        return mLoadMoreControl;
+    }
+
+    public View getEmptyView() {
+        if(mEmptyView == null){
+            mEmptyView = View.inflate(mContext, R.layout.common_empty_view, null);
+        }
+        return mEmptyView;
+    }
+
+    public void setEmptyView(View emptyView) {
+        if(mEmptyView != emptyView){
+            mEmptyView = emptyView;
+        }
+    }
+
+    //当没有数据的时候是否显示空视图
+    protected boolean shouldDisplayEmptyView(){
+        return true;
+    }
+
+    //空视图高度 默认和listView一样高
+    protected int getEmptyViewHeight(){
+        return -1;
     }
 
     @Override
@@ -74,6 +121,43 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
     }
 
     @Override
+    public void onClickLoadMore() {
+        getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_LOADING);
+        onLoadMore();
+    }
+
+    @Override
+    public final void loadMoreComplete(boolean hasMore) {
+        if(!loadMoreEnable())
+            return;
+
+        if(hasMore){
+            getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_HAS_MORE);
+        }else {
+            getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_NO_MORE_DATA);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public final void loadMoreFail() {
+        if(!loadMoreEnable())
+            return;
+        getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_FAIL);
+    }
+
+    //是否是加载更多的UI
+    private boolean isLoadMoreItem(int position){
+        return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
+    }
+
+    //是否是空视图
+    private boolean isEmptyView(int position){
+        return mRealCount == 0 && shouldDisplayEmptyView();
+    }
+
+    @Override
     public final int getCount() {
 
         if(mShouldReloadData){
@@ -101,6 +185,17 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
                 if(sectionInfo.isExistFooter)
                     count ++;
             }
+
+            mRealCount = count;
+
+            if(loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
+                count ++;
+            }
+
+            if(count == 0 && shouldDisplayEmptyView()){
+                count ++;
+            }
+
             mCount = count;
         }
 
@@ -109,6 +204,9 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
 
     @Override
     public final Object getItem(int position) {
+
+        if(isEmptyView(position) || isLoadMoreItem(position))
+            return null;
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
 
@@ -129,6 +227,10 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
 
     @Override
     public final int getItemViewType(int position) {
+
+        if(isEmptyView(position) || isLoadMoreItem(position)){
+            return numberItemViewTypes();
+        }
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
 
@@ -151,11 +253,21 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
     @Override
     public final int getViewTypeCount() {
 
-        return numberItemViewTypes();
+        int count = numberItemViewTypes();
+        if(loadMoreEnable() && mLoadMoreControl.shouldDisplay())
+            count ++;
+
+        if(mRealCount == 0 && shouldDisplayEmptyView())
+            count ++;
+
+        return count;
     }
 
     @Override
     public final long getItemId(int position) {
+
+        if(isEmptyView(position) || isLoadMoreItem(position))
+            return 0;
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
 
@@ -176,6 +288,41 @@ public abstract class AbsListViewSectionAdapter extends BaseAdapter implements A
 
     @Override
     public final View getView(int position, View convertView, ViewGroup parent) {
+
+        //显示加载更多
+        if(loadMoreEnable() && getLoadMoreControl().loadMoreEnable()){
+            if(mCount - position - 2 <= getLoadMoreControl().getReciprocalToLoadMore()){
+                getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_LOADING);
+                onLoadMore();
+            }
+        }
+
+        //显示空视图
+        if(isEmptyView(position)){
+            View emptyView = getEmptyView();
+            AbsListView.LayoutParams params = null;
+            if(emptyView.getLayoutParams() instanceof  AbsListView.LayoutParams){
+                params = (AbsListView.LayoutParams)emptyView.getLayoutParams();
+            }
+
+            if(params == null){
+                params = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams
+                        .WRAP_CONTENT);
+            }
+
+            int height = getEmptyViewHeight();
+            if(height < 0){
+                height = parent.getHeight();
+            }
+            params.height = height;
+
+            emptyView.setLayoutParams(params);
+            return emptyView;
+        }
+
+
+        if(isLoadMoreItem(position))
+            return getLoadMoreControl().getContentView();
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
 

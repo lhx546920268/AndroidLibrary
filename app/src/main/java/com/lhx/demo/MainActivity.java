@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
+import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
 import com.lhx.demo.text.TextBoundsFragment;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("HttpAsyncTask");
         infos.add("Toast");
         infos.add("text bounds(字体范围)");
+        infos.add("loadMore (加载更多)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -90,23 +92,27 @@ public class MainActivity extends AppCompatActivity {
                         clazz = RefreshActivity.class;
                         break;
                     case 2 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, DialogFragment.class));
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, DialogFragment.class));
                         break;
                     case 3 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this,
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
                                 CornerDrawableFragment.class));
                         break;
                     case 4 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, TabLayoutFragment.class));
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, TabLayoutFragment.class));
                         break;
                     case 5 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, HttpFragment.class));
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, HttpFragment.class));
                         break;
                     case 6 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, ToastFragment.class));
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, ToastFragment.class));
                         break;
                     case 7 :
-                        startActivity(AppBaseActivity.openActivityWithFragment(MainActivity.this, TextBoundsFragment
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, TextBoundsFragment
+                                .class));
+                        break;
+                    case 8 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, ListViewLoadMoreFragment
                                 .class));
                         break;
                 }

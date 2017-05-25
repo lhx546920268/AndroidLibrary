@@ -56,8 +56,8 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
                         "c914cddf1e36cca2255c2d902e.png?1494425270#h"){
                     @Override
                     public void onConfigure(HttpRequest request) {
-                        request.setDownloadTemporayPath(FileUtil.getTemporaryFilePath(mActivity, ""));
-                        request.setDownloadDestinationPath(FileUtil.getTemporaryFilePath(mActivity, ""));
+                        request.setDownloadTemporayPath(FileUtil.getTemporaryFilePath(mContext, ""));
+                        request.setDownloadDestinationPath(FileUtil.getTemporaryFilePath(mContext, ""));
                         request.setShowDownloadProgress(true);
                     }
                 };

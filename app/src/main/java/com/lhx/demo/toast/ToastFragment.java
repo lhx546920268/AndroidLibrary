@@ -26,7 +26,7 @@ public class ToastFragment extends AppBaseFragment implements View.OnClickListen
         int id = v.getId();
         switch (id){
             case R.id.icon_text :
-                ToastUtil.alert(mActivity, "a toast", R.mipmap.checkboxmark);
+                ToastUtil.alert(mContext, "a toast", R.mipmap.checkboxmark);
                 break;
         }
     }
