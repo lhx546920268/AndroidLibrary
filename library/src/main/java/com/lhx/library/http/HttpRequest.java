@@ -456,10 +456,10 @@ public class HttpRequest {
                 String string = null;
                 if(multiPartBytes == null){
                     switch (type){
-                        case PARAM_TYPE_FILE :
+                        case PARAM_TYPE_NORMAL :
                             string = "Content-Disposition: form-data; name=\"" + key + "\"\r\n" + value;
                             break;
-                        case PARAM_TYPE_NORMAL :
+                        case PARAM_TYPE_FILE :
                             StringBuilder builder = new StringBuilder();
                             builder.append("Content-Disposition: form-data; name=\"");
                             builder.append(key);
@@ -467,7 +467,12 @@ public class HttpRequest {
                             builder.append(file.getName());
                             builder.append("\"\r\n");
                             builder.append("Content-Type: ");
-                            builder.append(FileUtil.getMimeType(file.getAbsolutePath()));
+
+                            String mime = FileUtil.getMimeType(file.getAbsolutePath());
+                            if(StringUtil.isEmpty(mime)){
+                                mime = "application/octet-stream; charset=" + mStringEncoding;
+                            }
+                            builder.append(mime);
                             builder.append("\r\n");
                             string = builder.toString();
                             break;
@@ -475,8 +480,9 @@ public class HttpRequest {
                             string = "";
                             break;
                     }
+                    multiPartBytes = string.getBytes(mStringEncoding);
                 }
-                multiPartBytes = string.getBytes(mStringEncoding);
+
             }catch (UnsupportedEncodingException e){
                 e.printStackTrace();
                 multiPartBytes = new byte[0];
@@ -511,8 +517,7 @@ public class HttpRequest {
     private void buildURLEncodePostBody() throws IOException{
 
         mTotalSizeDidUpload = 0;
-        mConn.setDoOutput(true);
-        OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
+
 
         mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s", URL_ENCODE, CHAR_SET,
                 mStringEncoding));
@@ -532,9 +537,19 @@ public class HttpRequest {
         byte[] bytes = builder.toString().getBytes(mStringEncoding);
         mTotalSizeToUpload = bytes.length;
         mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
-        mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+        try {
+            //jdk 1.7才有
+            mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+        }catch (NoSuchMethodError e){
+            mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+        }
 
+
+        mConn.setDoOutput(true);
+        OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
+        //这时已建立连接 不能在设置 setRequestProperty
         outputStream.write(bytes);
+
         mTotalSizeDidUpload += bytes.length;
         updateUploadProgress();
 
@@ -547,15 +562,15 @@ public class HttpRequest {
 
         mTotalSizeDidUpload = 0;
         mTotalSizeToUpload = 0;
-        mConn.setDoOutput(true);
-        OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
 
         ///form data 边界
         String boundary = "0xKhTmLbOuNdArY-" + Build.SERIAL;
 
         //格式类型
-        mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s; boundary=%s",
-                MULTI_PART_FORM_DATA, CHAR_SET, mStringEncoding, boundary));
+        String contentType = String.format(Locale.getDefault(), "%s; %s=%s; boundary=%s",
+                MULTI_PART_FORM_DATA, CHAR_SET, mStringEncoding, boundary);
+
+        mConn.setRequestProperty(CONTENT_TYPE, contentType);
 
         //每个参数的分隔符
         byte[] paramSeparatorBytes = String.format(Locale.getDefault(), "\r\n--%s\r\n", boundary).getBytes(mStringEncoding);
@@ -584,8 +599,17 @@ public class HttpRequest {
 
         //设置上传长度
         mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
-        mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+        try {
+            //jdk1.7 才有
+            mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+        }catch (NoSuchMethodError e){
+            mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+        }
 
+        mConn.setDoOutput(true);
+        OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
+
+        //这时已建立连接 不能在设置 setRequestProperty
         outputStream.write(bytes);
         mTotalSizeDidUpload += bytes.length;
         updateUploadProgress();
@@ -632,24 +656,20 @@ public class HttpRequest {
     }
 
     //读取文件
-    private long readFile(File file, OutputStream outputStream) throws IOException{
+    private void readFile(File file, OutputStream outputStream) throws IOException{
         BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         int result = 0;
-        long len = 0;
-        do {
-            byte[] bytes = new byte[1024 * 256];
-            result = inputStream.read(bytes);
-            outputStream.write(bytes, 0, result); //写入实际大小
-            if (result != -1) {
-                len += result;
-                mTotalSizeDidUpload += len;
-                updateUploadProgress();
-            }
-        } while (result != -1);
+
+        byte[] bytes = new byte[1024 * 256];
+        while ((result = inputStream.read(bytes)) != -1){
+
+            //写入实际大小
+            outputStream.write(bytes, 0, result);
+            mTotalSizeDidUpload += result;
+            updateUploadProgress();
+        }
 
         inputStream.close();
-
-        return len;
     }
 
     //把输入流转成字节流

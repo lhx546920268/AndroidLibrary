@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import com.lhx.library.R;
 import com.lhx.library.loadmore.LoadMoreControl;
 import com.lhx.library.loadmore.LoadMoreHandler;
+import com.lhx.library.section.OnItemClickListener;
 import com.lhx.library.section.RecyclerViewSectionHandler;
 import com.lhx.library.section.SectionInfo;
 import com.lhx.library.viewHoler.RecyclerViewHolder;
+import com.lhx.library.widget.OnSingleClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder> implements
-        RecyclerViewSectionHandler, LoadMoreControl.LoadMoreControlHandler, LoadMoreHandler{
+        RecyclerViewSectionHandler, LoadMoreControl.LoadMoreControlHandler, LoadMoreHandler, OnItemClickListener{
 
 
     //关联的
@@ -167,31 +169,20 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         return false;
     }
 
-    /**
-     * 点击item
-     * @param indexInSection section中的行下标
-     * @param section section下标
-     */
-    public void onClickItemAtIndexPath(int indexInSection, int section){
+    @Override
+    public void onItemClick(int indexInSection, int section) {
 
     }
 
-    /**
-     * 点击头部
-     * @param section 头部下标
-     */
-    public void onClickHeaderAtSection(int section){
+    @Override
+    public void onHeaderClick(int section) {
 
     }
 
-    /**
-     * 点击底部
-     * @param section 底部下标
-     */
-    public void  onClickFooterAtSection(int section){
+    @Override
+    public void onFooterClick(int section) {
 
     }
-
 
     /**
      * 获取item
@@ -337,10 +328,9 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             }
             default : {
                 final RecyclerViewHolder holder = onCreateViewHolderForViewType(viewType, parent);
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                holder.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
-                    public void onClick(View view) {
-
+                    public void onSingleClick(View v) {
                         ///添加点击事件
                         int position = holder.getAdapterPosition();
                         SectionInfo sectionInfo = sectionInfoForPosition(position);
@@ -348,13 +338,13 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                         ///存在头部
                         if(sectionInfo.isHeaderForPosition(position)){
 
-                            onClickHeaderAtSection(sectionInfo.section);
+                            onHeaderClick(sectionInfo.section);
                         }else if(sectionInfo.isFooterForPosition(position)){
                             ///存在底部
-                            onClickFooterAtSection(sectionInfo.section);
+                            onFooterClick(sectionInfo.section);
                         }else {
 
-                            onClickItemAtIndexPath(position - sectionInfo.getItemPosition(), sectionInfo.section);
+                            onItemClick(position - sectionInfo.getItemPosition(), sectionInfo.section);
                         }
                     }
                 });

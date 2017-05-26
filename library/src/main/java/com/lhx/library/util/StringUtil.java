@@ -9,6 +9,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 /**
@@ -56,13 +57,47 @@ public class StringUtil {
      */
     public static long parseLong(String string){
         long value = 0;
-        try {
-            value = Long.parseLong(string);
-        }catch (NumberFormatException e){
-            e.printStackTrace();
+        if(!isEmpty(string)){
+            try {
+                value = Long.parseLong(string);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
         }
 
+
         return value;
+    }
+
+    /**
+     * 判断字符串是否为空
+     * @param string 要判断的字符串
+     * @return 是否为空
+     */
+    public static boolean isEmpty(String string){
+        return string == null || string.length() == 0 || "null".equals(string);
+    }
+
+    public static String stringFromBytes(byte[] bytes){
+        return stringFromBytes(bytes, "utf-8");
+    }
+
+    /**
+     * 通过字节生成字符串
+     * @param bytes 字节数组
+     * @param charset 字符编码
+     * @return 字符串
+     */
+    public static String stringFromBytes(byte[] bytes, String charset){
+        if(bytes == null || bytes.length == 0)
+            return "";
+
+        try {
+            return new String(bytes, 0, bytes.length, charset);
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public static int mesureTextHeight(CharSequence text, Context context, int textSize, int maxWidth){

@@ -89,7 +89,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             }
 
             View view = (View)object;
-            view.setTag(R.integer.view_pager_position_tag_key, realPosition);
+            view.setTag(R.id.view_pager_position_tag_key, realPosition);
             if(view.getParent() == null){
                 container.addView(view);
             }
@@ -190,7 +190,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             Iterator<View> iterator = viewHashSet.iterator();
             while (iterator.hasNext()){
                 View view = iterator.next();
-                int position = (int)view.getTag(R.integer.view_pager_position_tag_key);
+                int position = (int)view.getTag(R.id.view_pager_position_tag_key);
                 instantiateItemForRealPosition(view, position, getViewType(position));
             }
         }
@@ -222,7 +222,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             Iterator<View> iterator = viewHashSet.iterator();
             while (iterator.hasNext()){
                 View view = iterator.next();
-                int tag = (int)view.getTag(R.integer.view_pager_position_tag_key);
+                int tag = (int)view.getTag(R.id.view_pager_position_tag_key);
                 if(tag == position)
                     return view;
             }

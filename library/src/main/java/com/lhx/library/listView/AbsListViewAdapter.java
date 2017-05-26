@@ -15,7 +15,9 @@ import com.lhx.library.R;
 import com.lhx.library.loadmore.LoadMoreControl;
 import com.lhx.library.loadmore.LoadMoreHandler;
 import com.lhx.library.section.AbsListViewSectionHandler;
+import com.lhx.library.section.OnItemClickListener;
 import com.lhx.library.section.SectionInfo;
+import com.lhx.library.widget.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -25,7 +27,7 @@ import java.util.ArrayList;
  * 把AbsListView 支持分成多个section，加载更多，没有数据是显示空视图
  */
 public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListViewSectionHandler,
-        LoadMoreHandler, LoadMoreControl.LoadMoreControlHandler{
+        LoadMoreHandler, LoadMoreControl.LoadMoreControlHandler, OnItemClickListener{
 
     ///section信息数组
     private ArrayList<SectionInfo> mSections = new ArrayList<>();
@@ -118,6 +120,21 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     @Override
     public int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type){
         return type;
+    }
+
+    @Override
+    public void onItemClick(int indexInSection, int section) {
+
+    }
+
+    @Override
+    public void onHeaderClick(int section) {
+
+    }
+
+    @Override
+    public void onFooterClick(int section) {
+
     }
 
     @Override
@@ -329,7 +346,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         //判断重用的view是否正确
         int type = getItemViewType(position);
         if(convertView != null){
-            int viewType = (int)convertView.getTag(R.integer.list_view_tag_key);
+            int viewType = (int)convertView.getTag(R.id.list_view_type_tag_key);
             if(viewType != type){
                 convertView = null;
             }
@@ -338,10 +355,10 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         View view;
 
         ///存在头部
-        if(position == sectionInfo.getHeaderPosition() && sectionInfo.isExistHeader){
+        if(sectionInfo.isHeaderForPosition(position)){
 
             view = getSectionHeaderForSection(sectionInfo.section, convertView, parent);
-        }else if(sectionInfo.isExistFooter && position == sectionInfo.getFooterPosition()){
+        }else if(sectionInfo.isFooterForPosition(position)){
 
             ///存在底部
             view = getSectionFooterForSection(sectionInfo.section, convertView, parent);
@@ -350,7 +367,32 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             view = getViewForIndexPath(position - sectionInfo.getItemPosition(), sectionInfo.section, convertView,
                     parent);
         }
-        view.setTag(R.integer.list_view_tag_key, type);
+        view.setTag(R.id.list_view_type_tag_key, type);
+        view.setTag(R.id.list_view_item_position_tag_key, position);
+
+        if(!view.hasOnClickListeners()){
+            //添加点击事件
+            view.setOnClickListener(new OnSingleClickListener() {
+                @Override
+                public void onSingleClick(View v) {
+                    int position = (int)v.getTag(R.id.list_view_item_position_tag_key);
+                    SectionInfo sectionInfo = sectionInfoForPosition(position);
+
+                    ///存在头部
+                    if(sectionInfo.isHeaderForPosition(position)){
+
+                        onHeaderClick(sectionInfo.section);
+                    }else if(sectionInfo.isFooterForPosition(position)){
+                        ///存在底部
+                        onFooterClick(sectionInfo.section);
+                    }else {
+
+                        onItemClick(position - sectionInfo.getItemPosition(), sectionInfo.section);
+                    }
+                }
+            });
+        }
+
         return view;
     }
 

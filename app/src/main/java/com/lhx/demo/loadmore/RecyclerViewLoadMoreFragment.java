@@ -125,7 +125,7 @@ public class RecyclerViewLoadMoreFragment extends AppBaseFragment implements Han
         }
 
         @Override
-        public void onClickItemAtIndexPath(int indexInSection, int section) {
+        public void onItemClick(int indexInSection, int section) {
             strings.clear();
             notifyDataSetChanged();
         }

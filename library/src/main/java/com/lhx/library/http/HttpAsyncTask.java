@@ -38,6 +38,9 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     //编码类型
     protected String mStringEncoding = "utf-8";
 
+    //用来识别是哪个请求
+    private String mName;
+
     //http请求
     protected HttpRequest mHttpRequest;
 
@@ -74,6 +77,18 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     public void setStringEncoding(String stringEncoding) {
         mStringEncoding = stringEncoding;
+    }
+
+    public String getURL() {
+        return mURL;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     //把结果转成string

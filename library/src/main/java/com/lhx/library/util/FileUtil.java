@@ -1,7 +1,10 @@
 package com.lhx.library.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
@@ -26,16 +29,25 @@ public class FileUtil {
      */
     public static String getMimeType(@NonNull String filePath){
 
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        String mine = "";
-        try {
-            retriever.setDataSource(filePath);
-            mine = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-        }catch (IllegalArgumentException e){
-            e.printStackTrace();
+        int index = filePath.lastIndexOf("/");
+        String fileName = filePath;
+        String extension = "";
+        //通过文件名称获取 拓展名，防止文件路径里面有 .
+        if(index != -1){
+            fileName = filePath.substring(index);
         }
 
-        return mine;
+        int extensionIndex = fileName.lastIndexOf(".");
+        if(extensionIndex != -1 && extensionIndex + 1 < fileName.length()){
+            extension = fileName.substring(extensionIndex + 1);
+        }
+
+        if(!StringUtil.isEmpty(extension)){
+            MimeTypeMap map = MimeTypeMap.getSingleton();
+            return map.getMimeTypeFromExtension(extension);
+        }
+
+        return "";
     }
 
     /**
@@ -269,5 +281,36 @@ public class FileUtil {
         }
 
         return true;
+    }
+
+    /**
+     * 通过uri 获取文件路径
+     * @param uri uri
+     * @return 成功则返回文件路径，否则返回null
+     */
+    public static String filePathFromUri(Context context, Uri uri){
+        Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Video.VideoColumns.DATA},
+                null, null, null);
+        String scheme = uri.getScheme();
+        if(scheme == null){
+
+            return uri.getPath();
+        }else if(ContentResolver.SCHEME_FILE.equals(scheme)){
+
+            return uri.getPath();
+        }else if(ContentResolver.SCHEME_CONTENT.equals(scheme)){
+
+            if(cursor != null){
+                if(cursor.moveToFirst()){
+                    int index = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
+                    if(index > -1){
+                        return cursor.getString(index);
+                    }
+                }
+                cursor.close();
+            }
+        }
+
+        return null;
     }
 }
