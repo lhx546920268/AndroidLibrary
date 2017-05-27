@@ -55,12 +55,11 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     }
 
     public HttpAsyncTask(String URL, ContentValues params) {
-        mURL = URL;
-        mParams = params;
+        this(URL, params, null);
     }
 
     public HttpAsyncTask(String URL) {
-        mURL = URL;
+        this(URL, null, null);
     }
 
     public void setHttpRequestHandler(HttpRequestHandler httpRequestHandler) {
@@ -144,7 +143,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         return null;
     }
 
-    //配置 http
+    //配置 http 不要在该方法上做任何与主线程有关的东西
     public abstract void onConfigure(HttpRequest request);
 
     @Override
@@ -189,5 +188,13 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
             mHttpRequest.close();
             mHttpRequest = null;
         }
+    }
+
+    public HttpAsyncTask startSerially(){
+        return (HttpAsyncTask)execute();
+    }
+
+    public HttpAsyncTask startConcurrently(){
+        return (HttpAsyncTask)executeOnExecutor(THREAD_POOL_EXECUTOR);
     }
 }

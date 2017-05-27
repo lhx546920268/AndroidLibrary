@@ -457,7 +457,7 @@ public class HttpRequest {
                 if(multiPartBytes == null){
                     switch (type){
                         case PARAM_TYPE_NORMAL :
-                            string = "Content-Disposition: form-data; name=\"" + key + "\"\r\n" + value;
+                            string = "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n" + value;
                             break;
                         case PARAM_TYPE_FILE :
                             StringBuilder builder = new StringBuilder();
@@ -473,7 +473,7 @@ public class HttpRequest {
                                 mime = "application/octet-stream; charset=" + mStringEncoding;
                             }
                             builder.append(mime);
-                            builder.append("\r\n");
+                            builder.append("\r\n\r\n");
                             string = builder.toString();
                             break;
                         default :
