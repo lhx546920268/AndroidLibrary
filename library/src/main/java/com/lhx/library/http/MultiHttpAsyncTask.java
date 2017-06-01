@@ -48,12 +48,16 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
 
     public void startSerially(){
         for(HttpAsyncTask task : mTasks){
+            if(task.getStatus() != AsyncTask.Status.PENDING)
+                continue;
             task.execute();
         }
     }
 
     public void startConcurrently(){
         for(HttpAsyncTask task : mTasks){
+            if(task.getStatus() != AsyncTask.Status.PENDING)
+                continue;
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }

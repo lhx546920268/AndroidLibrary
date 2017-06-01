@@ -3,6 +3,7 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -134,7 +135,6 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
                 data = mHttpRequest.getResponseData();
             }
 
-            publishProgress();
             mHttpRequest.close();
             mHttpRequest = null;
             return data;
@@ -148,6 +148,8 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     @Override
     protected void onPostExecute(byte[] bytes) {
+
+        //http完成
         if(mHttpRequestHandler != null){
             if(mErrorCode == HttpRequest.ERROR_CODE_NONE && bytes != null){
                 mHttpRequestHandler.onSuccess(this, bytes);
@@ -164,6 +166,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         //更新进度条
         if(mHttpProgressHandler != null && values.length > 1){
             float type = values[1];
+
             if(type == PROGRESS_UPLOAD){
                 mHttpProgressHandler.onUpdateUploadProgress(this, values[0]);
             }else if(type == PROGRESS_DOWNLOAD){
@@ -188,6 +191,25 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
             mHttpRequest.close();
             mHttpRequest = null;
         }
+    }
+
+    public void cancel(){
+        cancel(true);
+        if(mHttpRequest != null){
+            Log.d("mHttpRequest", "http try cancel");
+
+            mHttpRequest.cancel();
+        }
+    }
+
+    //是否正在执行
+    public boolean isExecuting(){
+        return getStatus() == Status.RUNNING;
+    }
+
+    //是否已结束
+    public boolean isFinished(){
+        return getStatus() == Status.FINISHED;
     }
 
     public HttpAsyncTask startSerially(){

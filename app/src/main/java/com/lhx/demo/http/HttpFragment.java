@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.lhx.library.http.HttpRequest;
 import com.lhx.library.http.HttpRequestHandler;
 import com.lhx.library.security.MD5;
 import com.lhx.library.util.FileUtil;
+import com.lhx.library.util.ImageUtil;
 import com.lhx.library.util.StringUtil;
 
 import java.io.File;
@@ -152,6 +154,10 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
                 break;
             case R.id.upload_btn : {
 
+                if(mUploadImgTask != null && mUploadImgTask.isExecuting()){
+                    mUploadImgTask.cancel();
+                    return;
+                }
                  Intent intent = new Intent(Intent.ACTION_PICK,
                  android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                  intent.setType("image/*");
@@ -168,9 +174,12 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
             if(requestCode == SELECT_PHOTO_ID && data != null){
                 Uri uri = data.getData();
                 ImageView imageView = findViewById(R.id.upload_img);
-                imageView.setImageURI(uri);
 
+
+                DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
                 String filePath = FileUtil.filePathFromUri(mContext, uri);
+                imageView.setImageBitmap(ImageUtil.adjustImage(filePath, metrics.widthPixels, metrics.heightPixels));
+
                 File file = new File(filePath);
 
                 ContentValues values = new ContentValues(1);
