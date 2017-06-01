@@ -557,7 +557,7 @@ public class HttpRequest {
     }
 
     //构建 URL encode 类型的
-    private void buildURLEncodePostBody() throws IOException{
+    private void buildURLEncodePostBody(){
 
         mTotalSizeDidUpload = 0;
         mConn.setRequestProperty(CONTENT_TYPE, String.format(Locale.getDefault(), "%s; %s=%s", URL_ENCODE, CHAR_SET,
@@ -575,7 +575,7 @@ public class HttpRequest {
             i++;
         }
 
-        byte[] bytes = builder.toString().getBytes(mStringEncoding);
+        byte[] bytes =  getBytes(builder.toString());
         mTotalSizeToUpload = bytes.length;
         mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
         try {
@@ -586,18 +586,24 @@ public class HttpRequest {
         }
 
 
-        mConn.setDoOutput(true);
-        OutputStream outputStream = new BufferedOutputStream(mConn.getOutputStream());
-        mStreams.add(outputStream);
+        OutputStream outputStream = null;
+        try {
+            mConn.setDoOutput(true);
+            outputStream = new BufferedOutputStream(mConn.getOutputStream());
+            mStreams.add(outputStream);
 
-        //这时已建立连接 不能在设置 setRequestProperty
-        outputStream.write(bytes);
+            //这时已建立连接 不能在设置 setRequestProperty
+            outputStream.write(bytes);
 
-        mTotalSizeDidUpload += bytes.length;
-        updateUploadProgress();
+            mTotalSizeDidUpload += bytes.length;
+            updateUploadProgress();
 
-        outputStream.flush();
-        closeStream(outputStream);
+            outputStream.flush();
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            closeStream(outputStream);
+        }
     }
 
     //获取字节
