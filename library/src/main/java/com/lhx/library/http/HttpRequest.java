@@ -3,7 +3,6 @@ package com.lhx.library.http;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.lhx.library.util.FileUtil;
 import com.lhx.library.util.StringUtil;
@@ -24,8 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
@@ -45,7 +46,8 @@ public class HttpRequest {
     public static final int ERROR_CODE_BAD_URL = 3; //url 不合法
     public static final int ERROR_CODE_IO = 4; //输入输出流异常
     public static final int ERROR_CODE_FILE_NOT_EXIST = 5; //上传文件文件不存在
-    public static final int ERROR_CODE_NOT_KNOW = 6; //未知错误
+    public static final int ERROR_CODE_NETWORK = 6; //网络错误
+    public static final int ERROR_CODE_NOT_KNOW = 7; //未知错误
 
     //postBody 默认格式
     protected static final String URL_ENCODE = "application/x-www-form-urlencoded";
@@ -146,9 +148,6 @@ public class HttpRequest {
 
     //请求进度回调
     private HttpProgressHandler<HttpRequest> mHttpProgressHandler;
-
-    //正在开启的io流
-    private HashSet<Closeable> mStreams;
 
     //post 请求参数格式
     private
@@ -319,7 +318,7 @@ public class HttpRequest {
     /**开启请求任务
      * @return 是否成功
      */
-    public synchronized boolean startRequest() {
+    public boolean startRequest() {
 
         switch (mState){
             case HTTP_REQUEST_STATE_LOADING :
@@ -332,9 +331,9 @@ public class HttpRequest {
                 throw new IllegalStateException("HttpRequest have been close");
         }
 
+        InputStream inputStream = null;
         try {
 
-            mStreams = new HashSet<>();
             setState(HTTP_REQUEST_STATE_LOADING);
 
             URL url = new URL(mURL);
@@ -360,8 +359,7 @@ public class HttpRequest {
 
             /// 系统提供的方法要 java 7以上才能用
             mTotalSizeToDownload = StringUtil.parseLong(mConn.getHeaderField("Content-Length"));
-            InputStream inputStream = mConn.getInputStream();
-            mStreams.add(inputStream);
+            inputStream = mConn.getInputStream();
 
             if(mDownloadTemporayPath != null){
                 writeToFile(inputStream, mConn.getContentType());
@@ -380,23 +378,27 @@ public class HttpRequest {
             fail(ERROR_CODE_BAD_URL, 0);
         }catch (SocketException e){
 
-            setState(HTTP_REQUEST_STATE_CANCELED);
+            if(mState == HTTP_REQUEST_STATE_LOADING){
+                fail(ERROR_CODE_HTTP, 0);
+            }
         }catch (IOException ioe) {
 
-            fail(ERROR_CODE_IO, 0);
-        } finally {
-
-            //关闭所有io流
-            for(Closeable stream : mStreams){
-                try {
-                    stream.close();
-                }catch (IOException e){
-                    e.printStackTrace();
+            //包括 UnknownHostException
+            if(mState == HTTP_REQUEST_STATE_LOADING){
+                if(ioe instanceof UnknownHostException){
+                    fail(ERROR_CODE_NETWORK, 0);
+                }else if(ioe instanceof SocketTimeoutException){
+                    fail(ERROR_CODE_TIME_OUT, 0);
+                }else {
+                    fail(ERROR_CODE_IO, 0);
                 }
             }
-            mStreams.clear();
+        } finally {
 
-            if(mConn != null){
+            //关闭io流
+            closeStream(inputStream);
+
+            if(mConn != null && mState == HTTP_REQUEST_STATE_LOADING){
                 mConn.disconnect();
             }
         }
@@ -410,7 +412,9 @@ public class HttpRequest {
 
     //取消
     public synchronized void cancel(){
+
         if(mConn != null && mState == HTTP_REQUEST_STATE_LOADING){
+            setState(HTTP_REQUEST_STATE_CANCELED);
             mConn.disconnect();
         }
     }
@@ -427,6 +431,8 @@ public class HttpRequest {
     public synchronized void close(){
         if(mState == HTTP_REQUEST_STATE_CLOESED)
             return;
+
+        cancel();
         setState(HTTP_REQUEST_STATE_CLOESED);
         mConn = null;
         mResponseData = null;
@@ -438,9 +444,8 @@ public class HttpRequest {
 
     //关闭io流
     public synchronized void closeStream(Closeable stream){
-        if(stream != null && mStreams.contains(stream)){
+        if(stream != null){
             try {
-                mStreams.remove(stream);
                 stream.close();
             }catch (IOException e){
 
@@ -590,7 +595,6 @@ public class HttpRequest {
         try {
             mConn.setDoOutput(true);
             outputStream = new BufferedOutputStream(mConn.getOutputStream());
-            mStreams.add(outputStream);
 
             //这时已建立连接 不能在设置 setRequestProperty
             outputStream.write(bytes);
@@ -672,7 +676,6 @@ public class HttpRequest {
         try {
             mConn.setDoOutput(true);
             outputStream = new BufferedOutputStream(mConn.getOutputStream());
-            mStreams.add(outputStream);
 
             //这时已建立连接 不能在设置 setRequestProperty
             outputStream.write(bytes);
@@ -729,7 +732,6 @@ public class HttpRequest {
 
         try {
             inputStream = new BufferedInputStream(new FileInputStream(file));
-            mStreams.add(inputStream);
             int result = 0;
 
             byte[] bytes = new byte[1024 * 256];
@@ -756,9 +758,7 @@ public class HttpRequest {
         try {
 
             bufferedInputStream = new BufferedInputStream(inputStream);
-            mStreams.add(bufferedInputStream);
             outputStream = new ByteArrayOutputStream();
-            mStreams.add(outputStream);
 
             int len = 0;
             long totalSize = 0;
@@ -802,9 +802,7 @@ public class HttpRequest {
 
         try {
             outputStream = new FileOutputStream(file);
-            mStreams.add(outputStream);
             bufferedInputStream = new BufferedInputStream(inputStream);
-            mStreams.add(bufferedInputStream);
 
             byte[] bytes = new byte[1024 * 256];
 

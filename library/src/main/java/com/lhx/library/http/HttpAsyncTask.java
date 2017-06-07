@@ -191,13 +191,14 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
             mHttpRequest.close();
             mHttpRequest = null;
         }
+        if(mHttpRequestHandler != null){
+            mHttpRequestHandler.onComplete(this);
+        }
     }
 
     public void cancel(){
         cancel(true);
         if(mHttpRequest != null){
-            Log.d("mHttpRequest", "http try cancel");
-
             mHttpRequest.cancel();
         }
     }

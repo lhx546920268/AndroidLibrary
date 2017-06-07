@@ -20,13 +20,13 @@ public class ViewHolder {
     public static <T extends View> T get(View rootView, @IdRes int id){
 
         ///保存子视图的集合
-        SparseArray<View> holder = (SparseArray<View>) rootView.getTag(R.string.view_holer_tag_key);
+        SparseArray<View> holder = (SparseArray<View>) rootView.getTag(R.id.view_holer_tag_key);
 
         if (holder == null) {
 
             ///创建集合并关联rootView
             holder = new SparseArray<>();
-            rootView.setTag(R.string.view_holer_tag_key, holder);
+            rootView.setTag(R.id.view_holer_tag_key, holder);
         }
 
         View childView = holder.get(id);

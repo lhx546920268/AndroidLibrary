@@ -10,6 +10,7 @@
     <color name="cyan">#00ffff</color>
     <color name="blue">#0000ff</color>
     <color name="purple">#800080</color>
+    <color name="transparent">#00000000</color>
 
 
     <!--灰色-->

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.lhx.demo.R;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.recyclerView.RecyclerViewAdapter;
+import com.lhx.library.recyclerView.RecyclerViewGridAdapter;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.viewHoler.RecyclerViewHolder;
 
@@ -38,13 +39,13 @@ public class RecyclerViewLoadMoreFragment extends AppBaseFragment implements Han
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        mContentView = inflater.inflate(R.layout.recycler_view_load_more_fragment, null);
+        setContentView(inflater.inflate(R.layout.recycler_view_load_more_fragment, null));
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-//        addData(20);
-        adapter = new Adapter(recyclerView);
+        addData(20);
+        adapter = new Adapter(RecyclerViewGridAdapter.VERTICAL_LIST, recyclerView);
         adapter.loadMoreComplete(true);
 
         recyclerView.setAdapter(adapter);
@@ -75,10 +76,22 @@ public class RecyclerViewLoadMoreFragment extends AppBaseFragment implements Han
         return true;
     }
 
-    private class Adapter extends RecyclerViewAdapter{
+    private class Adapter extends RecyclerViewGridAdapter{
 
-        public Adapter(@NonNull RecyclerView recyclerView) {
-            super(recyclerView);
+        @Override
+        public int numberOfColumnInSection(int section) {
+            return 3;
+        }
+
+        @Override
+        public int getDifferentColumnProduct() {
+            return 3;
+        }
+
+        public Adapter(@Orientation int orientation, RecyclerView recyclerView) {
+            super(orientation, recyclerView);
+
+            mShouldDrawDivider = true;
         }
 
         @Override

@@ -29,7 +29,7 @@ public class TextBoundsFragment extends AppBaseFragment implements View.OnClickL
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        mContentView = inflater.inflate(R.layout.text_bounds_fragment, null);
+        setContentView(inflater.inflate(R.layout.text_bounds_fragment, null));
         textView = findViewById(R.id.text);
 
         textView.setText("其实我不懂fewgeoijgeogijreg你写个xxxgeoi个哦我" +

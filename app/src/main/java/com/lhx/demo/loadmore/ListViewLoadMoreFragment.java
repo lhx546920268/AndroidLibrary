@@ -42,24 +42,10 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
-        mContentView = inflater.inflate(R.layout.list_view_load_more_fragment, null);
+        setContentView(inflater.inflate(R.layout.list_view_load_more_fragment, null));
         listView = findViewById(R.id.list_view);
 
         addData(20);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                strings.clear();
-                adapter.notifyDataSetChanged();
-            }
-        });
-
-        final View header = new View(mContext);
-        header.setBackgroundColor(Color.CYAN);
-        header.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                100));
-        header.setPadding(100, 100,100, 100);
 
         adapter = new AbsListViewAdapter(mContext) {
 
@@ -118,16 +104,12 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
             }
 
             @Override
-            protected int getEmptyViewHeight() {
-                return listView.getHeight() - header.getHeight();
+            public void onItemClick(int indexInSection, int section) {
+                startActivity(AppBaseActivity.getIntentWithFragment(mContext, ListViewLoadMoreFragment.class));
             }
         };
 
         adapter.loadMoreComplete(true);
-
-
-
-        listView.addHeaderView(header);
 
 
         listView.setAdapter(adapter);

@@ -18,7 +18,7 @@ public class CornerDrawableFragment extends AppBaseFragment {
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        mContentView = inflater.inflate(R.layout.corner_drawable_fragment, null);
+        setContentView(inflater.inflate(R.layout.corner_drawable_fragment, null));
 
         TextView textView = findViewById(R.id.corner_text);
 

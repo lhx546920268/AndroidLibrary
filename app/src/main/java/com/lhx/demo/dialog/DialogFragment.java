@@ -30,7 +30,7 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
-        mContentView = inflater.inflate(R.layout.dialog_fragment, null);
+        setContentView(inflater.inflate(R.layout.dialog_fragment, null));
 
         findViewById(R.id.show_btn).setOnClickListener(this);
 

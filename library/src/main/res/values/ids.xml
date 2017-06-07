@@ -9,4 +9,7 @@
 
     <!--viewpager-->
     <item name="view_pager_position_tag_key" type="id"/>
+
+    <!--viewHolder tag key-->
+    <item name="view_holer_tag_key" type="id"/>
 </resources>

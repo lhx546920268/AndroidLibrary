@@ -41,7 +41,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     protected int itemCount;
 
     ///数据源item的数量
-    private int mRealCount = 0;
+    protected int mRealCount = 0;
 
     //加载更多控制器
     LoadMoreControl mLoadMoreControl;
@@ -130,12 +130,12 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     //是否是加载更多的UI
-    private boolean isLoadMoreItem(int position){
+    protected boolean isLoadMoreItem(int position){
         return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
     }
 
     //是否是空视图
-    private boolean isEmptyView(int position){
+    protected boolean isEmptyView(int position){
         return mRealCount == 0 && shouldDisplayEmptyView();
     }
 

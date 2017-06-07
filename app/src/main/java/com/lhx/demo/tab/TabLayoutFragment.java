@@ -17,7 +17,7 @@ public class TabLayoutFragment extends AppBaseFragment {
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        mContentView = inflater.inflate(R.layout.tab_layout_fragment, null);
+        setContentView(inflater.inflate(R.layout.tab_layout_fragment, null));
 
         final String[] datas = new String[]{"环球厨房", "环球创意厨具", "健康专家", "洗护",
                 "口腔护", "环球健康食品", "环球盐灯", "品质活物语", "彩电家具", "海尔红条", "手机数码", "笔记本", "外设", "大屏显示器"};

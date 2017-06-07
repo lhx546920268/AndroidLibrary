@@ -1,18 +1,23 @@
 package com.lhx.library.recyclerView;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.lhx.library.R;
 import com.lhx.library.section.EdgeInsets;
 import com.lhx.library.section.GridSectionInfo;
+import com.lhx.library.util.SizeUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -63,9 +68,15 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     ///是否需要绘制分割线
     public boolean mShouldDrawDivider = false;
 
+    ///分割线颜色
+    public @ColorInt int mDividerColor;
+
     ///构造方法
     public RecyclerViewGridAdapter(@Orientation int orientation, RecyclerView recyclerView) {
         super(recyclerView);
+
+        mItemFooterSpace = mItemSpace = mItemHeaderSpace = SizeUtil.pxFormDip(0.5f, mRecyclerView.getContext());
+        mDividerColor = ContextCompat.getColor(mRecyclerView.getContext(), R.color.divider_color);
 
         mOrientation = orientation;
         mDifferentColumnProduct = getDifferentColumnProduct();
@@ -84,7 +95,12 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
             @Override
             public int getSpanSize(int position) {
 
-                return RecyclerViewGridAdapter.this.spanCountForPosition(position);
+                int type = getItemViewType(position);
+                if(type == LOAD_MORE_VIEW_TYPE || type == EMPTY_VIEW_TYPE){
+                    return mDifferentColumnProduct;
+                }else {
+                    return RecyclerViewGridAdapter.this.spanCountForPosition(position);
+                }
             }
 
             @Override
@@ -129,12 +145,20 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         mSectionInsets = sectionInsets;
     }
 
-    public boolean isShouldDrawDivider() {
+    public boolean shouldDrawDivider() {
         return mShouldDrawDivider;
     }
 
     public void setShouldDrawDivider(boolean shouldDrawDivider) {
         mShouldDrawDivider = shouldDrawDivider;
+    }
+
+    public @ColorInt int getDividerColor() {
+        return mDividerColor;
+    }
+
+    public void setDividerColor(@ColorInt int dividerColor) {
+        mDividerColor = dividerColor;
     }
 
     /**列数
@@ -220,7 +244,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
             ///计算列表行数量
             int numberOfSection = numberOfSection();
-            itemCount = 0;
+            int count = 0;
             for(int section = 0;section < numberOfSection;section ++){
 
                 int numberOfItem = numberOfItemInSection(section);
@@ -236,76 +260,92 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                 sectionInfo.itemHeaderSpace = getItemHeaderSpaceAtSection(section);
                 sectionInfo.itemFooterSpace = getItemFooterSpaceAtSection(section);
                 sectionInfo.sectionInsets = getSectionInsetsAtSection(section);
-                sectionInfo.sectionBegin = itemCount;
+                sectionInfo.sectionBegin = count;
                 mSections.add(sectionInfo);
 
-                itemCount += numberOfItem;
+                count += numberOfItem;
                 if(sectionInfo.isExistHeader)
-                    itemCount ++;
+                    count ++;
                 if(sectionInfo.isExistFooter)
-                    itemCount ++;
+                    count ++;
             }
+
+            mRealCount = count;
+
+            if(loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
+                count ++;
+            }
+
+            if(count == 0 && shouldDisplayEmptyView()){
+                count ++;
+            }
+
+            itemCount = count;
         }
     }
 
     ///布局信息
     class LayoutInfo{
 
-        ///是否靠左
-        boolean onTheLeft;
-
-        ///是否靠右
-        boolean onTheRight;
-
-        ///是否靠顶
-        boolean onTheTop;
-
-        ///是否靠底
-        boolean onTheBottom;
-
         ///偏移量
         int left, top, right, bottom;
 
         public LayoutInfo(int position) {
 
-            GridSectionInfo sectionInfo = (GridSectionInfo)sectionInfoForPosition(position);
+            int type = getItemViewType(position);
+            switch (type){
+                case EMPTY_VIEW_TYPE :
+                    left = top = right = bottom = 0;
+                    break;
+                case LOAD_MORE_VIEW_TYPE :
+                    left = right = bottom = 0;
+                    EdgeInsets insets = getSectionInsetsAtSection(mSections.size() - 1);
+                    if(insets.bottom == 0){
+                        top = getItemSpaceAtSection(mSections.size() - 1);
+                    }
+                    break;
+                default : {
+                    GridSectionInfo sectionInfo = (GridSectionInfo)sectionInfoForPosition(position);
 
-            onTheTop = isOnTheTop(sectionInfo, position);
-            onTheLeft = isOnTheLeft(sectionInfo, position);
-            onTheRight = isOnTheRight(sectionInfo, position);
-            onTheBottom = isOnTheBottom(sectionInfo, position);
+                    boolean onTheTop = isOnTheTop(sectionInfo, position);
+                    boolean onTheLeft = isOnTheLeft(sectionInfo, position);
+                    boolean onTheRight = isOnTheRight(sectionInfo, position);
+                    boolean onTheBottom = isOnTheBottom(sectionInfo, position);
 
-            left = onTheLeft ? sectionInfo.sectionInsets.left : 0;
-            top = onTheTop ? sectionInfo.sectionInsets.top : 0;
-            right = onTheRight ? sectionInfo.sectionInsets.right : 0;
-            bottom = onTheBottom ? sectionInfo.sectionInsets.bottom : 0;
+                    left = onTheLeft ? sectionInfo.sectionInsets.left : 0;
+                    top = onTheTop ? sectionInfo.sectionInsets.top : 0;
+                    right = onTheRight ? sectionInfo.sectionInsets.right : 0;
+                    bottom = onTheBottom ? sectionInfo.sectionInsets.bottom : 0;
 
-            if(sectionInfo.isHeaderForPosition(position)){
+                    if(sectionInfo.isHeaderForPosition(position)){
 
-                ///头部和item之间的间隔，如果该section内没有item,则忽略间隔
-                if(sectionInfo.numberItems > 0)
-                    bottom = sectionInfo.itemHeaderSpace;
+                        ///头部和item之间的间隔，如果该section内没有item,则忽略间隔
+                        if(sectionInfo.numberItems > 0)
+                            bottom = sectionInfo.itemHeaderSpace;
 
-            }else if(sectionInfo.isFooterForPosition(position)){
+                    }else if(sectionInfo.isFooterForPosition(position)){
 
-                ///存在item
-                if(sectionInfo.numberItems > 0){
-                    top = sectionInfo.itemFooterSpace;
-                }
-            }else {
+                        ///存在item
+                        if(sectionInfo.numberItems > 0){
+                            top = sectionInfo.itemFooterSpace;
+                        }
+                    }else {
 
-                ///如果不是最右的item，则添加间隔，否则添加section右边的偏移量
-                if(!onTheRight){
-                    right = sectionInfo.itemSpace;
-                }
+                        ///如果不是最右的item，则添加间隔，否则添加section右边的偏移量
+                        if(!onTheRight){
+                            right = sectionInfo.itemSpace;
+                        }
 
-                ///如果不是最后一行，添加item间隔
-                if(!onTheBottom){
-                    bottom = mItemSpace;
-                }else if(!sectionInfo.isExistFooter){
+                        ///如果不是最后一行，添加item间隔
+                        if(!onTheBottom){
+                            bottom = mItemSpace;
+                        }else if(!sectionInfo.isExistFooter){
 
-                    ///不存在底部，设置section偏移量
-                    bottom = sectionInfo.sectionInsets.bottom;
+                            ///不存在底部，设置section偏移量
+                            bottom = sectionInfo.sectionInsets.bottom;
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -386,7 +426,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
             mOrientation = orientation;
             ColorDrawable drawable = new ColorDrawable();
-            drawable.setColor(Color.RED);
+            drawable.setColor(mDividerColor);
             mDivider = drawable;
         }
 
@@ -478,8 +518,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
             GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams)view.getLayoutParams();
 
             int position = layoutParams.getViewLayoutPosition();
-            LayoutInfo info = getLayoutInfoAtPosition(position);
 
+            LayoutInfo info = getLayoutInfoAtPosition(position);
             if(mOrientation == HORIZONTAL_LIST){
                 outRect.set(info.top, info.left, info.bottom, info.right);
             }else {

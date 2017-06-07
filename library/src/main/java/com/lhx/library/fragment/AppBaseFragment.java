@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,11 +15,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.lhx.library.R;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
 import com.lhx.library.util.SizeUtil;
+import com.lhx.library.widget.OnSingleClickListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,16 +32,27 @@ import com.lhx.library.util.SizeUtil;
 public abstract class AppBaseFragment extends Fragment {
 
     ///内容视图
-    protected View mContentView;
+    private View mContentView;
+
+    ///内容容器
+    private FrameLayout mContentContainer;
 
     ///容器视图
-    protected LinearLayout mContainer;
+    private LinearLayout mContainer;
 
     ///导航栏
-    protected NavigationBar mNavigationBar;
+    private NavigationBar mNavigationBar;
 
     ///关联的context
     protected Context mContext;
+
+    ///页面是否正在载入
+    private boolean mPageLoading = false;
+    private View mPageLoadingView;
+
+    ///页面是否载入失败
+    private boolean mPageLoadFail = false;
+    private View mPageLoadFailView;
 
     public AppBaseFragment() {
         // Required empty public constructor
@@ -97,9 +115,8 @@ public abstract class AppBaseFragment extends Fragment {
         Log.d("AppBaseFragment", "onCreateView");
         if(mContainer == null){
             ///创建容器视图
-            mContainer = new LinearLayout(getContext());
+            mContainer = (LinearLayout)inflater.inflate(R.layout.app_base_fragment, null);
             mContainer.setBackgroundColor(Color.WHITE);
-            mContainer.setOrientation(LinearLayout.VERTICAL);
 
             ///创建导航栏
             if(showNavigationBar())
@@ -108,10 +125,12 @@ public abstract class AppBaseFragment extends Fragment {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
                         .MATCH_PARENT,
                         SizeUtil.pxFormDip(45.0f, getContext()));
-                mContainer.addView(mNavigationBar,layoutParams);
+                mContainer.addView(mNavigationBar, 0, layoutParams);
             }
 
+            mContentContainer = (FrameLayout)mContainer.findViewById(R.id.content_container);
             initialize(inflater, container, savedInstanceState);
+
             if(mContentView.getLayoutParams() == null){
 
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -119,7 +138,8 @@ public abstract class AppBaseFragment extends Fragment {
                 mContentView.setLayoutParams(layoutParams);
             }
 
-            mContainer.addView(mContentView);
+
+            mContentContainer.addView(mContentView, 0);
         }
 
         return mContainer;
@@ -128,7 +148,7 @@ public abstract class AppBaseFragment extends Fragment {
     ///子类可重写这个方法设置 contentView
     public abstract void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState);
 
-    ///是否需要显示导航栏 default is 'true'
+    ///是否需要显示导航栏
     public boolean showNavigationBar(){
         return true;
     }
@@ -138,12 +158,27 @@ public abstract class AppBaseFragment extends Fragment {
         return  mContentView;
     }
 
+    public void setContentView(View contentView) {
+        if(mContentView != null){
+            throw new RuntimeException(this.getClass().getName() + "contentView 已经设置");
+        }
+        mContentView = contentView;
+    }
+
+    public void setContentView(@LayoutRes int layoutResId){
+        setContentView(View.inflate(mContext, layoutResId, null));
+    }
+
     public NavigationBar getNavigationBar() {
         return mNavigationBar;
     }
 
     public LinearLayout getContainer() {
         return mContainer;
+    }
+
+    public FrameLayout getContentContainer(){
+        return mContentContainer;
     }
 
     ///获取子视图
@@ -164,4 +199,88 @@ public abstract class AppBaseFragment extends Fragment {
         startActivity(intent);
     }
 
+
+    ///重新载入页面 子类按需重写
+    protected void onReloadPage(){
+
+    }
+
+    public void setPageLoading(boolean pageLoading){
+        setPageLoading(pageLoading, pageLoading ? getString(R.string.common_page_loading_text) : null);
+    }
+
+    /**
+     * 设置页面载入
+     * @param pageLoading 是否载入
+     * @param loadingText 载入文字
+     */
+    public void setPageLoading(boolean pageLoading, String loadingText){
+        if(mPageLoading != pageLoading){
+            mPageLoading = pageLoading;
+
+            if(mPageLoadFail){
+
+            }
+            if(mPageLoading){
+                mPageLoadingView = View.inflate(mContext, R.layout.common_page_loading, null);
+                TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
+                textView.setText(loadingText);
+                mContentContainer.addView(mPageLoadingView);
+            }else if(mPageLoadingView != null){
+                mContentContainer.removeView(mPageLoadingView);
+                mPageLoadingView = null;
+            }
+        }
+    }
+
+    public boolean isPageLoading(){
+        return mPageLoading;
+    }
+
+    public void setPageLoadFail(boolean pageLoadFail){
+        setPageLoadFail(pageLoadFail, 0, getString(R.string.common_page_load_fail_title),
+                getString(R.string.common_page_load_fail_subtitle));
+    }
+
+    /**
+     * 设置页面载入失败
+     * @param pageLoadFail 是否载入失败
+     * @param logoResId logo
+     * @param title 标题
+     * @param subtitle 副标题
+     */
+    public void setPageLoadFail(boolean pageLoadFail, @DrawableRes int logoResId, String title, String subtitle){
+        if(mPageLoadFail != pageLoadFail){
+            mPageLoadFail = pageLoadFail;
+
+            if(mPageLoadFail){
+                mPageLoadFailView = View.inflate(mContext, R.layout.common_page_load_fail, null);
+                mPageLoadFailView.setOnClickListener(new OnSingleClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        setPageLoadFail(false);
+                        onReloadPage();
+                    }
+                });
+
+                ImageView imageView = (ImageView)mPageLoadFailView.findViewById(R.id.logo);
+                imageView.setImageResource(logoResId);
+
+                TextView textView = (TextView)mPageLoadFailView.findViewById(R.id.title);
+                textView.setText(title);
+
+                textView = (TextView)mPageLoadFailView.findViewById(R.id.subtitle);
+                textView.setText(subtitle);
+
+                mContentContainer.addView(mPageLoadFailView);
+            }else if(mPageLoadFailView != null) {
+                mContentContainer.removeView(mPageLoadFailView);
+                mPageLoadFailView = null;
+            }
+        }
+    }
+
+    public boolean isPageLoadFail(){
+        return mPageLoadFail;
+    }
 }

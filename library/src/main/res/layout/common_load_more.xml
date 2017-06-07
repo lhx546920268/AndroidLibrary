@@ -17,11 +17,12 @@
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="@dimen/refresh_control_progress_bar_size"
-            android:minHeight="@dimen/refresh_control_progress_bar_size"
-            android:maxHeight="@dimen/refresh_control_progress_bar_size"
-            android:maxWidth="@dimen/refresh_control_progress_bar_size"
+            android:minWidth="@dimen/loading_progress_bar_size"
+            android:minHeight="@dimen/loading_progress_bar_size"
+            android:maxHeight="@dimen/loading_progress_bar_size"
+            android:maxWidth="@dimen/loading_progress_bar_size"
             android:layout_marginRight="5dp"
+            android:indeterminateDrawable="@drawable/loading_progress_bar"
             android:id="@+id/progress_bar"/>
 
         <!--文字-->
@@ -29,7 +30,7 @@
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="加载更多"
+            android:text="正在载入..."
             android:textSize="15sp"
             android:textColor="@color/gray"
             android:id="@+id/text_view"

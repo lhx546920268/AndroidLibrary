@@ -58,7 +58,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
-        mContentView = inflater.inflate(R.layout.http_fragment, null);
+        setContentView(inflater.inflate(R.layout.http_fragment, null));
 
         findViewById(R.id.download_img).setOnClickListener(this);
         mProgressBar = findViewById(R.id.progress_bar);
@@ -66,6 +66,13 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
 
         findViewById(R.id.upload_btn).setOnClickListener(this);
 
+
+        onReloadPage();
+    }
+
+    @Override
+    protected void onReloadPage() {
+        setPageLoading(true);
         //登录
 
         ContentValues values = new ContentValues();
@@ -90,12 +97,12 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
 
             @Override
             public void onFail(HttpAsyncTask task, int errorCode, int httpCode) {
-
+                setPageLoadFail(true);
             }
 
             @Override
             public void onComplete(HttpAsyncTask task) {
-
+                setPageLoading(false);
             }
         });
 
@@ -109,8 +116,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
         switch (id){
             case R.id.download_img :
 
-                mDownloadImgTask = new HttpAsyncTask("http://chinauenvi.wxy01.com/public/images/e9/67/5b/b7f80f93bc7950" +
-                        "c914cddf1e36cca2255c2d902e.png?1494425270#h"){
+                mDownloadImgTask = new HttpAsyncTask("http://chinauenvi.wxy01.com/public/images/ea/0b/12/18ad2dc9140c710738f2cd092164f2b798a0a026.jpg?1496365993#w"){
                     @Override
                     public void onConfigure(HttpRequest request) {
                         request.setDownloadTemporayPath(FileUtil.getTemporaryFilePath(mContext, ""));
@@ -122,7 +128,9 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
                     @Override
                     public void onSuccess(HttpAsyncTask task, byte[] result) {
 
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(result,0, result.length);
+                        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(result,0, result.length, ImageUtil.getOptions
+                                (result, metrics.widthPixels, metrics.heightPixels));
                         ImageView imageView = findViewById(R.id.img);
                         imageView.setImageBitmap(bitmap);
                     }

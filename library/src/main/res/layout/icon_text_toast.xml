@@ -3,6 +3,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
     android:orientation="vertical"
+              android:background="@drawable/black_round_background"
     android:padding="10dp">
 
     <!--带图标和文字的toast-->
@@ -16,7 +17,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="15sp"
         android:textColor="@color/white"
         android:layout_gravity="center_horizontal"
         android:id="@+id/text"/>

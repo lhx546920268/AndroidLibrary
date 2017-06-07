@@ -7,7 +7,9 @@ import android.support.annotation.AnimRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 
 import com.lhx.library.R;
@@ -20,13 +22,61 @@ public class AppBaseActivity extends AppCompatActivity {
     public static final String FRAGMENT_STRING = "fragmentString";
 
     @Override
+    protected void onRestart() {
+        Log.d("AppBaseActivity", "onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d("AppBaseActivity", "onStart");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d("AppBaseActivity", "onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d("AppBaseActivity", "onStop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("AppBaseActivity", "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        Log.d("AppBaseActivity", "onAttachedToWindow");
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        Log.d("AppBaseActivity", "onDetachedFromWindow");
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        Log.d("AppBaseActivity", "onCreateView");
+        return super.onCreateView(name, context, attrs);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-
+        Log.d("AppBaseActivity", "onCreate");
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_app_base);
+        setContentView(R.layout.app_base_activity);
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);
         Class clazz;
@@ -40,7 +90,7 @@ public class AppBaseActivity extends AppCompatActivity {
                 setCurrentFragment(currentFragment);
             }else {
 
-                Log.w("AppBaseActivity", className + "的实例为空");
+                Log.w("AppBaseActivity", className + "不能实例化");
             }
         }catch (Exception e){
 

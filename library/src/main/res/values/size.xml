@@ -2,5 +2,5 @@
 <resources>
 
     <!--刷新菊花大小-->
-    <dimen name="refresh_control_progress_bar_size">20dp</dimen>
+    <dimen name="loading_progress_bar_size">18dp</dimen>
 </resources>

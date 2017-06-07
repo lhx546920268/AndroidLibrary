@@ -112,7 +112,7 @@ public class LoadMoreControl {
                 }
                 case LOAD_MORE_STATUS_HAS_MORE :
                 case LOAD_MORE_STATUS_LOADING : {
-                    mTextView.setText("加载中...");
+                    mTextView.setText("正在载入...");
                     mProgressBar.setVisibility(View.VISIBLE);
                     mContentView.setEnabled(false);
                     break;

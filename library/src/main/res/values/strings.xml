@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">Library</string>
-    
-    <!--viewHolder tag key-->
-    <string name="view_holer_tag_key">999999</string>
+
+    <!--loading-->
+    <string name="common_page_loading_text">正在载入...</string>
+
+    <!--loading fail-->
+    <string name="common_page_load_fail_title">加载失败</string>
+    <string name="common_page_load_fail_subtitle">轻触屏幕重新加载</string>
 
 </resources>

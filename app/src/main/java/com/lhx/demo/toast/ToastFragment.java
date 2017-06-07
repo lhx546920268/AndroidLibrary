@@ -16,7 +16,7 @@ public class ToastFragment extends AppBaseFragment implements View.OnClickListen
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        mContentView = inflater.inflate(R.layout.toast_fragment, null);
+        setContentView(inflater.inflate(R.layout.toast_fragment, null));
 
         findViewById(R.id.icon_text).setOnClickListener(this);
     }
