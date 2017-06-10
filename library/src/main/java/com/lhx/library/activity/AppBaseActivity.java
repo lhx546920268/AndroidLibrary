@@ -64,12 +64,6 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        Log.d("AppBaseActivity", "onCreateView");
-        return super.onCreateView(name, context, attrs);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);

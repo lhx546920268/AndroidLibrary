@@ -21,6 +21,7 @@ import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
+import com.lhx.demo.recyclerview.TetrisFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
 import com.lhx.demo.text.TextBoundsFragment;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("text bounds(字体范围)");
         infos.add("loadMore (加载更多 listView)");
         infos.add("loadMore (加载更多 recyclerView)");
+        infos.add("TetrisLayout (recyclerView)");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -120,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
                     case 9 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
                                 RecyclerViewLoadMoreFragment.class));
+                        break;
+                    case 10 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, TetrisFragment.class));
                         break;
                 }
 

@@ -117,7 +117,7 @@ public class RecyclerViewLoadMoreFragment extends AppBaseFragment implements Han
             int padding = SizeUtil.pxFormDip(10, getContext());
             textView.setPadding(padding, padding, padding, padding);
             textView.setTextColor(Color.BLACK);
-            return new RecyclerViewHolder(textView, viewType);
+            return new RecyclerViewHolder(textView);
         }
 
         @Override

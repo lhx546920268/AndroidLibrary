@@ -443,7 +443,7 @@ public class HttpRequest {
     }
 
     //关闭io流
-    public synchronized void closeStream(Closeable stream){
+    private void closeStream(Closeable stream){
         if(stream != null){
             try {
                 stream.close();

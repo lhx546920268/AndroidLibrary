@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -65,7 +66,6 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
         mUploadProgressBar = findViewById(R.id.upload_progress_bar);
 
         findViewById(R.id.upload_btn).setOnClickListener(this);
-
 
         onReloadPage();
     }
@@ -241,6 +241,18 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mDownloadImgTask != null){
+            mDownloadImgTask.cancel();
+        }
+
+        if(mUploadImgTask != null){
+            mUploadImgTask.cancel();
+        }
     }
 
     /**

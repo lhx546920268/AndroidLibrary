@@ -258,7 +258,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             }
         }
 
-        int viewType = holder.getViewType();
+        int viewType = holder.getItemViewType();
         switch (viewType){
             case LOAD_MORE_VIEW_TYPE :
 
@@ -320,11 +320,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         switch (viewType){
             case LOAD_MORE_VIEW_TYPE : {
 
-                return new RecyclerViewHolder(getLoadMoreControl().getContentView(), LOAD_MORE_VIEW_TYPE);
+                return new RecyclerViewHolder(getLoadMoreControl().getContentView());
             }
             case EMPTY_VIEW_TYPE : {
 
-                return new RecyclerViewHolder(getEmptyView(), EMPTY_VIEW_TYPE);
+                return new RecyclerViewHolder(getEmptyView());
             }
             default : {
                 final RecyclerViewHolder holder = onCreateViewHolderForViewType(viewType, parent);

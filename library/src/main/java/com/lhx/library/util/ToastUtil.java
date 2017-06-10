@@ -2,6 +2,7 @@ package com.lhx.library.util;
 
 import android.content.Context;
 import android.support.annotation.DrawableRes;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +34,10 @@ public class ToastUtil {
     }
 
     public static void alert(Context context, CharSequence text, @DrawableRes int icon){
+        alert(context, text, icon, Gravity.CENTER);
+    }
+
+    public static void alert(Context context, CharSequence text, @DrawableRes int icon, int gravity){
         close();
         currentToast = new Toast(context);
         View view = View.inflate(context, R.layout.icon_text_toast, null);
@@ -41,6 +46,8 @@ public class ToastUtil {
 
         TextView textView = (TextView)view.findViewById(R.id.text);
         textView.setText(text);
+
+        currentToast.setGravity(gravity, 0, 0);
 
         currentToast.setView(view);
         currentToast.setDuration(Toast.LENGTH_SHORT);

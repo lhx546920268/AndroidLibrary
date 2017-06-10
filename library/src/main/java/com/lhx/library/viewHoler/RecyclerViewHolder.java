@@ -11,20 +11,13 @@ import android.view.View;
 
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    //view 类型
-    private int mViewType;
-
     //保存view的集合
     private SparseArray<View> mViews;
 
-    public RecyclerViewHolder(View itemView, int viewType) {
+    public RecyclerViewHolder(View itemView) {
         super(itemView);
-        mViewType = viewType;
     }
 
-    public int getViewType(){
-        return mViewType;
-    }
 
     /**
      * 通过id 获取view
