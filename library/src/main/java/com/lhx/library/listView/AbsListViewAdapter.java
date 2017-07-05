@@ -246,7 +246,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     public final int getItemViewType(int position) {
 
         if(isEmptyView(position) || isLoadMoreItem(position)){
-            return numberItemViewTypes();
+            return numberOfItemViewTypes();
         }
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
@@ -270,7 +270,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     @Override
     public final int getViewTypeCount() {
 
-        int count = numberItemViewTypes();
+        int count = numberOfItemViewTypes();
         if(loadMoreEnable() && mLoadMoreControl.shouldDisplay())
             count ++;
 

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
+import com.lhx.demo.listview.StickListViewFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
 import com.lhx.demo.recyclerview.TetrisFragment;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("loadMore (加载更多 listView)");
         infos.add("loadMore (加载更多 recyclerView)");
         infos.add("TetrisLayout (recyclerView)");
+        infos.add("ListView stick");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -125,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 10 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, TetrisFragment.class));
+                        break;
+                    case 11 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, StickListViewFragment
+                                .class));
                         break;
                 }
 

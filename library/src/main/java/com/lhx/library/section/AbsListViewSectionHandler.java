@@ -68,5 +68,5 @@ public interface AbsListViewSectionHandler extends SectionHandler {
      * 获取列表item类型的数量,包括sectionHeader 和 footer
      * @return item类型数量
      */
-    int numberItemViewTypes();
+    int numberOfItemViewTypes();
 }

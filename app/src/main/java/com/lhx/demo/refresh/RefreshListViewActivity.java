@@ -195,7 +195,7 @@ public class RefreshListViewActivity extends AppCompatActivity {
         }
 
         @Override
-        public int numberItemViewTypes() {
+        public int numberOfItemViewTypes() {
             return 3;
         }
 

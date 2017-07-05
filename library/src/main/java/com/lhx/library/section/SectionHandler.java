@@ -21,7 +21,7 @@ public interface SectionHandler {
 
     @IntDef({ITEM_TYPE_VIEW, ITEM_TYPE_HEADER, ITEM_TYPE_FOOTER})
     @Retention(RetentionPolicy.SOURCE)
-    @interface ItemType{}
+    public @interface ItemType{}  //public 不能去掉，否则会编译错误，找不到ItemType
 
     ///section数量
     int numberOfSection();

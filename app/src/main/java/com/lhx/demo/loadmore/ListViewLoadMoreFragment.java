@@ -99,7 +99,7 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
             }
 
             @Override
-            public int numberItemViewTypes() {
+            public int numberOfItemViewTypes() {
                 return 1;
             }
 
