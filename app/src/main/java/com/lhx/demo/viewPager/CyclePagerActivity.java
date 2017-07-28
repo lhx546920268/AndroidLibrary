@@ -59,10 +59,11 @@ public class CyclePagerActivity extends AppCompatActivity {
                 findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                count = count == 3 ? 20 : 3;
+                count = count == 1 ? 3 : (count - 1);
                 viewPager.getAdapter().notifyDataSetChanged();
             }
         });
+
 
 
         adapter = new CyclePagerAdapter(viewPager) {
@@ -76,68 +77,10 @@ public class CyclePagerActivity extends AppCompatActivity {
             public Object instantiateItemForRealPosition(View convertView, int position, int viewType) {
 
                 if(convertView == null){
+                    TextView textView = new TextView(getBaseContext());
+                    textView.setGravity(Gravity.CENTER);
 
-//                    LinearLayout linearLayout = new LinearLayout(getBaseContext());
-//                    linearLayout.setWeightSum(4);
-//                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams
-//                            .MATCH_PARENT,
-//                            100);
-//                    linearLayout.setLayoutParams(layoutParams);
-//                    convertView = linearLayout;
-                    convertView = View.inflate(getBaseContext(), R.layout.page_item, null);
-                    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(720, 1280);
-                    convertView.setLayoutParams(params);
-
-                    final GridView gridView = (GridView)convertView.findViewById(R.id.grid_view);
-
-                    final BaseAdapter baseAdapter = new BaseAdapter() {
-                        @Override
-                        public int getCount() {
-                            return 20;
-                        }
-
-                        @Override
-                        public Object getItem(int position) {
-                            return null;
-                        }
-
-                        @Override
-                        public long getItemId(int position) {
-                            return 0;
-                        }
-
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            if(convertView == null){
-                                TextView textView = new TextView(getBaseContext());
-
-                                convertView = textView;
-                            }
-
-                            int page = (int)gridView.getTag();
-                            TextView textView = (TextView)convertView;
-                            textView.setText("第" + position + "个，在第" + page + "页");
-                            if(show){
-                                textView.setBackgroundColor(Color.LTGRAY);
-                            }else {
-                                textView.setBackgroundColor(Color.GRAY);
-                            }
-
-                            return textView;
-                        }
-                    };
-                    gridView.setAdapter(baseAdapter);
-
-                    gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-                        @Override
-                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                            show = !show;
-                            adapter.notifyDataSetChanged();
-                            return true;
-                        }
-                    });
+                    convertView = textView;
                 }
 
                 switch (position){
@@ -158,44 +101,11 @@ public class CyclePagerActivity extends AppCompatActivity {
                         break;
                 }
 
-                Log.d("tag", "position = " + position);
-
-                GridView gridView = (GridView)convertView.findViewById(R.id.grid_view);
-                BaseAdapter baseAdapter = (BaseAdapter)gridView.getAdapter();
-                gridView.setTag(position);
-                baseAdapter.notifyDataSetChanged();
-
-                return convertView;
-            }
-
-            @Override
-            public int numberOfSubviewInPage(int position) {
-                return 4;
-            }
-
-            @Override
-            public View getSubview(View convertView, int position, int subviewPosition, int subviewType) {
-                if(convertView == null){
-                    TextView textView = new TextView(getBaseContext());
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0,
-                            50);
-                    layoutParams.weight = 1;
-                    layoutParams.gravity = Gravity.CENTER_VERTICAL;
-                    layoutParams.setMargins(10, 0, 10, 0);
-                    textView.setLayoutParams(layoutParams);
-
-                    convertView = textView;
-                }
 
                 TextView textView = (TextView)convertView;
-                textView.setText("第" + subviewPosition + "个");
-                if(show){
-                    textView.setBackgroundColor(Color.LTGRAY);
-                }else {
-                    textView.setBackgroundColor(Color.GRAY);
-                }
+                textView.setText("第" + position + "个");
 
-                return textView;
+                return convertView;
             }
         };
 

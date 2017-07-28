@@ -162,9 +162,11 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
         }
     }
 
-    /**
-     * 获取真实的数量
-     * @return 真实的数量
-     */
-    public abstract int getRealCount();
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if(mShouldAutoPlay && mRealCount <= 1){
+            stopAutoPlayTimer();
+        }
+    }
 }

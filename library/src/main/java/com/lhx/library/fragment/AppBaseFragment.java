@@ -29,6 +29,7 @@ import com.lhx.library.widget.OnSingleClickListener;
 /**
  * A simple {@link Fragment} subclass.
  */
+@SuppressWarnings("unchecked")
 public abstract class AppBaseFragment extends Fragment {
 
     ///内容视图

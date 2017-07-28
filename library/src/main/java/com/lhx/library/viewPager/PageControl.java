@@ -29,7 +29,7 @@ public class PageControl extends LinearLayout {
     private int curPage = 0;
 
 //    只有一个点时是否隐藏
-    private boolean hideForSingle = false;
+    private boolean hideForSingle = true;
 
     //关联的viewPager
     private ViewPager viewPager;
@@ -65,6 +65,11 @@ public class PageControl extends LinearLayout {
     }
 
     public void setCurPage(int curPage) {
+
+        if(viewPager != null && viewPager.getAdapter() instanceof CyclePagerAdapter){
+            CyclePagerAdapter adapter = (CyclePagerAdapter)viewPager.getAdapter();
+            curPage = adapter.getRealPosition(curPage);
+        }
 
         if(curPage < points.size()){
             int previousPage = this.curPage;
@@ -104,7 +109,9 @@ public class PageControl extends LinearLayout {
                 addView(point);
                 points.add(point);
             }
-            setCurPage(0);
+            if(viewPager != null){
+                setCurPage(viewPager.getCurrentItem());
+            }
 
             if(hideForSingle && pageCount <= 1){
                 setVisibility(INVISIBLE);
@@ -227,12 +234,7 @@ public class PageControl extends LinearLayout {
 
                 @Override
                 public void onPageSelected(int position) {
-                    if(viewPager.getAdapter() instanceof CyclePagerAdapter){
-                        CyclePagerAdapter adapter = (CyclePagerAdapter)viewPager.getAdapter();
-                        setCurPage(adapter.getRealPosition(position));
-                    }else {
-                        setCurPage(position);
-                    }
+                    setCurPage(position);
                 }
 
                 @Override

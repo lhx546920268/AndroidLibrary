@@ -131,6 +131,10 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
         return object;
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
@@ -185,13 +189,16 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
         super.notifyDataSetChanged();
 
         //viewPager 本身是不会刷新的，要手动刷新可见视图
+        int count = getRealCount();
         for(int i = 0;i < mVisibleViews.size();i ++){
             HashSet<View> viewHashSet = mVisibleViews.get(mVisibleViews.keyAt(i));
             Iterator<View> iterator = viewHashSet.iterator();
             while (iterator.hasNext()){
                 View view = iterator.next();
                 int position = (int)view.getTag(R.id.view_pager_position_tag_key);
-                instantiateItemForRealPosition(view, position, getViewType(position));
+                if(position < getRealCount()){
+                    instantiateItemForRealPosition(view, position, getViewType(position));
+                }
             }
         }
     }
@@ -318,5 +325,11 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
 
     }
 
+
+    /**
+     * 获取真实的数量
+     * @return 真实的数量
+     */
+    public abstract int getRealCount();
 
 }
