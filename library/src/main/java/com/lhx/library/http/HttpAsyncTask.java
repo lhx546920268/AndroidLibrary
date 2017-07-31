@@ -8,6 +8,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -31,7 +33,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     protected int mErrorCode = HttpRequest.ERROR_CODE_NONE;
 
     //请求完成回调
-    protected HttpRequestHandler mHttpRequestHandler;
+    protected HashSet<HttpRequestHandler> mHttpRequestHandlers = new HashSet<>();
 
     //请求进度回调 必须在 onConfigure 设置 httpRequest showUploadProgress showDownloadProgress 为true
     protected HttpProgressHandler<HttpAsyncTask> mHttpProgressHandler;
@@ -63,8 +65,22 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         this(URL, null, null);
     }
 
+    @Deprecated
     public void setHttpRequestHandler(HttpRequestHandler httpRequestHandler) {
-        mHttpRequestHandler = httpRequestHandler;
+        mHttpRequestHandlers.clear();
+        mHttpRequestHandlers.add(httpRequestHandler);
+    }
+
+    public void addHttpRequestHandler(HttpRequestHandler httpRequestHandler){
+        if(httpRequestHandler != null && !mHttpRequestHandlers.contains(httpRequestHandler)){
+            mHttpRequestHandlers.add(httpRequestHandler);
+        }
+    }
+
+    public void removeHttpRequestHandler(HttpRequestHandler httpRequestHandler){
+        if(httpRequestHandler != null){
+            mHttpRequestHandlers.remove(httpRequestHandler);
+        }
     }
 
     public void setHttpProgressHandler(HttpProgressHandler<HttpAsyncTask> httpProgressHandler) {
@@ -150,13 +166,18 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     protected void onPostExecute(byte[] bytes) {
 
         //http完成
-        if(mHttpRequestHandler != null){
-            if(mErrorCode == HttpRequest.ERROR_CODE_NONE && bytes != null){
-                mHttpRequestHandler.onSuccess(this, bytes);
-            }else {
-                mHttpRequestHandler.onFail(this, mErrorCode, mHttpResponseCode);
+        if(mHttpRequestHandlers.size() > 0){
+            Iterator<HttpRequestHandler> iterator = mHttpRequestHandlers.iterator();
+            while (iterator.hasNext()){
+                HttpRequestHandler httpRequestHandler = iterator.next();
+
+                if(mErrorCode == HttpRequest.ERROR_CODE_NONE && bytes != null){
+                    httpRequestHandler.onSuccess(this, bytes);
+                }else {
+                    httpRequestHandler.onFail(this, mErrorCode, mHttpResponseCode);
+                }
+                httpRequestHandler.onComplete(this);
             }
-            mHttpRequestHandler.onComplete(this);
         }
     }
 
@@ -190,9 +211,6 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         if(mHttpRequest != null){
             mHttpRequest.close();
             mHttpRequest = null;
-        }
-        if(mHttpRequestHandler != null){
-            mHttpRequestHandler.onComplete(this);
         }
     }
 

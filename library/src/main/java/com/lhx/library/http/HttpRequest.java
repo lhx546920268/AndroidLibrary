@@ -149,10 +149,35 @@ public class HttpRequest {
     //请求进度回调
     private HttpProgressHandler<HttpRequest> mHttpProgressHandler;
 
+
     //post 请求参数格式
     private
     @PostBodyFormat
     int mPostBodyFormat;
+
+    //通过网络错误获取错误信息
+    public static String getErrorStringFromCode(int errCode, int httpCode){
+
+        switch (errCode){
+            case ERROR_CODE_NONE :
+                return "请求成功";
+            case ERROR_CODE_HTTP :
+                return String.valueOf(httpCode);
+            case ERROR_CODE_TIME_OUT :
+                return "请求超时";
+            case ERROR_CODE_BAD_URL :
+                return "URL不合法";
+            case ERROR_CODE_IO :
+                return "IO异常";
+            case ERROR_CODE_NETWORK :
+                return "网络状态不佳";
+            case ERROR_CODE_FILE_NOT_EXIST :
+                return "上传的文件不存在";
+            case ERROR_CODE_NOT_KNOW :
+                default :
+                    return "未知错误";
+        }
+    }
 
     public String getStringEncoding() {
         return mStringEncoding;
@@ -583,11 +608,17 @@ public class HttpRequest {
         byte[] bytes =  getBytes(builder.toString());
         mTotalSizeToUpload = bytes.length;
         mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
-        try {
-            //jdk 1.7才有
-            mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
-        }catch (NoSuchMethodError e){
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
+
             mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+        }else {
+            //sdk 1.9才有
+            try {
+                //jdk 1.7才有
+                mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+            }catch (NoSuchMethodError e){
+                mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+            }
         }
 
 
@@ -664,11 +695,16 @@ public class HttpRequest {
 
         //设置上传长度
         mConn.setRequestProperty("Content-Length", mTotalSizeToUpload + "");
-        try {
-            //jdk1.7 才有
-            mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
-        }catch (NoSuchMethodError e){
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
             mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+        }else {
+            //api 19才有
+            try {
+                //jdk1.7 才有
+                mConn.setFixedLengthStreamingMode(mTotalSizeToUpload);
+            }catch (NoSuchMethodError e){
+                mConn.setFixedLengthStreamingMode((int)mTotalSizeToUpload);
+            }
         }
 
 

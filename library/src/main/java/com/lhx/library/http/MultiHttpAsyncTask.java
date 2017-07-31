@@ -17,6 +17,20 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     //http请求任务
     private ArrayList<HttpAsyncTask> mTasks = new ArrayList<>();
 
+    //是否有个请求失败了
+    private boolean mHasOneFail;
+
+    //是否取消所有请求当有个请求失败时
+    private boolean mShouldCancelWhileOneFail = true;
+
+    public void setShouldCancelWhileOneFail(boolean shouldCancelWhileOneFail) {
+        this.mShouldCancelWhileOneFail = shouldCancelWhileOneFail;
+    }
+
+    public void setHasOneFail(boolean hasOneFail) {
+        this.mHasOneFail = hasOneFail;
+    }
+
     /**
      * 添加任务
      * @param URL 请求链接
@@ -32,7 +46,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
 
             }
         };
-        task.setHttpRequestHandler(this);
+        task.addHttpRequestHandler(this);
         mTasks.add(task);
 
         return task;
@@ -47,6 +61,8 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     }
 
     public void startSerially(){
+
+        mHasOneFail = false;
         for(HttpAsyncTask task : mTasks){
             if(task.getStatus() != AsyncTask.Status.PENDING)
                 continue;
@@ -55,6 +71,8 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     }
 
     public void startConcurrently(){
+
+        mHasOneFail = false;
         for(HttpAsyncTask task : mTasks){
             if(task.getStatus() != AsyncTask.Status.PENDING)
                 continue;
@@ -67,10 +85,20 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     public void onComplete(HttpAsyncTask task) {
         mTasks.remove(task);
         if(mTasks.size() == 0){
-            onAllTaskComplete();
+            onAllTaskComplete(mHasOneFail);
         }
     }
 
+    @Override
+    public void onSuccess(HttpAsyncTask task, byte[] result) {
+
+    }
+
+    @Override
+    public void onFail(HttpAsyncTask task, int errorCode, int httpCode) {
+        mHasOneFail = true;
+    }
+
     ///所有任务执行完成
-    public abstract void onAllTaskComplete();
+    public abstract void onAllTaskComplete(boolean oneFail);
 }

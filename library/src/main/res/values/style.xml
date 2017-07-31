@@ -12,5 +12,5 @@
         <item name="android:windowEnterAnimation">@anim/action_sheet_enter</item>
         <item name="android:windowExitAnimation">@anim/action_sheet_exit</item>
     </style>
-    
+
 </resources>

@@ -89,7 +89,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             }
 
             View view = (View)object;
-            view.setTag(R.id.view_pager_position_tag_key, realPosition);
+            view.setTag(R.id.view_pager_position_tag_key, position);
             if(view.getParent() == null){
                 container.addView(view);
             }
@@ -189,14 +189,14 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
         super.notifyDataSetChanged();
 
         //viewPager 本身是不会刷新的，要手动刷新可见视图
-        int count = getRealCount();
+        int count = getCount();
         for(int i = 0;i < mVisibleViews.size();i ++){
             HashSet<View> viewHashSet = mVisibleViews.get(mVisibleViews.keyAt(i));
             Iterator<View> iterator = viewHashSet.iterator();
             while (iterator.hasNext()){
                 View view = iterator.next();
                 int position = (int)view.getTag(R.id.view_pager_position_tag_key);
-                if(position < getRealCount()){
+                if(position < count){
                     instantiateItemForRealPosition(view, position, getViewType(position));
                 }
             }
@@ -230,7 +230,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
             while (iterator.hasNext()){
                 View view = iterator.next();
                 int tag = (int)view.getTag(R.id.view_pager_position_tag_key);
-                if(tag == position)
+                if(getRealPosition(tag) == position)
                     return view;
             }
         }
@@ -324,12 +324,4 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     public void destorySubview(View convertView, int position, int subviewPosition, int subviewType){
 
     }
-
-
-    /**
-     * 获取真实的数量
-     * @return 真实的数量
-     */
-    public abstract int getRealCount();
-
 }

@@ -10,7 +10,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +22,7 @@ import android.widget.TextView;
 import com.lhx.library.R;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
+import com.lhx.library.dialog.LoadingDialog;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.OnSingleClickListener;
 
@@ -46,6 +46,7 @@ public abstract class AppBaseFragment extends Fragment {
 
     ///关联的context
     protected Context mContext;
+    protected Activity mActivity;
 
     ///页面是否正在载入
     private boolean mPageLoading = false;
@@ -55,6 +56,10 @@ public abstract class AppBaseFragment extends Fragment {
     private boolean mPageLoadFail = false;
     private View mPageLoadFailView;
 
+    ///显示加载菊花
+    private boolean mLoading = false;
+    private LoadingDialog mLoadingDialog;
+
     public AppBaseFragment() {
         // Required empty public constructor
     }
@@ -62,51 +67,52 @@ public abstract class AppBaseFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d("AppBaseFragment", "onActivityCreated");
+        mActivity = getActivity();
+//        Log.d("AppBaseFragment", "onActivityCreated");
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("AppBaseFragment", "onStart");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d("AppBaseFragment", "onStop");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("AppBaseFragment", "onResume");
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        Log.d("AppBaseFragment", "onStart");
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        Log.d("AppBaseFragment", "onStop");
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.d("AppBaseFragment", "onResume");
+//    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        Log.d("AppBaseFragment", "onAttach");
+//        Log.d("AppBaseFragment", "onAttach");
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("AppBaseFragment", "onDestroy");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("AppBaseFragment", "onDestroyView");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("AppBaseFragment", "onDetach");
-    }
+//
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        Log.d("AppBaseFragment", "onDestroy");
+//    }
+//
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        Log.d("AppBaseFragment", "onDestroyView");
+//    }
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        Log.d("AppBaseFragment", "onDetach");
+//    }
 
 
     @Override
@@ -283,5 +289,25 @@ public abstract class AppBaseFragment extends Fragment {
 
     public boolean isPageLoadFail(){
         return mPageLoadFail;
+    }
+
+    public boolean isLoading() {
+        return mLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        if(loading != mLoading){
+            mLoading = loading;
+            if(mLoading){
+                if(mLoadingDialog == null){
+                    mLoadingDialog = new LoadingDialog(mContext);
+                }
+
+                mLoadingDialog.show();
+            }else {
+                mLoadingDialog.dismiss();
+                mLoadingDialog = null;
+            }
+        }
     }
 }

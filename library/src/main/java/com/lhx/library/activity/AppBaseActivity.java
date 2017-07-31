@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.AnimRes;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.Window;
 
 import com.lhx.library.R;
 
+@SuppressWarnings("unchecked")
 public class AppBaseActivity extends AppCompatActivity {
 
     ///当前显示的Fragment
@@ -21,76 +23,87 @@ public class AppBaseActivity extends AppCompatActivity {
 
     public static final String FRAGMENT_STRING = "fragmentString";
 
-    @Override
-    protected void onRestart() {
-        Log.d("AppBaseActivity", "onRestart");
-        super.onRestart();
-    }
-
-    @Override
-    protected void onStart() {
-        Log.d("AppBaseActivity", "onStart");
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        Log.d("AppBaseActivity", "onResume");
-        super.onResume();
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d("AppBaseActivity", "onStop");
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d("AppBaseActivity", "onDestroy");
-        super.onDestroy();
-    }
-
-    @Override
-    public void onAttachedToWindow() {
-        Log.d("AppBaseActivity", "onAttachedToWindow");
-        super.onAttachedToWindow();
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        Log.d("AppBaseActivity", "onDetachedFromWindow");
-        super.onDetachedFromWindow();
-    }
+//    @Override
+//    protected void onRestart() {
+//        Log.d("AppBaseActivity", "onRestart");
+//        super.onRestart();
+//    }
+//
+//    @Override
+//    protected void onStart() {
+//        Log.d("AppBaseActivity", "onStart");
+//        super.onStart();
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        Log.d("AppBaseActivity", "onResume");
+//        super.onResume();
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        Log.d("AppBaseActivity", "onStop");
+//        super.onStop();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        Log.d("AppBaseActivity", "onDestroy");
+//        super.onDestroy();
+//    }
+//
+//    @Override
+//    public void onAttachedToWindow() {
+//        Log.d("AppBaseActivity", "onAttachedToWindow");
+//        super.onAttachedToWindow();
+//    }
+//
+//    @Override
+//    public void onDetachedFromWindow() {
+//        Log.d("AppBaseActivity", "onDetachedFromWindow");
+//        super.onDetachedFromWindow();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        Log.d("AppBaseActivity", "onCreate");
+//        Log.d("AppBaseActivity", "onCreate");
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.app_base_activity);
+        setContentView(getContentViewRes());
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);
-        Class clazz;
-        try {
+        if(className != null){
+            Class clazz;
+            try {
 
-            clazz  = Class.forName(className);
-            Fragment currentFragment = (Fragment) clazz.newInstance();
+                clazz  = Class.forName(className);
+                if(!clazz.isAssignableFrom(Fragment.class)){
+                    throw new RuntimeException(className + "必须是Fragment或者其子类");
+                }
 
-            if(currentFragment != null){
+                Fragment currentFragment = (Fragment) clazz.newInstance();
 
-                setCurrentFragment(currentFragment);
-            }else {
+                if(currentFragment != null){
 
-                Log.w("AppBaseActivity", className + "不能实例化");
+                    setCurrentFragment(currentFragment);
+                }else {
+
+                    throw new RuntimeException(className + "不能实例化");
+                }
+            }catch (Exception e){
+
+                e.printStackTrace();
+                finish();
             }
-        }catch (Exception e){
-
-            e.printStackTrace();
-            finish();
         }
+    }
+
+    //获取视图内容，必须包含 fragment_container
+    public @LayoutRes int getContentViewRes(){
+        return R.layout.app_base_activity;
     }
 
     ///设置当前显示的fragment,无动画效果
@@ -124,6 +137,13 @@ public class AppBaseActivity extends AppCompatActivity {
         Intent intent = new Intent(context, AppBaseActivity.class);
         intent.putExtra(FRAGMENT_STRING, fragmentClass.getName());
 
+        return intent;
+    }
+
+    //启动一个activity
+    public Intent startActivity(Class clazz) {
+        Intent intent = new Intent(this, clazz);
+        startActivity(intent);
         return intent;
     }
 }

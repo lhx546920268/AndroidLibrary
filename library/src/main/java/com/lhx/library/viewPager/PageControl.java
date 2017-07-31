@@ -3,6 +3,9 @@ package com.lhx.library.viewPager;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
@@ -23,12 +26,12 @@ import java.util.ArrayList;
 
 public class PageControl extends LinearLayout {
 
-//    显示的点
+    //显示的点
     private ArrayList<PageControlPoint> points = new ArrayList<>();
 
     private int curPage = 0;
 
-//    只有一个点时是否隐藏
+    //只有一个点时是否隐藏
     private boolean hideForSingle = true;
 
     //关联的viewPager
@@ -45,6 +48,12 @@ public class PageControl extends LinearLayout {
 
     //点高亮颜色
     private int selectedColor = Color.RED;
+
+    //点背景
+    private @DrawableRes int normalRes = 0;
+
+    //点高亮背景
+    private @DrawableRes int selectedRes = 0;
 
     public PageControl(Context context) {
         this(context, null);
@@ -75,11 +84,22 @@ public class PageControl extends LinearLayout {
             int previousPage = this.curPage;
             if(previousPage < points.size() && previousPage >= 0){
                 PageControlPoint point = points.get(previousPage);
-                point.drawable.setBackgroundColor(normalColor);
+                if(normalRes != 0){
+                    point.setBackgroundResource(normalRes);
+                }else {
+                    point.setDetaultDrawable();
+                    point.drawable.setBackgroundColor(normalColor);
+                }
             }
             this.curPage = curPage;
             PageControlPoint point = points.get(curPage);
-            point.drawable.setBackgroundColor(selectedColor);
+
+            if(selectedRes != 0){
+                point.setBackgroundResource(selectedRes);
+            }else {
+                point.setDetaultDrawable();
+                point.drawable.setBackgroundColor(selectedColor);
+            }
         }
     }
 
@@ -103,8 +123,12 @@ public class PageControl extends LinearLayout {
                 layoutParams.setMargins(0, 0, margin, 0);
                 layoutParams.gravity = Gravity.CENTER_VERTICAL;
                 point.setLayoutParams(layoutParams);
-                point.drawable.setCornerRadius(size / 2);
-                point.drawable.setBackgroundColor(normalColor);
+                if(normalRes != 0){
+                    point.setBackgroundResource(normalRes);
+                }else {
+                    point.setDetaultDrawable();
+                    point.drawable.setBackgroundColor(normalColor);
+                }
 
                 addView(point);
                 points.add(point);
@@ -130,6 +154,7 @@ public class PageControl extends LinearLayout {
             this.selectedColor = selectedColor;
             if(curPage < points.size()){
                 PageControlPoint point = points.get(curPage);
+                point.setDetaultDrawable();
                 point.drawable.setBackgroundColor(selectedColor);
             }
         }
@@ -146,7 +171,30 @@ public class PageControl extends LinearLayout {
                 if(i == curPage)
                     continue;
                 PageControlPoint point = points.get(i);
+                point.setDetaultDrawable();
                 point.drawable.setBackgroundColor(normalColor);
+            }
+        }
+    }
+
+    public void setNormalRes(int normalRes) {
+        if(normalRes != this.normalRes){
+            this.normalRes = normalRes;
+            for(int i = 0;i < points.size();i ++){
+                if(i == curPage)
+                    continue;
+                PageControlPoint point = points.get(i);
+                point.setBackgroundResource(normalRes);
+            }
+        }
+    }
+
+    public void setSelectedRes(int selectedRes) {
+        if(this.selectedRes != selectedRes){
+            this.selectedRes = selectedRes;
+            if(curPage < points.size()){
+                PageControlPoint point = points.get(curPage);
+                point.setBackgroundResource(selectedRes);
             }
         }
     }
@@ -173,7 +221,6 @@ public class PageControl extends LinearLayout {
                layoutParams.width = size;
                layoutParams.height = size;
                point.setLayoutParams(layoutParams);
-               point.drawable.setCornerRadius(size / 2);
            }
        }
     }
@@ -283,14 +330,23 @@ public class PageControl extends LinearLayout {
 
     class PageControlPoint extends View{
 
-        //圆角
         CornerBorderDrawable drawable;
 
         public PageControlPoint(Context context) {
             super(context);
+        }
 
-            drawable = new CornerBorderDrawable();
-            drawable.attatchView(this, false);
+        public void setDetaultDrawable(){
+            if(drawable == null){
+                drawable = new CornerBorderDrawable();
+                drawable.setShouldAbsoluteCircle(true);
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+                    this.setBackgroundDrawable(drawable);
+                }else {
+                    this.setBackground(drawable);
+                }
+            }
+
         }
     }
 }
