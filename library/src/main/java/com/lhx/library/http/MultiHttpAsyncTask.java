@@ -60,6 +60,13 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
         return addTask(URL, null, null);
     }
 
+    public void addTask(HttpAsyncTask task){
+
+        if(task != null && !mTasks.contains(task)){
+            mTasks.add(task);
+        }
+    }
+
     public void startSerially(){
 
         mHasOneFail = false;
@@ -78,6 +85,14 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
                 continue;
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
+    }
+
+    //取消所有任务
+    public void cancelAllTask(){
+        for(HttpAsyncTask task : mTasks){
+            task.cancel();
+        }
+        mTasks.clear();
     }
 
     @Override

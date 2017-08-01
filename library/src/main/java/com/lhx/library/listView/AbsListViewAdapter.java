@@ -169,6 +169,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
     }
 
+    //是否正在加载更多
+    public boolean isLoadingMore(){
+        return loadMoreEnable() && getLoadMoreControl().isLoadingMore();
+    }
+
     //是否是空视图
     private boolean isEmptyView(int position){
         return mRealCount == 0 && shouldDisplayEmptyView();

@@ -143,6 +143,11 @@ public class LoadMoreControl {
         return mLoadingStatus != LOAD_MORE_STATUS_NORMAL;
     }
 
+    ///是否正在加载更多
+    public boolean isLoadingMore(){
+        return mLoadingStatus == LOAD_MORE_STATUS_LOADING;
+    }
+
     //加载更多控制器回调
     public interface LoadMoreControlHandler{
 

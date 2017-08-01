@@ -3,6 +3,7 @@ package com.lhx.library.bar;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -13,9 +14,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.util.SizeUtil;
 
@@ -80,8 +83,8 @@ public class NavigationBar extends RelativeLayout {
 
             ///标题
             title_textView = new TextView(context);
-            title_textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18.0f);
-            title_textView.setTextColor(Color.BLACK);
+            title_textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigationBarTitleTextSize);
+            title_textView.setTextColor(App.NavigationBarTintColor);
             title_textView.setLines(1);
             title_textView.setEllipsize(TextUtils.TruncateAt.END);
             title_textView.setBackgroundColor(Color.TRANSPARENT);
@@ -97,7 +100,7 @@ public class NavigationBar extends RelativeLayout {
 
             ///阴影
             shadow_line = new View(context);
-            shadow_line.setBackgroundColor(Color.LTGRAY);
+            shadow_line.setBackgroundColor(App.NavigationBarShadowColor);
             layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, SizeUtil.pxFormDip(0.5f, context));
             layoutParams.addRule(ALIGN_PARENT_BOTTOM);
             this.addView(shadow_line, layoutParams);
@@ -224,11 +227,20 @@ public class NavigationBar extends RelativeLayout {
     public Button setNavigationItem(String title, Drawable drawable, @Position int position){
 
         Button button = new Button(this.getContext());
-        button.setText(title);
-        button.setTextColor(Color.BLACK);
-        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+
+        if(!TextUtils.isEmpty(title)){
+            button.setText(title);
+        }
+
+        button.setTextColor(App.NavigationBarTintColor);
+        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigatonBarButtonTextSize);
         button.setBackgroundColor(Color.TRANSPARENT);
         button.setMinWidth(0);
+
+        if(drawable != null){
+            button.setCompoundDrawables(null, drawable, null, null);
+        }
+
         button.setMinimumWidth(0);
 
         if(drawable != null) {

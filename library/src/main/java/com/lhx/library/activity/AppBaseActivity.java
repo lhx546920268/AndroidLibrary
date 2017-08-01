@@ -5,21 +5,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.AnimRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 
 import com.lhx.library.R;
+import com.lhx.library.fragment.AppBaseFragment;
 
 @SuppressWarnings("unchecked")
 public class AppBaseActivity extends AppCompatActivity {
 
     ///当前显示的Fragment
-    private Fragment fragment;
+    private AppBaseFragment fragment;
 
     public static final String FRAGMENT_STRING = "fragmentString";
 
@@ -80,11 +83,11 @@ public class AppBaseActivity extends AppCompatActivity {
             try {
 
                 clazz  = Class.forName(className);
-                if(!clazz.isAssignableFrom(Fragment.class)){
-                    throw new RuntimeException(className + "必须是Fragment或者其子类");
+                if(!clazz.isAssignableFrom(AppBaseFragment.class)){
+                    throw new RuntimeException(className + "必须是AppBaseFragment或者其子类");
                 }
 
-                Fragment currentFragment = (Fragment) clazz.newInstance();
+                AppBaseFragment currentFragment = (AppBaseFragment) clazz.newInstance();
 
                 if(currentFragment != null){
 
@@ -107,7 +110,7 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     ///设置当前显示的fragment,无动画效果
-    public void setCurrentFragment(Fragment currentFragment){
+    public void setCurrentFragment(AppBaseFragment currentFragment){
 
         setCurrentFragment(currentFragment, 0, 0);
     }
@@ -118,7 +121,7 @@ public class AppBaseActivity extends AppCompatActivity {
      * @param enter 进场动画
      * @param exit 出场动画
      */
-    public void setCurrentFragment(Fragment currentFragment, @AnimRes int enter, @AnimRes int exit){
+    public void setCurrentFragment(AppBaseFragment currentFragment, @AnimRes int enter, @AnimRes int exit){
 
         fragment = currentFragment;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -145,5 +148,40 @@ public class AppBaseActivity extends AppCompatActivity {
         Intent intent = new Intent(this, clazz);
         startActivity(intent);
         return intent;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (fragment != null && fragment.onKeyDown(keyCode, event)) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+
+        if (fragment != null && fragment.dispatchKeyEvent(event)) {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(fragment != null){
+            fragment.onWindowFocusChanged(hasFocus);
+        }
+    }
+
+    //获取授权
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
+            grantResults) {
+        if(fragment != null){
+            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

@@ -134,6 +134,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
     }
 
+    //是否正在加载更多
+    public boolean isLoadingMore(){
+        return loadMoreEnable() && getLoadMoreControl().isLoadingMore();
+    }
+
     //是否是空视图
     protected boolean isEmptyView(int position){
         return mRealCount == 0 && shouldDisplayEmptyView();
@@ -183,6 +188,21 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     public void onFooterClick(int section) {
 
     }
+
+//    @Override
+//    public boolean shouldSetOnClickListenerAtItem(int indexInSection, int section) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean shouldSetOnClickListenerAtHeader(int section) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean shouldSetOnClickListenerAtFooter(int section) {
+//        return false;
+//    }
 
     /**
      * 获取item

@@ -47,4 +47,21 @@ public class SizeUtil{
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return pxValue / fontScale + 0.5f;
     }
+
+
+    /**
+     * 获取屏幕宽度
+     * @return 宽度
+     */
+    public static int getWindowWidth(Context context){
+        return context.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
+     * 获取屏幕高度
+     * @return 高度
+     */
+    public static int getWindowHeight(Context context){
+        return context.getResources().getDisplayMetrics().heightPixels;
+    }
 }

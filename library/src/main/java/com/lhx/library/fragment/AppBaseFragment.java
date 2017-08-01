@@ -5,12 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
@@ -176,6 +180,33 @@ public abstract class AppBaseFragment extends Fragment {
         setContentView(View.inflate(mContext, layoutResId, null));
     }
 
+    //显示返回按钮
+    public void setShowBackButton(boolean show){
+
+        if(mNavigationBar != null){
+            if(show){
+
+                Drawable drawable = null;
+                int icon = App.NavigationBarBackButtonIcon;
+                String title = null;
+                if(icon != 0){
+                    drawable = ContextCompat.getDrawable(mContext, icon);
+                }
+                if(drawable == null){
+                    title = App.NavigationBarBackButtonTitle;
+                }
+
+                mNavigationBar.setNavigationItem(title, drawable, NavigationBar
+                        .NAVIGATIONBAR_ITEM_POSITION_LEFT).setOnClickListener(new OnSingleClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        mActivity.finish();
+                    }
+                });
+            }
+        }
+    }
+
     public NavigationBar getNavigationBar() {
         return mNavigationBar;
     }
@@ -291,6 +322,7 @@ public abstract class AppBaseFragment extends Fragment {
         return mPageLoadFail;
     }
 
+    //显示加载菊花
     public boolean isLoading() {
         return mLoading;
     }
@@ -309,5 +341,22 @@ public abstract class AppBaseFragment extends Fragment {
                 mLoadingDialog = null;
             }
         }
+    }
+
+    //点击物理键
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        return false;
+    }
+
+    //分发点击物理键事件
+    public boolean dispatchKeyEvent(KeyEvent event) {
+
+        return false;
+    }
+
+    //屏幕焦点改变
+    public void onWindowFocusChanged(boolean hasFocus) {
+
     }
 }
