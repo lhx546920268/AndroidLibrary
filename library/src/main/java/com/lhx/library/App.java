@@ -33,4 +33,7 @@ public class App {
 
     //http分页请求第一页
     public static int HttpFirstPage = 1;
+
+    //长按钮圆角
+    public static int LongButtonCornerRadius = 10;
 }

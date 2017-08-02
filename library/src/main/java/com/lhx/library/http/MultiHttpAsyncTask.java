@@ -3,6 +3,7 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.support.annotation.CallSuper;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
 
         if(task != null && !mTasks.contains(task)){
             mTasks.add(task);
+            task.addHttpRequestHandler(this);
         }
     }
 
@@ -83,6 +85,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
         for(HttpAsyncTask task : mTasks){
             if(task.getStatus() != AsyncTask.Status.PENDING)
                 continue;
+            Log.d("task", "startConcurrently" + task.getName());
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -99,6 +102,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     @CallSuper
     public void onComplete(HttpAsyncTask task) {
         mTasks.remove(task);
+        Log.d("task", "onComplete" + task.getName());
         if(mTasks.size() == 0){
             onAllTaskComplete(mHasOneFail);
         }

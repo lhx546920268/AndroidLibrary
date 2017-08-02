@@ -29,6 +29,7 @@ public class RecyclerViewFragment extends PageFragment{
             setContentView(R.layout.recycler_view_fragment);
         }
         mRecyclerView = findViewById(R.id.recycler_view);
+        setRefreshView(mRecyclerView);
 
         mRefreshLayout.setPtrHandler(this);
 

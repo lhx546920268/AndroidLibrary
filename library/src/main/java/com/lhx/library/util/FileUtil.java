@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.lhx.library.App;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,6 +23,48 @@ import java.io.IOException;
  */
 
 public class FileUtil {
+
+    //app目录
+    static String appFolder = null;
+
+    //app缓存文件夹
+    static String cacheFolder = null;
+
+    //app缓存图片文件夹
+    static String imageCahceFolder = null;
+
+    public static String getAppFolder(Context context) {
+        if(appFolder == null){
+            appFolder = context.getExternalCacheDir() + File.separator + AppUtil.getAppPackageName(context) + File.separator;
+            File file = new File(appFolder);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+        }
+        return appFolder;
+    }
+
+    public static String getCacheFolder(Context context) {
+        if(cacheFolder == null){
+            cacheFolder = getAppFolder(context) + ".cache" + File.separator;
+            File file = new File(cacheFolder);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+        }
+        return cacheFolder;
+    }
+
+    public static String getImageCacheFolder(Context context) {
+        if(imageCahceFolder == null){
+            imageCahceFolder = getAppFolder(context) + "imageCache" + File.separator;
+            File file = new File(imageCahceFolder);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+        }
+        return imageCahceFolder;
+    }
 
     /**
      * 获取文件的 mimetype
@@ -313,4 +357,6 @@ public class FileUtil {
 
         return null;
     }
+
+
 }

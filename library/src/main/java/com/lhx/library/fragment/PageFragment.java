@@ -15,6 +15,7 @@ import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.BackToTopButton;
 
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
 
@@ -36,6 +37,9 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     //回到顶部按钮图标
     private static @DrawableRes int mScrollToTopIconRes;
 
+    //当前用来下拉刷新的视图
+    private View mRefreshView;
+
     //是否有下拉刷新功能
     public boolean hasRefresh(){
         return false;
@@ -43,7 +47,9 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
 
     @Override
     public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-        return true;
+        if(mRefreshView == null)
+            return false;
+        return PtrDefaultHandler.checkContentCanBePulledDown(frame, mRefreshView, header);
     }
 
     //开始下拉刷新，子类重写
@@ -78,6 +84,12 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     public static void setScrollToTopIconRes(int scrollToTopIconRes) {
         if(mScrollToTopIconRes != scrollToTopIconRes){
             mScrollToTopIconRes = scrollToTopIconRes;
+        }
+    }
+
+    public void setRefreshView(View refreshView){
+        if(mRefreshView != refreshView){
+            mRefreshView = refreshView;
         }
     }
 
