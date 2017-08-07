@@ -3,10 +3,10 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     protected int mErrorCode = HttpRequest.ERROR_CODE_NONE;
 
     //请求完成回调
-    protected HashSet<HttpRequestHandler> mHttpRequestHandlers = new HashSet<>();
+    protected ArrayList<HttpRequestHandler> mHttpRequestHandlers = new ArrayList<>();
 
     //请求进度回调 必须在 onConfigure 设置 httpRequest showUploadProgress showDownloadProgress 为true
     protected HttpProgressHandler<HttpAsyncTask> mHttpProgressHandler;

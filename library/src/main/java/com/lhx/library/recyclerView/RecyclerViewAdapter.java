@@ -131,8 +131,6 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     //是否是加载更多的UI
     protected boolean isLoadMoreItem(int position){
-        Log.d("tag", (mRealCount > 0) + "," + (position == mRealCount) + "," + (loadMoreEnable()) + "," +
-                (getLoadMoreControl().shouldDisplay()));
         return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
     }
 

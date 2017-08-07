@@ -109,6 +109,10 @@ public class AppBaseActivity extends AppCompatActivity {
 //                }
 
                 AppBaseFragment currentFragment = (AppBaseFragment) clazz.newInstance();
+                Bundle bundle = getIntent().getExtras();
+                if(bundle != null){
+                    currentFragment.setArguments(bundle);
+                }
 
                 if(currentFragment != null){
 

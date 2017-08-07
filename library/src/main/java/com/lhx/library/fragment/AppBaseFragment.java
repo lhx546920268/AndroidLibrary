@@ -428,73 +428,53 @@ public abstract class AppBaseFragment extends Fragment {
 
     ///获取bundle内容
     public String getExtraStringFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return "";
-        }
 
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         if(nBundle == null) return "";
         return nBundle.getString(key);
     }
 
     public double getExtraDoubleFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return 0.00;
-        }
-
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         return nBundle.getDouble(key);
     }
 
     public int getExtraIntFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return 0;
-        }
-
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         return nBundle.getInt(key);
     }
 
     public long getExtraLongFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return 0;
-        }
-
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         return nBundle.getLong(key);
     }
 
     public boolean getExtraBooleanFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return false;
-        }
-
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         return nBundle.getBoolean(key, false);
     }
 
     public List<String> getExtraStringListFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return new ArrayList<String>();
-        }
-
-        Bundle nBundle = intent.getExtras();
+        Bundle nBundle = getBundle();
         return nBundle.getStringArrayList(key);
     }
 
     public Serializable getExtraSerializableFromBundle(String key){
-        Intent intent = mActivity.getIntent();
-        if (intent == null) {
-            return new ArrayList<String>();
+        Bundle nBundle = getBundle();
+        return nBundle.getSerializable(key);
+    }
+
+    //获取对应bundle
+    public Bundle getBundle(){
+
+        Bundle bundle = getArguments();
+        if(bundle != null){
+            return bundle;
         }
 
-        Bundle nBundle = intent.getExtras();
-        return nBundle.getSerializable(key);
+        if(mActivity != null){
+            return mActivity.getIntent().getExtras();
+        }
+        return null;
     }
 }
