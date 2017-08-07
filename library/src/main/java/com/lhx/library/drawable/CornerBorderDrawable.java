@@ -291,6 +291,10 @@ public class CornerBorderDrawable extends Drawable {
         drawable.mBitmapShader = mBitmapShader;
         drawable.mPaint = mPaint;
         drawable.mBitmapPaint = mBitmapPaint;
+        drawable.mLeftBottomCornerRadius = mLeftBottomCornerRadius;
+        drawable.mRightBottomCornerRadius = mRightBottomCornerRadius;
+        drawable.mLeftTopCornerRadius = mLeftTopCornerRadius;
+        drawable.mRightTopCornerRadius = mRightTopCornerRadius;
 
         return drawable;
     }

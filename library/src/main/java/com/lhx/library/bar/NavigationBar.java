@@ -41,10 +41,10 @@ public class NavigationBar extends RelativeLayout {
     public @interface Position{}
 
     ///左右边距
-    private static final int LEFT_RIGHT_MARGIN = 20;
+    public static int LEFT_RIGHT_MARGIN = 20;
 
     ///按钮、标题之间的间距
-    private static final int VIEW_INTERVAL = 20;
+    public static int VIEW_INTERVAL = 20;
 
     ///标题
     private TextView title_textView;
@@ -235,13 +235,15 @@ public class NavigationBar extends RelativeLayout {
         button.setTextColor(App.NavigationBarTintColor);
         button.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigatonBarButtonTextSize);
         button.setBackgroundColor(Color.TRANSPARENT);
+        button.setMinimumWidth(0);
+        button.setMinimumHeight(0);
         button.setMinWidth(0);
+        button.setMinHeight(0);
 
         if(drawable != null){
+            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
             button.setCompoundDrawables(null, drawable, null, null);
         }
-
-        button.setMinimumWidth(0);
 
         if(drawable != null) {
             button.setCompoundDrawables(null,drawable,null,null);
@@ -249,9 +251,11 @@ public class NavigationBar extends RelativeLayout {
 
         switch (position){
             case NAVIGATIONBAR_ITEM_POSITION_LEFT :
+                button.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
                 setLeftNavigationBarItem(button);
                 break;
             case NAVIGATIONBAR_ITEM_POSITION_RIGHT :
+                button.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
                 setRightNavigationBarItem(button);
                 break;
             default :

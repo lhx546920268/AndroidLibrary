@@ -148,6 +148,14 @@ public class TabLayout extends FrameLayout {
         }
     }
 
+    public void setSelectedIndicatorColor(int selectedIndicatorColor) {
+        if(mSelectedIndicatorColor != selectedIndicatorColor){
+            mSelectedIndicatorColor = selectedIndicatorColor;
+            mSelectedIndicator.setBackgroundColor(mSelectedIndicatorColor);
+            refreshUI();
+        }
+    }
+
     ///设置分割线颜色
     public void setDividerColor(int dividerColor) {
         if (mDividerColor != dividerColor) {
@@ -786,6 +794,7 @@ public class TabLayout extends FrameLayout {
                         int bottom = child.getBottom();
                         int padding = (bottom - top - mDivierHeight) / 2;
 
+                        mDividerDrawable.setColor(mDividerColor);
                         mDividerDrawable.setBounds(child.getRight() - mDividerWidth, top + padding, child.getRight(),
                                 bottom - padding);
                         mDividerDrawable.draw(c);
@@ -797,6 +806,7 @@ public class TabLayout extends FrameLayout {
                         TabInfo info = mTabInfos.get(position);
 
                         int left = (info.mTabWidth - info.mSelectedIndicatorWidth) / 2 + child.getLeft();
+                        mSelectedIndicatorDrawable.setColor(mSelectedIndicatorColor);
                         mSelectedIndicatorDrawable.setBounds(left, child.getBottom() - mSelectedIndicator.getHeight(), left + info
                                 .mSelectedIndicatorWidth, child.getBottom());
                         mSelectedIndicatorDrawable.draw(c);

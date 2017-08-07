@@ -2,20 +2,20 @@ package com.lhx.library.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.lhx.library.R;
 
 /**
- * recyclerview 相关的fragment
+ * listview 相关的fragment
  */
 
-public class RecyclerViewFragment extends PageFragment{
+public class ListViewFragment extends PageFragment {
 
     //
-    protected RecyclerView mRecyclerView;
+    protected ListView mListView;
 
     @Override
     @CallSuper
@@ -23,13 +23,13 @@ public class RecyclerViewFragment extends PageFragment{
 
         super.initialize(inflater, container, saveInstanceState);
         if(hasRefresh()){
-            setContentView(R.layout.recycler_view_refresh_fragment);
+            setContentView(R.layout.list_view_refresh_fragment);
             mRefreshLayout = findViewById(R.id.ptr_layout);
             mRefreshLayout.setPtrHandler(this);
         }else {
-            setContentView(R.layout.recycler_view_fragment);
+            setContentView(R.layout.list_view_fragment);
         }
-        mRecyclerView = findViewById(R.id.recycler_view);
-        setRefreshView(mRecyclerView);
+        mListView = findViewById(R.id.list_view);
+        setRefreshView(mListView);
     }
 }

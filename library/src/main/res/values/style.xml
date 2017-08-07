@@ -6,11 +6,34 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
     </style>
-
+    
+    
+    <!--loading 背景-->
+    <style name="Theme_dialog_loading" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    
     <!--dialog动画-->
     <style name="action_sheet_animate" parent="@android:Animation">
         <item name="android:windowEnterAnimation">@anim/action_sheet_enter</item>
         <item name="android:windowExitAnimation">@anim/action_sheet_exit</item>
+    </style>
+
+    <!--listView-->
+
+    <style name="listview">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:listSelector">@color/white</item>
+        <item name="android:cacheColorHint">@color/white</item>
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0.5dip</item>
+        <item name="android:fadingEdgeLength">0sp</item>
+        <item name="android:drawSelectorOnTop">false</item>
     </style>
 
 </resources>

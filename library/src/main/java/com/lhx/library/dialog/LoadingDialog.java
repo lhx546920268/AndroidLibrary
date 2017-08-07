@@ -6,7 +6,10 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.lhx.library.R;
 import com.lhx.library.drawable.CornerBorderDrawable;
@@ -18,7 +21,7 @@ import com.lhx.library.drawable.CornerBorderDrawable;
 public class LoadingDialog extends Dialog {
 
     public LoadingDialog(@NonNull Context context) {
-        super(context);
+        super(context, R.style.Theme_dialog_loading);
         initlization();
     }
 
@@ -42,5 +45,12 @@ public class LoadingDialog extends Dialog {
 
         setCancelable(false);
         setCanceledOnTouchOutside(false);
+
+        Window window = getWindow();
+        WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.gravity = Gravity.CENTER;
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(layoutParams);
     }
 }

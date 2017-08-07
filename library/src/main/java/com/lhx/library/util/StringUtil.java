@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 /**
  * 字符串功能类
@@ -142,5 +143,44 @@ public class StringUtil {
         StaticLayout layout = new StaticLayout(text, paint, maxWidth, alignment, lineSpacingMultiplier,
                 lineSpacingExtra, true);
         return layout.getHeight();
+    }
+
+
+    /**
+     * 判断是否为手机号
+     *
+     * @param mobile 手机号
+     * @return 返回true则是手机号
+     */
+    public static boolean isMoile(String mobile) {
+
+        if (TextUtils.isEmpty(mobile))
+            return false;
+        return Pattern.compile("^1[3|4|5|7|8][0-9]\\d{8}$").matcher(mobile).matches();
+    }
+
+    /**
+     * 判断是否为固话
+     *
+     * @param tel 固话
+     * @return 返回true则是手机号
+     */
+    public static boolean isTelPhoneNumber(String tel) {
+
+        if (TextUtils.isEmpty(tel))
+            return false;
+        return Pattern.compile("((\\d{12})|^((\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})-" +
+                "(\\d{4}|\\d{3}|\\d{2}|\\d{1})|(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1}))$)|(\\d{11})").matcher(tel)
+                .matches();
+    }
+
+    /**
+     * 是否是邮箱
+     */
+    public static boolean isEmail(String email){
+        if (TextUtils.isEmpty(email))
+            return false;
+        return Pattern.compile("[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}").matcher(email)
+                .matches();
     }
 }

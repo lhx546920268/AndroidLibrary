@@ -7,16 +7,20 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +33,10 @@ import com.lhx.library.bar.NavigationBar;
 import com.lhx.library.dialog.LoadingDialog;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.OnSingleClickListener;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,6 +71,9 @@ public abstract class AppBaseFragment extends Fragment {
     ///显示加载菊花
     private boolean mLoading = false;
     private LoadingDialog mLoadingDialog;
+
+    //显示空视图信息
+    private View mEmptyView;
 
     public AppBaseFragment() {
         // Required empty public constructor
@@ -196,13 +207,19 @@ public abstract class AppBaseFragment extends Fragment {
                     title = App.NavigationBarBackButtonTitle;
                 }
 
-                mNavigationBar.setNavigationItem(title, drawable, NavigationBar
-                        .NAVIGATIONBAR_ITEM_POSITION_LEFT).setOnClickListener(new OnSingleClickListener() {
+                Button button = mNavigationBar.setNavigationItem(title, null, NavigationBar
+                        .NAVIGATIONBAR_ITEM_POSITION_LEFT);
+                button.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
                         mActivity.finish();
                     }
                 });
+
+                if(drawable != null){
+                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                    button.setCompoundDrawables(drawable, null, null, null);
+                }
             }
         }
     }
@@ -230,13 +247,25 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void startActivity(Class fragmentClass, Bundle bundle){
+        startActivityForResult(fragmentClass, 0, bundle);
+    }
+
+    public void startActivityForResult(Class fragmentClass, int requestCode){
+        startActivityForResult(fragmentClass, requestCode, null);
+    }
+
+    public void startActivityForResult(Class fragmentClass, int requestCode, Bundle bundle){
         Intent intent = AppBaseActivity.getIntentWithFragment(mContext, fragmentClass);
         if(bundle != null){
             intent.putExtras(bundle);
         }
-        startActivity(intent);
-    }
 
+        if(requestCode != 0){
+            mActivity.startActivityForResult(intent, requestCode);
+        }else {
+            mActivity.startActivity(intent);
+        }
+    }
 
     ///重新载入页面 子类按需重写
     protected void onReloadPage(){
@@ -343,6 +372,32 @@ public abstract class AppBaseFragment extends Fragment {
         }
     }
 
+    /**
+     * 设置显示空视图
+     * @param text 显示的信息
+     */
+    public void setShowEmptyViwe(String text){
+
+        if(mEmptyView == null){
+            mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, mContentContainer, false);
+        }
+
+        if(!TextUtils.isEmpty(text)){
+            TextView textView = (TextView)mEmptyView.findViewById(R.id.text);
+            textView.setText(text);
+        }
+
+        if(isPageLoading()){
+            setPageLoading(false);
+        }
+
+        if(isPageLoadFail()){
+            setPageLoadFail(false);
+        }
+
+        mContentContainer.addView(mEmptyView);
+    }
+
     //点击物理键
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -358,5 +413,88 @@ public abstract class AppBaseFragment extends Fragment {
     //屏幕焦点改变
     public void onWindowFocusChanged(boolean hasFocus) {
 
+    }
+
+    //获取颜色
+    public @ColorInt int getColor(@ColorRes int colorRes){
+        return ContextCompat.getColor(mContext, colorRes);
+    }
+
+    //获取drawable
+    public Drawable getDrawable(@DrawableRes int drawableRes){
+        return ContextCompat.getDrawable(mContext, drawableRes);
+    }
+
+
+    ///获取bundle内容
+    public String getExtraStringFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return "";
+        }
+
+        Bundle nBundle = intent.getExtras();
+        if(nBundle == null) return "";
+        return nBundle.getString(key);
+    }
+
+    public double getExtraDoubleFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return 0.00;
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getDouble(key);
+    }
+
+    public int getExtraIntFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return 0;
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getInt(key);
+    }
+
+    public long getExtraLongFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return 0;
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getLong(key);
+    }
+
+    public boolean getExtraBooleanFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return false;
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getBoolean(key, false);
+    }
+
+    public List<String> getExtraStringListFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return new ArrayList<String>();
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getStringArrayList(key);
+    }
+
+    public Serializable getExtraSerializableFromBundle(String key){
+        Intent intent = mActivity.getIntent();
+        if (intent == null) {
+            return new ArrayList<String>();
+        }
+
+        Bundle nBundle = intent.getExtras();
+        return nBundle.getSerializable(key);
     }
 }

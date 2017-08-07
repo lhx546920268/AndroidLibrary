@@ -32,10 +32,10 @@
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/common_loading_text"
+            android:text="请稍后..."
             android:textSize="15sp"
             android:layout_marginLeft="5dp"
-            android:textColor="@color/gray"
+            android:textColor="@color/white"
             android:id="@+id/text_view"
             />
 

@@ -2,10 +2,13 @@ package com.lhx.library.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.AnimRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +20,19 @@ import android.view.Window;
 
 import com.lhx.library.R;
 import com.lhx.library.fragment.AppBaseFragment;
+import com.lhx.library.inter.LoginHandler;
 
 @SuppressWarnings("unchecked")
 public class AppBaseActivity extends AppCompatActivity {
+
+    //登录请求code
+    public static final int LOGIN_REQUEST_CODE = 1018;
+
+    //登录完成回调
+    private LoginHandler mLoginHandler;
+
+    //是否有登录回调
+    private boolean mHasLoginHandler = false;
 
     ///当前显示的Fragment
     private AppBaseFragment fragment;
@@ -76,6 +89,14 @@ public class AppBaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(getContentViewRes());
+
+        //java.net.SocketException: sendto failed: ECONNRESET (Connection reset by peer)
+        if (Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);
         if(className != null){
@@ -83,9 +104,9 @@ public class AppBaseActivity extends AppCompatActivity {
             try {
 
                 clazz  = Class.forName(className);
-                if(!clazz.isAssignableFrom(AppBaseFragment.class)){
-                    throw new RuntimeException(className + "必须是AppBaseFragment或者其子类");
-                }
+//                if(!clazz.isAssignableFrom(AppBaseFragment.class)){
+//                    throw new RuntimeException(className + "必须是AppBaseFragment或者其子类");
+//                }
 
                 AppBaseFragment currentFragment = (AppBaseFragment) clazz.newInstance();
 
@@ -183,5 +204,49 @@ public class AppBaseActivity extends AppCompatActivity {
             fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == RESULT_OK){
+            switch (requestCode){
+                case LOGIN_REQUEST_CODE : {
+                    //登录
+                    if(mLoginHandler != null){
+                        mLoginHandler.onLogin();
+                        mLoginHandler = null;
+                    }
+                    return;
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void startActivityForResult(Intent intent, int requestCode, LoginHandler loginHandler){
+        mLoginHandler = loginHandler;
+        mHasLoginHandler = true;
+        super.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        if(mHasLoginHandler){
+            mHasLoginHandler = false;
+        }else {
+            mLoginHandler = null;
+        }
+        super.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, @Nullable Bundle options) {
+        if(mHasLoginHandler){
+            mHasLoginHandler = false;
+        }else {
+            mLoginHandler = null;
+        }
+        super.startActivityForResult(intent, requestCode, options);
     }
 }

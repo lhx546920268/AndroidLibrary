@@ -23,6 +23,7 @@ public class CacheUtil {
             return;
         key = AppUtil.getAppPackageName(context) + "." + key;
         SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(context).edit();
+
         if (value instanceof Boolean) {
             
             prefs.putBoolean(key, (Boolean) value);
@@ -45,6 +46,8 @@ public class CacheUtil {
         
         prefs.apply();
     }
+
+    //
 
     // //////////////////////////////加载配置文件中的信息////////////////////////////////
     public static String loadPrefsString(Context context, String key, String defValue) {

@@ -11,6 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -624,7 +625,7 @@ public class HttpRequest {
         OutputStream outputStream = null;
         try {
             mConn.setDoOutput(true);
-            outputStream = new BufferedOutputStream(mConn.getOutputStream());
+            outputStream = new DataOutputStream(mConn.getOutputStream());
 
             //这时已建立连接 不能在设置 setRequestProperty
             outputStream.write(bytes);

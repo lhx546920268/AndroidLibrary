@@ -85,7 +85,6 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
         for(HttpAsyncTask task : mTasks){
             if(task.getStatus() != AsyncTask.Status.PENDING)
                 continue;
-            Log.d("task", "startConcurrently" + task.getName());
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -102,7 +101,6 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     @CallSuper
     public void onComplete(HttpAsyncTask task) {
         mTasks.remove(task);
-        Log.d("task", "onComplete" + task.getName());
         if(mTasks.size() == 0){
             onAllTaskComplete(mHasOneFail);
         }
