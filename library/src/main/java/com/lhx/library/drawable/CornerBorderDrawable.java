@@ -324,7 +324,6 @@ public class CornerBorderDrawable extends Drawable {
         if(Color.alpha(mBackgroundColor) != 0){
 
             RectF bounds = new RectF(mRectF);
-            float radius = mCornerRadius;
 
             boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
             int margin = existBorder ? mBorderWidth : 0;
