@@ -59,7 +59,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     ///布局方式
     private GridLayoutManager mLayoutManager;
 
-    ///所有不同的列的乘积
+    ///所有不同的列的最小公倍数
     private int mDifferentColumnProduct;
 
     ///布局信息
@@ -113,32 +113,16 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         mRecyclerView.addItemDecoration(new GridItemDecoration(mOrientation));
     }
 
-    public int getItemSpace() {
-        return mItemSpace;
-    }
-
     public void setItemSpace(int itemSpace) {
         mItemSpace = itemSpace;
-    }
-
-    public int getItemHeaderSpace() {
-        return mItemHeaderSpace;
     }
 
     public void setItemHeaderSpace(int itemHeaderSpace) {
         mItemHeaderSpace = itemHeaderSpace;
     }
 
-    public int getItemFooterSpace() {
-        return mItemFooterSpace;
-    }
-
     public void setItemFooterSpace(int itemFooterSpace) {
         mItemFooterSpace = itemFooterSpace;
-    }
-
-    public EdgeInsets getSectionInsets() {
-        return mSectionInsets;
     }
 
     public void setSectionInsets(EdgeInsets sectionInsets) {
@@ -167,8 +151,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
      */
     public abstract int numberOfColumnInSection(int section);
 
-    /**不同的列数的乘积
-     * @return 乘积
+    /**不同的列数的最小公倍数
+     * @return 最小公倍数
      */
     public abstract int getDifferentColumnProduct();
 
@@ -210,6 +194,14 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     public EdgeInsets getSectionInsetsAtSection(int section) {
 
         return mSectionInsets;
+    }
+
+    public boolean headerShouldUseSectionInsets(int section){
+        return true;
+    }
+
+    public boolean footerShouldUseSectionInsets(int section){
+        return true;
     }
 
     ///获取spanCount
@@ -259,7 +251,14 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                 sectionInfo.itemSpace = getItemSpaceAtSection(section);
                 sectionInfo.itemHeaderSpace = getItemHeaderSpaceAtSection(section);
                 sectionInfo.itemFooterSpace = getItemFooterSpaceAtSection(section);
-                sectionInfo.sectionInsets = getSectionInsetsAtSection(section);
+                sectionInfo.footerUseSectionInsets = footerShouldUseSectionInsets(section);
+                sectionInfo.headerUseSectionInsets = headerShouldUseSectionInsets(section);
+
+                EdgeInsets insets = getSectionInsetsAtSection(section);
+                if(insets == null){
+                    insets = mSectionInsets;
+                }
+                sectionInfo.sectionInsets = insets;
                 sectionInfo.sectionBegin = count;
                 mSections.add(sectionInfo);
 
@@ -319,12 +318,25 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
                     if(sectionInfo.isHeaderForPosition(position)){
 
+                        if(!sectionInfo.headerUseSectionInsets){
+                            left = 0;
+                            top = 0;
+                            right = 0;
+                            bottom = 0;
+                        }
+
                         ///头部和item之间的间隔，如果该section内没有item,则忽略间隔
                         if(sectionInfo.numberItems > 0)
                             bottom = sectionInfo.itemHeaderSpace;
 
                     }else if(sectionInfo.isFooterForPosition(position)){
 
+                        if(!sectionInfo.footerUseSectionInsets){
+                            left = 0;
+                            top = 0;
+                            right = 0;
+                            bottom = 0;
+                        }
                         ///存在item
                         if(sectionInfo.numberItems > 0){
                             top = sectionInfo.itemFooterSpace;
@@ -338,7 +350,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
                         ///如果不是最后一行，添加item间隔
                         if(!onTheBottom){
-                            bottom = mItemSpace;
+                            bottom = sectionInfo.itemSpace;
                         }else if(!sectionInfo.isExistFooter){
 
                             ///不存在底部，设置section偏移量

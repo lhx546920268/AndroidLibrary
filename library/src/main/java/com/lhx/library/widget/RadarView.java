@@ -11,7 +11,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.lhx.library.dialog.AlertController;
 import com.lhx.library.util.SizeUtil;
+
+import java.util.ArrayList;
 
 /**
  * 雷达图
@@ -21,9 +24,6 @@ public class RadarView extends View{
 
     //圆心坐标
     private int mCenterX, mCenterY;
-
-    //数据数量
-    private int mCount = 5;
 
     //雷达线条颜色
     private @ColorInt int mRedarStrokeColor;
@@ -36,6 +36,12 @@ public class RadarView extends View{
 
     //外包填充颜色
     private @ColorInt int mOuterFillColor;
+
+    //雷达数据
+    private ArrayList<RadarInfo> mInfos;
+
+    //最大指数
+    private int mMaxValue = 100;
 
     public RadarView(Context context) {
         this(context, null, 0);
@@ -64,45 +70,126 @@ public class RadarView extends View{
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
+    public void setInfos(ArrayList<RadarInfo> infos) {
+        if(mInfos != infos){
+            mInfos = infos;
+            postInvalidate();
+        }
+    }
+
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
+        if(mInfos == null || mInfos.size() == 0)
+            return;
+
+        int count = mInfos.size();
         Paint paint = new Paint();
         paint.setStrokeWidth(SizeUtil.pxFormDip(1, getContext()));
 
         Path path = new Path();
         int radius = Math.min(mCenterX, mCenterY);
         double radian = Math.PI * 2 / 5;
-        double startRadin = getStartRadin();
+        double startRadin = count % 2 == 0 ? 0 : Math.PI / 2;
 
+
+        //绘制蛛网
         float x;
         float y;
-        for(int i = 0;i < mCount;i ++){
+        for(int i = count;i > 0;i --){
 
+            int tmpRaidus = radius / count * i;
             path.reset();
-            for(int j = 0;j < mCount;j ++){
-                x = (float)(mCenterX + Math.sin(startRadin + radian * j) * radius);
-                y = (float)(mCenterY - Math.cos(startRadin + radian * j) * radius);
-                if(j == 0){
-                    path.moveTo(x, y);
-                }else {
-                    path.lineTo(x, y);
-                }
+            x = (float)(mCenterX + Math.cos(startRadin) * tmpRaidus);
+            y = (float)(mCenterY - Math.sin(startRadin) * tmpRaidus);
+            path.moveTo(x, y);
+
+            for(int j = 1;j <= count;j ++){
+                x = (float)(mCenterX + Math.cos(startRadin + radian * j) * tmpRaidus);
+                y = (float)(mCenterY - Math.sin(startRadin + radian * j) * tmpRaidus);
+                path.lineTo(x, y);
             }
 
             paint.setColor(mRedarStrokeColor);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawPath(path, paint);
+            if(i % 2 == 0){
+                paint.setColor(mInnerFillColor);
+            }else {
+                paint.setColor(mOuterFillColor);
+            }
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawPath(path, paint);
+
             path.close();
         }
+
+        path.reset();
+        //绘制多边形角上的点和中心连线
+        for(int i = 0;i < count;i ++){
+
+            path.moveTo(mCenterX, mCenterY);
+            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * radius);
+            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * radius);
+            path.lineTo(x, y);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(mRedarStrokeColor);
+            canvas.drawPath(path, paint);
+
+        }
+        path.close();
+
+
+        //绘制数据线
+        float startX = 0;
+        float startY = 0;
+
+        path.reset();
+        for(int i = 0;i < count;i ++){
+
+
+            RadarInfo info = mInfos.get(i);
+            int tmpRadius = info.value / 100 * radius;
+            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * tmpRadius);
+            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * tmpRadius);
+
+            if(i == 0){
+                startX = x;
+                startY = y;
+                path.moveTo(startX, startY);
+            }else {
+                path.lineTo(x, y);
+                if(i == count - 1){
+                    path.lineTo(startX, startY);
+                }
+            }
+        }
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(mDataStrokeColor);
+        canvas.drawPath(path, paint);
+
+        path.close();
+
+
+        path.reset();
+        //绘制点
+        for(int i = 0;i < count;i ++){
+
+            RadarInfo info = mInfos.get(i);
+            int tmpRadius = info.value / 100 * radius;
+            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * tmpRadius);
+            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * tmpRadius);
+            path.addCircle(x, y, 3, Path.Direction.CCW);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(mDataStrokeColor);
+            canvas.drawPath(path, paint);
+        }
+
+        path.close();
     }
 
-    //获取开始弧度
-    private double getStartRadin(){
-
-        return mCount % 2 == 0 ? 0 : Math.PI / 2;
-    }
 
     //雷达信息
     public static class RadarInfo{

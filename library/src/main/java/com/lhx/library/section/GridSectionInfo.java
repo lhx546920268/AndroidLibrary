@@ -17,4 +17,8 @@ public class GridSectionInfo extends SectionInfo {
 
     ///section偏移量
     public EdgeInsets sectionInsets;
+
+    ///头部是否需要使用 EdgeInsets
+    public boolean headerUseSectionInsets = true;
+    public boolean footerUseSectionInsets = true;
 }

@@ -114,6 +114,9 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
     @Override
     public void onFail(HttpAsyncTask task, int errorCode, int httpCode) {
         mHasOneFail = true;
+        if(mShouldCancelWhileOneFail){
+            cancelAllTask();
+        }
     }
 
     ///所有任务执行完成
