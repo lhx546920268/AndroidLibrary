@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -43,6 +44,9 @@ public class RadarView extends View{
     //最大指数
     private int mMaxValue = 100;
 
+    //y轴坐标便宜
+    private int mOffsetY;
+
     public RadarView(Context context) {
         this(context, null, 0);
     }
@@ -58,6 +62,7 @@ public class RadarView extends View{
         mDataStrokeColor = Color.parseColor("#28cec1");
         mInnerFillColor = Color.parseColor("#a0d3da");
         mOuterFillColor = Color.parseColor("#afe2e9");
+        mOffsetY = SizeUtil.pxFormDip(10, context);
     }
 
     @Override
@@ -85,11 +90,17 @@ public class RadarView extends View{
             return;
 
         int count = mInfos.size();
-        Paint paint = new Paint();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStrokeWidth(SizeUtil.pxFormDip(1, getContext()));
 
         Path path = new Path();
-        int radius = Math.min(mCenterX, mCenterY);
+
+        int centerX = mCenterX;
+        int centerY = mCenterY + mOffsetY;
+
+        int outRadius = Math.min(mCenterX, mCenterY);
+        int radius = outRadius - SizeUtil.pxFormDip(15, getContext());
+
         double radian = Math.PI * 2 / 5;
         double startRadin = count % 2 == 0 ? 0 : Math.PI / 2;
 
@@ -101,13 +112,13 @@ public class RadarView extends View{
 
             int tmpRaidus = radius / count * i;
             path.reset();
-            x = (float)(mCenterX + Math.cos(startRadin) * tmpRaidus);
-            y = (float)(mCenterY - Math.sin(startRadin) * tmpRaidus);
+            x = (float)(centerX + Math.cos(startRadin) * tmpRaidus);
+            y = (float)(centerY - Math.sin(startRadin) * tmpRaidus);
             path.moveTo(x, y);
 
             for(int j = 1;j <= count;j ++){
-                x = (float)(mCenterX + Math.cos(startRadin + radian * j) * tmpRaidus);
-                y = (float)(mCenterY - Math.sin(startRadin + radian * j) * tmpRaidus);
+                x = (float)(centerX + Math.cos(startRadin + radian * j) * tmpRaidus);
+                y = (float)(centerY - Math.sin(startRadin + radian * j) * tmpRaidus);
                 path.lineTo(x, y);
             }
 
@@ -129,9 +140,9 @@ public class RadarView extends View{
         //绘制多边形角上的点和中心连线
         for(int i = 0;i < count;i ++){
 
-            path.moveTo(mCenterX, mCenterY);
-            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * radius);
-            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * radius);
+            path.moveTo(centerX, centerY);
+            x = (float)(centerX + Math.cos(startRadin + radian * i) * radius);
+            y = (float)(centerY - Math.sin(startRadin + radian * i) * radius);
             path.lineTo(x, y);
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(mRedarStrokeColor);
@@ -150,9 +161,9 @@ public class RadarView extends View{
 
 
             RadarInfo info = mInfos.get(i);
-            int tmpRadius = info.value / 100 * radius;
-            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * tmpRadius);
-            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * tmpRadius);
+            int tmpRadius = info.value / mMaxValue * radius;
+            x = (float)(centerX + Math.cos(startRadin + radian * i) * tmpRadius);
+            y = (float)(centerY - Math.sin(startRadin + radian * i) * tmpRadius);
 
             if(i == 0){
                 startX = x;
@@ -172,17 +183,60 @@ public class RadarView extends View{
 
         path.close();
 
+        TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(mDataStrokeColor);
+        textPaint.setTextSize(17);
+
+        //文字高度
+        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+        float fontHeight = fontMetrics.descent - fontMetrics.ascent;
+
+        //绘制文字
+        for(int i = 0;i < count;i ++){
+            RadarInfo info = mInfos.get(i);
+
+            double tmpRadian = startRadin + radian * i;
+
+            x = (float)(centerX + Math.cos(tmpRadian) * (radius + fontHeight / 2));
+            y = (float)(centerY - Math.sin(tmpRadian) * (radius + fontHeight / 2));
+
+            if(tmpRadian > Math.PI * 2){
+                tmpRadian -= Math.PI * 2;
+            }
+
+            if(tmpRadian >= 0 && tmpRadian <= Math.PI / 2){//第1象限
+
+                if(tmpRadian == Math.PI / 2){
+                    float dis = textPaint.measureText(info.title);
+                    x -= dis / 2;
+                }
+                canvas.drawText(info.title, x, y, textPaint);
+
+            }else if(tmpRadian >= 3 * Math.PI / 2 && tmpRadian <= Math.PI * 2){//第4象限
+                
+                canvas.drawText(info.title, x + 10,y,textPaint);
+            }else if(tmpRadian > Math.PI / 2 && tmpRadian <= Math.PI){//第2象限
+                
+                float dis = textPaint.measureText(info.title);//文本长度
+                canvas.drawText(info.title, x - dis, y, textPaint);
+            }else if(tmpRadian >= Math.PI && tmpRadian < 3 * Math.PI / 2){//第3象限
+                
+                float dis = textPaint.measureText(info.title);//文本长度
+                canvas.drawText(info.title, x - dis - 10, y, textPaint);
+            }
+        }
+
 
         path.reset();
         //绘制点
         for(int i = 0;i < count;i ++){
 
             RadarInfo info = mInfos.get(i);
-            int tmpRadius = info.value / 100 * radius;
-            x = (float)(mCenterX + Math.cos(startRadin + radian * i) * tmpRadius);
-            y = (float)(mCenterY - Math.sin(startRadin + radian * i) * tmpRadius);
+            int tmpRadius = info.value / mMaxValue * radius;
+            x = (float)(centerX + Math.cos(startRadin + radian * i) * tmpRadius);
+            y = (float)(centerY - Math.sin(startRadin + radian * i) * tmpRadius);
             path.addCircle(x, y, 3, Path.Direction.CCW);
-            paint.setStyle(Paint.Style.STROKE);
+            paint.setStyle(Paint.Style.FILL);
             paint.setColor(mDataStrokeColor);
             canvas.drawPath(path, paint);
         }

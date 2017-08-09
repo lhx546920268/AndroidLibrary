@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lhx.library.App;
@@ -48,7 +49,7 @@ public abstract class AppBaseFragment extends Fragment {
     private View mContentView;
 
     ///内容容器
-    private FrameLayout mContentContainer;
+    private RelativeLayout mContentContainer;
 
     ///容器视图
     private LinearLayout mContainer;
@@ -74,6 +75,9 @@ public abstract class AppBaseFragment extends Fragment {
 
     //显示空视图信息
     private View mEmptyView;
+
+    //添加固定在底部的视图
+    private View mBottomView;
 
     public AppBaseFragment() {
         // Required empty public constructor
@@ -150,13 +154,14 @@ public abstract class AppBaseFragment extends Fragment {
                 mContainer.addView(mNavigationBar, 0, layoutParams);
             }
 
-            mContentContainer = (FrameLayout)mContainer.findViewById(R.id.content_container);
-            initialize(inflater, container, savedInstanceState);
+            mContentContainer = (RelativeLayout) mContainer.findViewById(R.id.content_container);
+            initialize(inflater, mContentContainer, savedInstanceState);
 
+            mContentView.setId(R.id.app_base_fragment_content_id);
             if(mContentView.getLayoutParams() == null){
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                        RelativeLayout.LayoutParams.MATCH_PARENT);
                 mContentView.setLayoutParams(layoutParams);
             }
 
@@ -188,7 +193,7 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void setContentView(@LayoutRes int layoutResId){
-        setContentView(View.inflate(mContext, layoutResId, null));
+        setContentView(LayoutInflater.from(mContext).inflate(layoutResId, mContentContainer, false));
     }
 
     //显示返回按钮
@@ -207,9 +212,9 @@ public abstract class AppBaseFragment extends Fragment {
                     title = App.NavigationBarBackButtonTitle;
                 }
 
-                Button button = mNavigationBar.setNavigationItem(title, null, NavigationBar
+                TextView textView = mNavigationBar.setNavigationItem(title, null, NavigationBar
                         .NAVIGATIONBAR_ITEM_POSITION_LEFT);
-                button.setOnClickListener(new OnSingleClickListener() {
+                textView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
                         mActivity.finish();
@@ -218,7 +223,7 @@ public abstract class AppBaseFragment extends Fragment {
 
                 if(drawable != null){
                     drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                    button.setCompoundDrawables(drawable, null, null, null);
+                    textView.setCompoundDrawables(drawable, null, null, null);
                 }
             }
         }
@@ -232,13 +237,17 @@ public abstract class AppBaseFragment extends Fragment {
         return mContainer;
     }
 
-    public FrameLayout getContentContainer(){
+    public RelativeLayout getContentContainer(){
         return mContentContainer;
     }
 
     ///获取子视图
     public <T extends View> T findViewById(int resId){
-        return (T)mContentView.findViewById(resId);
+        T view = (T)mContentView.findViewById(resId);
+        if(view == null && mBottomView != null){
+            view = (T)mBottomView.findViewById(resId);
+        }
+        return view;
     }
 
     //启动一个带activity的fragment
@@ -289,9 +298,11 @@ public abstract class AppBaseFragment extends Fragment {
 
             }
             if(mPageLoading){
-                mPageLoadingView = View.inflate(mContext, R.layout.common_page_loading, null);
+                mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,
+                        mContentContainer, false);
                 TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
                 textView.setText(loadingText);
+
                 mContentContainer.addView(mPageLoadingView);
             }else if(mPageLoadingView != null){
                 mContentContainer.removeView(mPageLoadingView);
@@ -321,7 +332,8 @@ public abstract class AppBaseFragment extends Fragment {
             mPageLoadFail = pageLoadFail;
 
             if(mPageLoadFail){
-                mPageLoadFailView = View.inflate(mContext, R.layout.common_page_load_fail, null);
+                mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail,
+                        mContentContainer, false);
                 mPageLoadFailView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
@@ -338,8 +350,8 @@ public abstract class AppBaseFragment extends Fragment {
 
                 textView = (TextView)mPageLoadFailView.findViewById(R.id.subtitle);
                 textView.setText(subtitle);
-
                 mContentContainer.addView(mPageLoadFailView);
+
             }else if(mPageLoadFailView != null) {
                 mContentContainer.removeView(mPageLoadFailView);
                 mPageLoadFailView = null;
@@ -376,7 +388,7 @@ public abstract class AppBaseFragment extends Fragment {
      * 设置显示空视图
      * @param text 显示的信息
      */
-    public void setShowEmptyViwe(String text){
+    public void setShowEmptyView(String text){
 
         if(mEmptyView == null){
             mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, mContentContainer, false);
@@ -396,6 +408,56 @@ public abstract class AppBaseFragment extends Fragment {
         }
 
         mContentContainer.addView(mEmptyView);
+    }
+
+    //设置底部视图
+    public void setBottomView(View bottomView){
+        if(mBottomView != bottomView){
+            if(mBottomView != null){
+                mContentContainer.removeView(mBottomView);
+            }
+
+            mBottomView = bottomView;
+
+            if(mBottomView == null)
+                return;
+
+            RelativeLayout.LayoutParams params;
+            if(mBottomView.getLayoutParams() != null && mBottomView.getLayoutParams() instanceof RelativeLayout
+                    .LayoutParams){
+                params = (RelativeLayout.LayoutParams)mBottomView.getLayoutParams();
+            }else {
+                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            mBottomView.setLayoutParams(params);
+            mBottomView.setId(R.id.app_base_fragment_bottom_id);
+
+            if(mBottomView.getParent() != mContentContainer){
+                if(mBottomView.getParent() != null){
+                    ViewGroup parent = (ViewGroup)mBottomView.getParent();
+                    parent.removeView(mBottomView);
+                }
+
+                mContentContainer.addView(mBottomView);
+            }
+
+            params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+            params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
+            mContentView.setLayoutParams(params);
+        }
+    }
+
+    public void setBottomView(@LayoutRes int res){
+        if(res != 0){
+            setBottomView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false));
+        }
+    }
+
+    public View getBottomView() {
+        return mBottomView;
     }
 
     //点击物理键

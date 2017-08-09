@@ -4,11 +4,10 @@ package com.lhx.library.fragment;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.lhx.library.App;
 import com.lhx.library.util.SizeUtil;
@@ -98,10 +97,12 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         if(mBackToTopButton == null){
             mBackToTopButton = new BackToTopButton(mContext);
             mBackToTopButton.setImageResource(mScrollToTopIconRes);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
             params.setMargins(0, 0, SizeUtil.pxFormDip(20, mContext), SizeUtil.pxFormDip(20, mContext));
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            mBackToTopButton.setVisibility(View.GONE);
             mBackToTopButton.setLayoutParams(params);
             getContentContainer().addView(mBackToTopButton);
         }

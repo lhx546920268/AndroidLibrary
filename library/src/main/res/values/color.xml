@@ -11,6 +11,10 @@
     <color name="blue">#0000ff</color>
     <color name="purple">#800080</color>
     <color name="transparent">#00000000</color>
+    
+     
+    <!--黑色半透明背景-->
+    <color name="translucent_black">#77000000</color>
 
 
     <!--灰色-->

@@ -3,6 +3,9 @@
     <item name="left_navigation_item" type="id"/>
     <item name="right_navigation_item" type="id"/>
 
+    <item name="app_base_fragment_content_id" type="id"/>
+    <item name="app_base_fragment_bottom_id" type="id"/>
+
     <!--listView-->
     <item name="list_view_type_tag_key" type="id"/>
     <item name="list_view_item_position_tag_key" type="id"/>

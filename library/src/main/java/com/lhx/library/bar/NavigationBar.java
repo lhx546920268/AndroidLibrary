@@ -3,7 +3,6 @@ package com.lhx.library.bar;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -13,8 +12,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -178,7 +176,7 @@ public class NavigationBar extends RelativeLayout {
 
             ///布局item
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    LayoutParams.MATCH_PARENT);
             layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             layoutParams.leftMargin = LEFT_RIGHT_MARGIN;
             this.addView(left_navigationBarItem, layoutParams);
@@ -203,7 +201,7 @@ public class NavigationBar extends RelativeLayout {
 
             ///布局item
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    LayoutParams.MATCH_PARENT);
             layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             layoutParams.rightMargin = LEFT_RIGHT_MARGIN;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -224,45 +222,44 @@ public class NavigationBar extends RelativeLayout {
      * @param position 位置,使用 NAVIGATIONBAR_ITEM_POSITION_LEFT,NAVIGATIONBAR_ITEM_POSITION_RIGHT
      * @return 新创建的按钮
      */
-    public Button setNavigationItem(String title, Drawable drawable, @Position int position){
+    public TextView setNavigationItem(String title, Drawable drawable, @Position int position){
 
-        Button button = new Button(this.getContext());
+        TextView textView = new TextView(this.getContext());
 
         if(!TextUtils.isEmpty(title)){
-            button.setText(title);
+            textView.setText(title);
         }
 
-        button.setTextColor(App.NavigationBarTintColor);
-        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigatonBarButtonTextSize);
-        button.setBackgroundColor(Color.TRANSPARENT);
-        button.setMinimumWidth(0);
-        button.setMinimumHeight(0);
-        button.setMinWidth(0);
-        button.setMinHeight(0);
+        textView.setGravity(Gravity.CENTER);
+        textView.setPadding(SizeUtil.pxFormDip(10, getContext()), 0, SizeUtil.pxFormDip(10, getContext()), 0);
+        textView.setTextColor(App.NavigationBarTintColor);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigatonBarButtonTextSize);
+        textView.setBackgroundColor(Color.TRANSPARENT);
 
         if(drawable != null){
             drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-            button.setCompoundDrawables(null, drawable, null, null);
-        }
-
-        if(drawable != null) {
-            button.setCompoundDrawables(null,drawable,null,null);
         }
 
         switch (position){
             case NAVIGATIONBAR_ITEM_POSITION_LEFT :
-                button.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-                setLeftNavigationBarItem(button);
+                textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                if(drawable != null){
+                    textView.setCompoundDrawables(drawable, null, null, null);
+                }
+                setLeftNavigationBarItem(textView);
                 break;
             case NAVIGATIONBAR_ITEM_POSITION_RIGHT :
-                button.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-                setRightNavigationBarItem(button);
+                textView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                if(drawable != null){
+                    textView.setCompoundDrawables(null, null, drawable, null);
+                }
+                setRightNavigationBarItem(textView);
                 break;
             default :
                 break;
         }
 
-        return button;
+        return textView;
     }
 
     ///重新布局

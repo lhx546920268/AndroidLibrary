@@ -6,6 +6,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
@@ -52,6 +53,10 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
 
     public void setBackToTopPosition(int backToTopPosition) {
         mBackToTopPosition = backToTopPosition;
+    }
+
+    public int getBackToTopPosition() {
+        return mBackToTopPosition;
     }
 
     public void setRecyclerView(RecyclerView recyclerView) {
@@ -107,12 +112,13 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
             //滑动停下来了
-            if(newState == SCROLL_STATE_IDLE){
+            if(newState == RecyclerView.SCROLL_STATE_IDLE){
 
                 RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
                 if(layoutManager instanceof LinearLayoutManager){
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager)layoutManager;
                     int position = linearLayoutManager.findFirstVisibleItemPosition();
+
                     if(position >= mBackToTopPosition){
                         setVisibility(VISIBLE);
                     }else {
@@ -120,11 +126,6 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
                     }
                 }
             }
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
         }
     }
 }

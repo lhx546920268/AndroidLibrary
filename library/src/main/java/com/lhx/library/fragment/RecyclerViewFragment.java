@@ -31,5 +31,7 @@ public class RecyclerViewFragment extends PageFragment{
         }
         mRecyclerView = findViewById(R.id.recycler_view);
         setRefreshView(mRecyclerView);
+
+        getBackToTopButton().setRecyclerView(mRecyclerView);
     }
 }
