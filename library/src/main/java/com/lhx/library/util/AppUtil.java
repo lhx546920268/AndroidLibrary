@@ -1,12 +1,16 @@
 package com.lhx.library.util;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.lhx.library.dialog.AlertController;
 
@@ -100,4 +104,35 @@ public class AppUtil {
         });
         controller.show();
     }
+
+    /**
+     * 关闭软键盘
+     * @param context  上下文
+     * @param view 当前焦点
+     */
+    public static void hideSoftInputMethod(Context context, View view) {
+        try {
+            // 隐藏软键盘
+            ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(view.getWindowToken(), 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 打开软键盘
+     * @param context 上下文
+     * @param view 当前焦点
+     */
+    public static void showSoftInputMethod(Context context, View view) {
+        try {
+            // 打开软键盘
+            ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .showSoftInputFromInputMethod(view.getWindowToken(), InputMethodManager.SHOW_FORCED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

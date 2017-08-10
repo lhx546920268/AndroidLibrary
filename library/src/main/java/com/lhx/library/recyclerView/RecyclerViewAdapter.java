@@ -482,7 +482,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     ///通过postion获取对应的sectionInfo
-    protected SectionInfo sectionInfoForPosition(int position){
+    public SectionInfo sectionInfoForPosition(int position){
 
         SectionInfo target = mSections.get(0);
 

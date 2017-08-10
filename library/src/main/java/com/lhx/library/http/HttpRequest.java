@@ -102,7 +102,7 @@ public class HttpRequest {
     protected String mStringEncoding = "utf-8";
 
     //超时 毫秒
-    protected int mTimeoutInterval = 30000;
+    protected int mTimeoutInterval = 15000;
 
     //上传总大小
     protected long mTotalSizeToUpload = 0;

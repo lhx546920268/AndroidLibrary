@@ -375,8 +375,9 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         view.setTag(R.id.list_view_type_tag_key, type);
         view.setTag(R.id.list_view_item_position_tag_key, position);
 
-        if(!view.hasOnClickListeners()){
+        if(view.getTag(R.id.list_view_item_onclick_tag_key) != null){
             //添加点击事件
+            view.setTag(R.id.list_view_type_tag_key, true);
             view.setOnClickListener(new OnSingleClickListener() {
                 @Override
                 public void onSingleClick(View v) {

@@ -29,4 +29,6 @@
     <!--分割线颜色-->
     <color name="divider_color">#c8c8c8</color>
 
+    <!--fragment背景-->
+    <color name="fragment_gray_background">#f0f0f0</color>
 </resources>

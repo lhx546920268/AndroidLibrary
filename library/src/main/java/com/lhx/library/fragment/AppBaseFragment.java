@@ -79,6 +79,9 @@ public abstract class AppBaseFragment extends Fragment {
     //添加固定在底部的视图
     private View mBottomView;
 
+    //添加固定在顶部的视图
+    private View mTopView;
+
     public AppBaseFragment() {
         // Required empty public constructor
     }
@@ -217,7 +220,7 @@ public abstract class AppBaseFragment extends Fragment {
                 textView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        mActivity.finish();
+                        back();
                     }
                 });
 
@@ -227,6 +230,11 @@ public abstract class AppBaseFragment extends Fragment {
                 }
             }
         }
+    }
+
+    //返回
+    public void back(){
+        mActivity.finish();
     }
 
     public NavigationBar getNavigationBar() {
@@ -282,6 +290,9 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void setPageLoading(boolean pageLoading){
+        if(isPageLoadFail()){
+            setPageLoadFail(false);
+        }
         setPageLoading(pageLoading, pageLoading ? getString(R.string.common_page_loading_text) : null);
     }
 
@@ -412,6 +423,10 @@ public abstract class AppBaseFragment extends Fragment {
 
     //设置底部视图
     public void setBottomView(View bottomView){
+        setBottomView(bottomView, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public void setBottomView(View bottomView, int height){
         if(mBottomView != bottomView){
             if(mBottomView != null){
                 mContentContainer.removeView(mBottomView);
@@ -458,6 +473,60 @@ public abstract class AppBaseFragment extends Fragment {
 
     public View getBottomView() {
         return mBottomView;
+    }
+
+    public void setTopView(View topView){
+        setTopView(topView, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    //设置顶部视图
+    public void setTopView(View topView, int height){
+        if(mTopView != topView){
+            if(mTopView != null){
+                mContentContainer.removeView(mTopView);
+            }
+
+            mTopView = topView;
+
+            if(mTopView == null)
+                return;
+
+            RelativeLayout.LayoutParams params;
+            if(mTopView.getLayoutParams() != null && mTopView.getLayoutParams() instanceof RelativeLayout
+                    .LayoutParams){
+                params = (RelativeLayout.LayoutParams)mTopView.getLayoutParams();
+            }else {
+                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        height);
+            }
+
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            mTopView.setLayoutParams(params);
+            mTopView.setId(R.id.app_base_fragment_top_id);
+
+            if(mTopView.getParent() != mContentContainer){
+                if(mTopView.getParent() != null){
+                    ViewGroup parent = (ViewGroup)mTopView.getParent();
+                    parent.removeView(mTopView);
+                }
+
+                mContentContainer.addView(mTopView);
+            }
+
+            params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+            params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
+            mContentView.setLayoutParams(params);
+        }
+    }
+
+    public void setTopView(@LayoutRes int res){
+        if(res != 0){
+            setTopView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false), 0);
+        }
+    }
+
+    public View getTopView() {
+        return mTopView;
     }
 
     //点击物理键

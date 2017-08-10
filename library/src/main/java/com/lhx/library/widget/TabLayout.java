@@ -106,9 +106,6 @@ public class TabLayout extends FrameLayout {
     ///按钮选中时标题字体
     private int mSelectedTitleSize = 16;
 
-    ///菜单内容是否已显示出来
-    private boolean mDidDisplay = false;
-
     ///将要选中的位置
     private int mWillSelectedPosition = NO_SELECT;
 
@@ -343,16 +340,6 @@ public class TabLayout extends FrameLayout {
         }
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-
-        if(!mDidDisplay){
-            mDidDisplay = true;
-            selectDefaultMenuTab();
-        }
-    }
-
     ///刷新UI
     public void refreshUI(){
         if(mRecyclerView != null){
@@ -440,7 +427,7 @@ public class TabLayout extends FrameLayout {
 
     ///选中默认值
     private void selectDefaultMenuTab(){
-        if (mTabInfos.size() > 0 && mDidDisplay) {
+        if (mTabInfos.size() > 0 && mContentWidth > 0) {
             if(mWillSelectedPosition != NO_SELECT && mWillSelectedPosition < mTabInfos.size()){
                 selectMenuTab(mWillSelectedPosition);
                 mWillSelectedPosition = NO_SELECT;
@@ -448,6 +435,10 @@ public class TabLayout extends FrameLayout {
                 selectMenuTab(0);
             }
         }
+    }
+
+    public int getSelectedPosition(){
+        return mSelectedPosition;
     }
 
     /**
@@ -465,7 +456,7 @@ public class TabLayout extends FrameLayout {
      */
     public void selectMenuTab(final int position, boolean animated) {
 
-        if(position >= 0 && !mDidDisplay){
+        if(position >= 0 && mContentWidth == 0){
             mWillSelectedPosition = position;
             return;
         }

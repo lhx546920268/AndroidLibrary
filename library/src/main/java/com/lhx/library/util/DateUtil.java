@@ -20,10 +20,20 @@ public class DateUtil {
     //yyyy-MM-dd
     public static final String DateFormatYMd = "yyyy-MM-dd";
 
+    ///年月日时分秒 {@link #formatMs}
+    public static final int Year = 0;
+    public static final int Month = 1;
+    public static final int Day = 2;
+    public static final int Hour = 3;
+    public static final int Minutes = 4;
+    public static final int Seconds = 5;
+
+
     //使用单例， 提升效率
-    static final SimpleDateFormat mYMdHmsDateFormat = new SimpleDateFormat(DateFormatYMdHms, Locale.getDefault());
-    static final SimpleDateFormat mYMdHmDateFormat = new SimpleDateFormat(DateFormatYMdHm, Locale.getDefault());
-    static final SimpleDateFormat mYMdDateFormat = new SimpleDateFormat(DateFormatYMd, Locale.getDefault());
+    public static final SimpleDateFormat mYMdHmsDateFormat = new SimpleDateFormat(DateFormatYMdHms, Locale.getDefault
+            ());
+    public static final SimpleDateFormat mYMdHmDateFormat = new SimpleDateFormat(DateFormatYMdHm, Locale.getDefault());
+    public static final SimpleDateFormat mYMdDateFormat = new SimpleDateFormat(DateFormatYMd, Locale.getDefault());
 
 
     /**
@@ -59,9 +69,9 @@ public class DateUtil {
      */
     public static String formatDate(Date date, String targetFromat){
 
-        if(mYMdDateFormat.equals(targetFromat)){
+        if(DateFormatYMd.equals(targetFromat)){
             return mYMdDateFormat.format(date);
-        }else if(mYMdHmDateFormat.equals(targetFromat)){
+        }else if(DateFormatYMdHm.equals(targetFromat)){
             return mYMdHmDateFormat.format(date);
         }else {
             SimpleDateFormat dateFormat = new SimpleDateFormat(targetFromat, Locale.getDefault());
@@ -75,5 +85,73 @@ public class DateUtil {
      */
     public static String getCurrentTime(String format){
         return formatDate(new Date(), format);
+    }
+
+
+    /**
+     * 解析时间
+     * @param time 时间
+     * @param format 格式
+     * @return date
+     */
+    public static Date praseTime(String time, String format){
+        try {
+            if(DateFormatYMd.equals(format)){
+                return mYMdDateFormat.parse(time);
+            }else if(DateFormatYMdHm.equals(format)){
+                return mYMdHmDateFormat.parse(time);
+            }else if(DateFormatYMdHms.equals(format)){
+                return mYMdHmsDateFormat.parse(time);
+            }
+            else {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.getDefault());
+                return dateFormat.parse(time);
+            }
+
+        }catch (ParseException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 格式化毫秒
+     * @param ms 毫秒
+     * @param type 返回的类型 {@link #Year}
+     * @return
+     */
+    public static String formatMs(long ms, int type){
+
+        long seconds = ms / 1000;
+        if(type == Seconds){
+            return String.valueOf(seconds);
+        }
+
+        long minutes = seconds / 60;
+        if(type == Minutes){
+            return String.valueOf(minutes);
+        }
+
+        long hour = minutes / 60;
+        if(type == Hour){
+            return String.valueOf(hour);
+        }
+
+        long day = hour / 24;
+        if(type == Day){
+            return String.valueOf(day);
+        }
+
+        long month = day / 30;
+        if(type == Month){
+            return String.valueOf(month);
+        }
+
+        long year = month / 12;
+        if(type == Year){
+            return String.valueOf(year);
+        }
+
+        return String.valueOf(ms);
     }
 }
