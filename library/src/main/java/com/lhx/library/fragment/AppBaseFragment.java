@@ -560,9 +560,13 @@ public abstract class AppBaseFragment extends Fragment {
         return nBundle.getLong(key);
     }
 
-    public boolean getExtraBooleanFromBundle(String key){
+    public boolean getExtraBooleanFromBundle(String key, boolean def){
         Bundle nBundle = getBundle();
-        return nBundle.getBoolean(key, false);
+        return nBundle.getBoolean(key, def);
+    }
+
+    public boolean getExtraBooleanFromBundle(String key){
+        return getExtraBooleanFromBundle(key, false);
     }
 
     public List<String> getExtraStringListFromBundle(String key){

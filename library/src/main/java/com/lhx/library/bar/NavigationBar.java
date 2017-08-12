@@ -78,9 +78,9 @@ public class NavigationBar extends RelativeLayout {
     public NavigationBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        this.setBackgroundColor(Color.WHITE);
         if (!isInEditMode()) {
 
+            setBackgroundColor(App.NavigationBarBackgroundColor);
             ///标题
             title_textView = new TextView(context);
             title_textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigationBarTitleTextSize);

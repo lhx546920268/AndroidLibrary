@@ -832,11 +832,13 @@ public class HttpRequest {
         }
 
         File file = new File(mDownloadTemporayPath);
-        FileUtil.createNewFileIfNotExist(file);
+
         FileOutputStream outputStream = null;
         BufferedInputStream bufferedInputStream = null;
 
         try {
+
+            FileUtil.createNewFileIfNotExist(file);
             outputStream = new FileOutputStream(file);
             bufferedInputStream = new BufferedInputStream(inputStream);
 

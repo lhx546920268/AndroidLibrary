@@ -275,8 +275,20 @@ public class FileUtil {
         return path;
     }
 
-    public static boolean createNewFileIfNotExist(@NonNull String filePath){
-        return createNewFileIfNotExist(new File(filePath));
+    /**
+     * 创建一个临时文件
+     * @param @param context 上下文
+     * @param extension 文件类型 包含 .
+     * @return 临时文件
+     */
+    public static File createTemporaryFile(@NonNull Context context, String extension) throws IOException{
+        return createNewFileIfNotExist(getTemporaryFilePath(context, extension));
+    }
+
+    public static File createNewFileIfNotExist(@NonNull String filePath) throws IOException{
+        File file = new File(filePath);
+        createNewFileIfNotExist(file);
+        return file;
     }
 
     /**
@@ -284,26 +296,22 @@ public class FileUtil {
      * @param file 文件路径
      * @return 是否成功， 如果文件存在，也返回成功
      */
-    public static boolean createNewFileIfNotExist(@NonNull File file){
+    public static boolean createNewFileIfNotExist(@NonNull File file) throws IOException{
         if(file.exists() && file.isFile())
             return true;
-        try {
-            String parent = file.getParent();
 
-            //创建文件夹
-            File directory = new File(parent);
-            if(!directory.exists() || !directory.isDirectory()){
-                if(!directory.mkdirs()){
-                    return false;
-                }
+        String parent = file.getParent();
+
+        //创建文件夹
+        File directory = new File(parent);
+        if (!directory.exists() || !directory.isDirectory()) {
+            if (!directory.mkdirs()) {
+                return false;
             }
-
-            return file.createNewFile();
-        }catch (IOException e){
-            e.printStackTrace();
         }
 
-        return false;
+        return file.createNewFile();
+
     }
 
     public static boolean createDirectoryIfNotEixist(@NonNull String filePath){

@@ -27,5 +27,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.0.0'
     compile 'com.android.support:support-v4:25.0.0'
     compile project(':AndroidLibrary:ptr-lib')
+    compile 'com.just.agentweb:agentweb:1.2.6'
 }
 
