@@ -94,6 +94,9 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
 
     public BackToTopButton getBackToTopButton(){
 
+        if(mScrollToTopIconRes == 0)
+            return null;
+
         if(mBackToTopButton == null){
             mBackToTopButton = new BackToTopButton(mContext);
             mBackToTopButton.setImageResource(mScrollToTopIconRes);

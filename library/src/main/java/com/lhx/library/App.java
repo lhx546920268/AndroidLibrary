@@ -13,6 +13,9 @@ public class App {
     //默认导航栏颜色
     public static int NavigationBarBackgroundColor = Color.WHITE;
 
+    //导航栏高度
+    public static float NavigationBarHeightDip = 45.0f;
+
     //导航栏阴影颜色
     public static int NavigationBarShadowColor = Color.LTGRAY;
 

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.lhx.library.R;
+import com.lhx.library.widget.BackToTopButton;
 
 /**
  * recyclerview 相关的fragment
@@ -32,6 +33,9 @@ public class RecyclerViewFragment extends PageFragment{
         mRecyclerView = findViewById(R.id.recycler_view);
         setRefreshView(mRecyclerView);
 
-        getBackToTopButton().setRecyclerView(mRecyclerView);
+        BackToTopButton backToTopButton = getBackToTopButton();
+        if(backToTopButton != null){
+            backToTopButton.setRecyclerView(mRecyclerView);
+        }
     }
 }

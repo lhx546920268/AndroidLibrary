@@ -153,7 +153,7 @@ public abstract class AppBaseFragment extends Fragment {
                 mNavigationBar = new NavigationBar(getContext());
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
                         .MATCH_PARENT,
-                        SizeUtil.pxFormDip(45.0f, getContext()));
+                        SizeUtil.pxFormDip(App.NavigationBarHeightDip, getContext()));
                 mContainer.addView(mNavigationBar, 0, layoutParams);
             }
 
@@ -203,31 +203,14 @@ public abstract class AppBaseFragment extends Fragment {
     public void setShowBackButton(boolean show){
 
         if(mNavigationBar != null){
-            if(show){
-
-                Drawable drawable = null;
-                int icon = App.NavigationBarBackButtonIcon;
-                String title = null;
-                if(icon != 0){
-                    drawable = ContextCompat.getDrawable(mContext, icon);
-                }
-                if(drawable == null){
-                    title = App.NavigationBarBackButtonTitle;
-                }
-
-                TextView textView = mNavigationBar.setNavigationItem(title, null, NavigationBar
-                        .NAVIGATIONBAR_ITEM_POSITION_LEFT);
+            TextView textView = mNavigationBar.setShowBackButton(show);
+            if(textView != null){
                 textView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
                         back();
                     }
                 });
-
-                if(drawable != null){
-                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                    textView.setCompoundDrawables(drawable, null, null, null);
-                }
             }
         }
     }
@@ -290,9 +273,6 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void setPageLoading(boolean pageLoading){
-        if(isPageLoadFail()){
-            setPageLoadFail(false);
-        }
         setPageLoading(pageLoading, pageLoading ? getString(R.string.common_page_loading_text) : null);
     }
 
@@ -306,7 +286,7 @@ public abstract class AppBaseFragment extends Fragment {
             mPageLoading = pageLoading;
 
             if(mPageLoadFail){
-
+                setPageLoadFail(false);
             }
             if(mPageLoading){
                 mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,

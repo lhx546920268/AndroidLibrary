@@ -18,4 +18,23 @@
 
     <!--viewHolder tag key-->
     <item name="view_holer_tag_key" type="id"/>
+
+    <!-- 二维码 -->
+    <item name="benchmark_done" type="id"/>
+    <item name="save" type="id"/>
+    <item name="save_succeeded" type="id"/>
+    <item name="save_failed" type="id"/>
+    <item name="auto_focus" type="id"/>
+    <item name="decode_failed" type="id"/>
+    <item name="decode_succeeded" type="id"/>
+    <item name="launch_product_query" type="id"/>
+    <item name="decode" type="id"/>
+    <item name="quit" type="id"/>
+    <item name="restart_preview" type="id"/>
+    <item name="return_scan_result" type="id"/>
+    <item name="search_book_contents_failed" type="id"/>
+    <item name="search_book_contents_succeeded" type="id"/>
+    <item name="about_tel" type="id"/>
+
+    <item name="selected_view" type="id"/>
 </resources>

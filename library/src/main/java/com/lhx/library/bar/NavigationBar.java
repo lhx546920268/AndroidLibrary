@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.util.SizeUtil;
+import com.lhx.library.widget.OnSingleClickListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -166,7 +168,7 @@ public class NavigationBar extends RelativeLayout {
         needLayout = true;
         if(left_navigationBarItem != null) {
 
-            left_navigationBarItem.setVisibility(View.GONE);
+            removeView(leftNavigationBarItem);
         }
 
         left_navigationBarItem = leftNavigationBarItem;
@@ -192,7 +194,7 @@ public class NavigationBar extends RelativeLayout {
         needLayout = true;
         if(right_navigationBarItem != null) {
 
-            right_navigationBarItem.setVisibility(View.GONE);
+            removeView(rightNavigationBarItem);
         }
 
         right_navigationBarItem = rightNavigationBarItem;
@@ -213,6 +215,35 @@ public class NavigationBar extends RelativeLayout {
                     .getPaddingTop(),
                     right_navigationBarItem.getPaddingRight(), right_navigationBarItem.getPaddingBottom());
         }
+    }
+
+    //显示返回按钮
+    public TextView setShowBackButton(boolean show) {
+        if (show) {
+
+            Drawable drawable = null;
+            int icon = App.NavigationBarBackButtonIcon;
+            String title = null;
+            if (icon != 0) {
+                drawable = ContextCompat.getDrawable(getContext(), icon);
+            }
+            if (drawable == null) {
+                title = App.NavigationBarBackButtonTitle;
+            }
+
+            TextView textView = setNavigationItem(title, null, NavigationBar
+                    .NAVIGATIONBAR_ITEM_POSITION_LEFT);
+
+            if (drawable != null) {
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                textView.setCompoundDrawables(drawable, null, null, null);
+            }
+
+            return textView;
+        } else {
+            setLeftNavigationBarItem(null);
+        }
+        return null;
     }
 
 

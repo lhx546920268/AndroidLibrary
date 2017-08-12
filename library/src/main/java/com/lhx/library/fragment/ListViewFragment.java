@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.lhx.library.R;
+import com.lhx.library.widget.BackToTopButton;
 
 /**
  * listview 相关的fragment
@@ -31,5 +32,10 @@ public class ListViewFragment extends PageFragment {
         }
         mListView = findViewById(R.id.list_view);
         setRefreshView(mListView);
+
+        BackToTopButton backToTopButton = getBackToTopButton();
+        if(backToTopButton != null){
+            backToTopButton.setAbsListView(mListView);
+        }
     }
 }

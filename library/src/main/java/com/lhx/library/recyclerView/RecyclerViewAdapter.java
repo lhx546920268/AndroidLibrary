@@ -129,6 +129,16 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_FAIL);
     }
 
+    @Override
+    public void onLoadMore() {
+
+    }
+
+    @Override
+    public boolean loadMoreEnable() {
+        return false;
+    }
+
     //是否是加载更多的UI
     protected boolean isLoadMoreItem(int position){
         return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();

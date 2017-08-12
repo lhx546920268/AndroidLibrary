@@ -33,6 +33,7 @@ import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.ColorUtil;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.StringUtil;
+import com.lhx.library.util.ViewUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -648,7 +649,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         stateListDrawable.addState(new int[]{}, drawable);
 
         view.setClickable(true);
-        view.setBackground(stateListDrawable);
+        ViewUtil.setBackground(stateListDrawable, view);
 
         return new CornerBorderDrawable[]{drawablePressed, drawable};
     }
