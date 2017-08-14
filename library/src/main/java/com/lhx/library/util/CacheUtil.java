@@ -4,11 +4,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Base64;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * 缓存工具类
  */
 
+@SuppressWarnings("unchecked")
 public class CacheUtil {
 
     /**
@@ -92,5 +101,46 @@ public class CacheUtil {
         key = AppUtil.getAppPackageName(context) + "." + key;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.contains(key);
+    }
+
+    //保存对象
+    public static void saveObject(Context context, String key, Serializable object) {
+
+        if(TextUtils.isEmpty(key))
+            return;
+        key = AppUtil.getAppPackageName(context) + "." + key;
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(context).edit();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(object);
+            String temp = new String(Base64.encode(baos.toByteArray(), Base64.DEFAULT));
+            prefs.putString(key, temp);
+            prefs.apply();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static <T extends Object> T getObject(Context context, String key) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String temp = prefs.getString(key, "");
+
+        ByteArrayInputStream bais =  new ByteArrayInputStream(Base64.decode(temp.getBytes(), Base64.DEFAULT));
+        T object = null;
+
+        try {
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            object = (T) ois.readObject();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return object;
     }
 }

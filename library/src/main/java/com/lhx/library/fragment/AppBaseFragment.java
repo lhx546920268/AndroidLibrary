@@ -267,6 +267,11 @@ public abstract class AppBaseFragment extends Fragment {
         }
     }
 
+    //打开activity 不要动画
+    public void closeAnimate(){
+        mActivity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     ///重新载入页面 子类按需重写
     protected void onReloadPage(){
 
@@ -551,8 +556,12 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public int getExtraIntFromBundle(String key){
+        return getExtraIntFromBundle(key, 0);
+    }
+
+    public int getExtraIntFromBundle(String key, int defValue){
         Bundle nBundle = getBundle();
-        return nBundle.getInt(key);
+        return nBundle.getInt(key, defValue);
     }
 
     public long getExtraLongFromBundle(String key){
