@@ -148,9 +148,15 @@ public class NavigationBar extends RelativeLayout {
         title_view = titleView;
         if(title_view != null) {
 
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
-            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+            RelativeLayout.LayoutParams layoutParams;
+            if(titleView.getLayoutParams() != null && title_view.getLayoutParams() instanceof RelativeLayout.LayoutParams){
+                layoutParams = (RelativeLayout.LayoutParams)title_view.getLayoutParams();
+            }else {
+                layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+            }
+
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
             title_view.setLayoutParams(layoutParams);
 
             this.addView(title_view);
