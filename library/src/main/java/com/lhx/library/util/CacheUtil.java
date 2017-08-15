@@ -3,11 +3,14 @@ package com.lhx.library.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -142,5 +145,47 @@ public class CacheUtil {
         }
 
         return object;
+    }
+
+
+    // 删除缓存目录
+    public static void deleteCacheFolder(@NonNull Context context, final Runnable runnable) {
+
+        final String folder = FileUtil.getImageCacheFolder(context);
+        new Thread() {
+            @Override
+            public void run() {
+                FileUtil.deleteAllFiles(new File(folder));
+                ThreadUtil.runOnMainThread(runnable);
+            }
+        }.start();
+    }
+
+    // 获取缓存大小
+    public static void getCacheSize(final Context context, final OnCacheHander onCacheHander) {
+
+        final String folder = FileUtil.getImageCacheFolder(context);
+        new Thread(){
+
+            @Override
+            public void run() {
+
+                final String size = Formatter.formatFileSize(context, FileUtil.getFileSize(new File(folder)));
+                if(onCacheHander != null){
+                    ThreadUtil.runOnMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onCacheHander.onGetCacheSize(size);
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
+
+    public interface OnCacheHander{
+
+        //获取缓存大小
+        void onGetCacheSize(String size);
     }
 }

@@ -118,6 +118,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     };
 
     @Override
+    public int numberOfSection() {
+        return 1;
+    }
+
+    @Override
     public int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type){
         return type;
     }
@@ -141,6 +146,16 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     public final void onClickLoadMore() {
         getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_LOADING);
         onLoadMore();
+    }
+
+    @Override
+    public void onLoadMore() {
+
+    }
+
+    @Override
+    public boolean loadMoreEnable() {
+        return false;
     }
 
     @Override
