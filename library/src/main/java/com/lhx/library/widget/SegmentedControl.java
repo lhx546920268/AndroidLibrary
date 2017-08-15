@@ -36,6 +36,9 @@ public class SegmentedControl extends LinearLayout{
     //字体大小 sp
     private int mTextSize;
 
+    //文字颜色
+    private  @ColorInt int mTextColor;
+
     //圆角 px
     private int mCornerRadius;
 
@@ -64,6 +67,7 @@ public class SegmentedControl extends LinearLayout{
 
         setOrientation(HORIZONTAL);
         mTintColor = ContextCompat.getColor(context, R.color.white);
+        mTextColor = ContextCompat.getColor(context, R.color.blue);
         mTextSize = 14;
         mCornerRadius = SizeUtil.pxFormDip(5, context);
 
@@ -102,7 +106,20 @@ public class SegmentedControl extends LinearLayout{
             if(mItems != null && mItems.size() > 0){
                 for(SegmentedItem item : mItems){
                     item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
-                    item.setTextColor(mTintColor);
+                }
+            }
+        }
+    }
+
+    public void setTextColor(@ColorInt int textColor){
+
+        if(mTextColor != textColor){
+            mTextColor = textColor;
+            if(mItems != null && mItems.size() > 0){
+                for(SegmentedItem item : mItems){
+                    if(item.position == mSelectedPosition){
+                        item.setTextColor(mTextColor);
+                    }
                 }
             }
         }
@@ -193,7 +210,6 @@ public class SegmentedControl extends LinearLayout{
         for(int i = 0;i < mButtonTitles.length;i ++){
             SegmentedItem item = new SegmentedItem(context);
             item.position = i;
-
             item.setText(mButtonTitles[i]);
             item.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
             item.setTextColor(mTintColor);
@@ -241,6 +257,7 @@ public class SegmentedControl extends LinearLayout{
         //初始化
         private void initialization(){
 
+            
             StateListDrawable stateListDrawable = new StateListDrawable();
 
             selectedBackgroundDrawable = new CornerBorderDrawable();
