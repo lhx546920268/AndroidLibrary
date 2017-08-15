@@ -367,4 +367,46 @@ public class FileUtil {
     }
 
 
+    /**
+     * 获取文件大小
+     * @param file 文件或文件夹
+     * @return 字节
+     */
+    public static long getFileSize(@NonNull File file) {
+        long size = 0;
+
+        if(file.exists()){
+
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                if (files != null) {
+                    for (File f : files){
+                        size += getFileSize(f);
+                    }
+                }
+            } else {
+                size += file.length();
+            }
+        }
+
+        return size;
+    }
+
+    /**
+     * 删除所有文件
+     * @param file 要删除的文件或文件夹
+     */
+    public static void deleteAllFiles(@NonNull File file) {
+        if (file.exists() && file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+
+                for (File f : files){
+                    deleteAllFiles(f);
+                }
+            }
+        } else {
+            deleteFile(file);
+        }
+    }
 }

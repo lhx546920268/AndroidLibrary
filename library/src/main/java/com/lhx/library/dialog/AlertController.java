@@ -664,11 +664,12 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 @Override
                 public void onClick(View v) {
 
-                    if(mOnItemClickListener != null){
-                        mOnItemClickListener.onItemClick(AlertController.this, holder.getAdapterPosition());
-                    }
                     if(mShouldDismissAfterClickItem){
                         dismiss();
+                    }
+
+                    if(mOnItemClickListener != null){
+                        mOnItemClickListener.onItemClick(AlertController.this, holder.getAdapterPosition());
                     }
                 }
             });

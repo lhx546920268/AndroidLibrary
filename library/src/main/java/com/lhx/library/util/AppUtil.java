@@ -44,6 +44,24 @@ public class AppUtil {
     }
 
     /**
+     * 获取app版本名
+     * @param context
+     * @return
+     */
+    public static String getAppVersionName(Context context) {
+        String ver = "";
+        try {
+            String packageName = context.getPackageName();
+            PackageManager packageManager = context.getPackageManager();
+            ver = packageManager.getPackageInfo(packageName, 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return ver;
+    }
+
+    /**
      * 获取app包名
      * @param context
      * @return 包名
