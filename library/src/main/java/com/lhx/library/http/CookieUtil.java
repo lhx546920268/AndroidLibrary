@@ -13,6 +13,8 @@ import java.util.Map;
 
 /**
  * cookie 工具类
+ * 使用前 要先
+    CookieHandler.setDefault(new CookieManager(null, null));
  */
 
 public class CookieUtil {
@@ -30,11 +32,6 @@ public class CookieUtil {
             Map<String, List<String>> nMap = new HashMap<String, List<String>>();
             nMap = nCookieHandler.get(URI.create(domain), nMap);
             nCookie = nMap.get("Cookie");
-            if(nCookie != null){
-                for(String str : nCookie){
-                    Log.d("cookie", str);
-                }
-            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -42,17 +39,15 @@ public class CookieUtil {
         return nCookie;
     }
 
-    public static int getIntCookie(String key, String domain){
-        int nValue = 0;
+    //获取cookie中的某个值
+    public static String getCookieValue(String key, String domain){
+        String nValue = "";
         List<String> nList = getCookie(domain);
         if (!TextUtils.isEmpty(key) && nList != null && nList.size() > 0) {
             String nKey = key + "=";
             for (String string : nList) {
                 if (string.startsWith(nKey)) {
-                    String nValueString = string.substring(nKey.length());
-                    if (!TextUtils.isEmpty(nValueString) && TextUtils.isDigitsOnly(nValueString)) {
-                        nValue = Integer.parseInt(nValueString);
-                    }
+                    nValue = string.substring(nKey.length());
                     break;
                 }
             }

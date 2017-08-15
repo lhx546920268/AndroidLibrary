@@ -44,9 +44,7 @@ public abstract class BaseDialog extends Dialog {
         //设置弹窗大小
         Window window = getWindow();
         WindowManager.LayoutParams layoutParams = window.getAttributes();
-        layoutParams.gravity = getGrayvity();
-        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        onConfigure(layoutParams);
 
         setCancelable(true);
         setCanceledOnTouchOutside(true);
@@ -55,5 +53,5 @@ public abstract class BaseDialog extends Dialog {
         window.setAttributes(layoutParams);
     }
 
-    public abstract int getGrayvity();
+    public abstract void onConfigure(WindowManager.LayoutParams params);
 }

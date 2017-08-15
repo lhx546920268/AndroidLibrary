@@ -30,8 +30,8 @@
         <item name="android:background">@color/white</item>
         <item name="android:listSelector">@color/white</item>
         <item name="android:cacheColorHint">@color/white</item>
-        <item name="android:divider">@null</item>
-        <item name="android:dividerHeight">0.5dip</item>
+        <item name="android:divider">@color/divider_color</item>
+        <item name="android:dividerHeight">@dimen/divider_size</item>
         <item name="android:fadingEdgeLength">0sp</item>
         <item name="android:drawSelectorOnTop">false</item>
     </style>
