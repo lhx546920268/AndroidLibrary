@@ -257,7 +257,7 @@ public class SegmentedControl extends LinearLayout{
         //初始化
         private void initialization(){
 
-            
+
             StateListDrawable stateListDrawable = new StateListDrawable();
 
             selectedBackgroundDrawable = new CornerBorderDrawable();
