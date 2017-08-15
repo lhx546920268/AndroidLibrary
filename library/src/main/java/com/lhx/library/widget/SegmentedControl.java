@@ -1,6 +1,8 @@
 package com.lhx.library.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -38,6 +40,7 @@ public class SegmentedControl extends LinearLayout{
 
     //文字颜色
     private  @ColorInt int mTextColor;
+    private  @ColorInt int mSelectedTextColor;
 
     //圆角 px
     private int mCornerRadius;
@@ -55,11 +58,11 @@ public class SegmentedControl extends LinearLayout{
     private int mSelectedPosition;
 
     public SegmentedControl(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public SegmentedControl(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public SegmentedControl(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -67,7 +70,9 @@ public class SegmentedControl extends LinearLayout{
 
         setOrientation(HORIZONTAL);
         mTintColor = ContextCompat.getColor(context, R.color.white);
-        mTextColor = ContextCompat.getColor(context, R.color.blue);
+        mTextColor = ContextCompat.getColor(context, R.color.white);
+        mSelectedTextColor = ContextCompat.getColor(context, R.color.blue);
+
         mTextSize = 14;
         mCornerRadius = SizeUtil.pxFormDip(5, context);
 
@@ -117,10 +122,21 @@ public class SegmentedControl extends LinearLayout{
             mTextColor = textColor;
             if(mItems != null && mItems.size() > 0){
                 for(SegmentedItem item : mItems){
-                    if(item.position == mSelectedPosition){
+                    if(item.position != mSelectedPosition){
                         item.setTextColor(mTextColor);
                     }
                 }
+            }
+        }
+    }
+
+    public void setSelectedTextColor(@ColorInt int selectedTextColor){
+
+        if(mSelectedTextColor != selectedTextColor){
+            mSelectedTextColor = selectedTextColor;
+            if(mItems != null && mItems.size() > 0 && mSelectedPosition < mItems.size()){
+                SegmentedItem item = mItems.get(mSelectedPosition);
+                item.setTextColor(mSelectedTextColor);
             }
         }
     }
@@ -158,8 +174,9 @@ public class SegmentedControl extends LinearLayout{
     public void setSelectedPosition(int position, boolean click){
 
         if(mSelectedPosition != position){
-            if(mSelectedPosition > 0 && mSelectedPosition < mItems.size()){
+            if(mSelectedPosition >= 0 && mSelectedPosition < mItems.size()){
                 SegmentedItem item = mItems.get(mSelectedPosition);
+                item.setTextColor(mTextColor);
                 item.setSelected(false);
             }
 
@@ -167,6 +184,7 @@ public class SegmentedControl extends LinearLayout{
 
             SegmentedItem item = mItems.get(mSelectedPosition);
             item.setSelected(true);
+            item.setTextColor(mSelectedTextColor);
 
             if(click && mOnItemClickListener != null){
                 mOnItemClickListener.onItemClick(mSelectedPosition);
@@ -212,11 +230,12 @@ public class SegmentedControl extends LinearLayout{
             item.position = i;
             item.setText(mButtonTitles[i]);
             item.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
-            item.setTextColor(mTintColor);
             item.setGravity(Gravity.CENTER);
             item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
             setItemCornerRadius(item, i);
             item.setSelected(i == mSelectedPosition);
+
+            item.setTextColor(item.isSelected() ? mSelectedTextColor : mTextColor);
 
             LayoutParams params = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
             params.weight = 1;
@@ -257,17 +276,16 @@ public class SegmentedControl extends LinearLayout{
         //初始化
         private void initialization(){
 
-            
             StateListDrawable stateListDrawable = new StateListDrawable();
 
             selectedBackgroundDrawable = new CornerBorderDrawable();
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed, android.R.attr.state_selected},
-                    selectedBackgroundDrawable);
+            selectedBackgroundDrawable.setBackgroundColor(Color.WHITE);
 
+            //state_selected 和 state_pressed一起会冲突
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedBackgroundDrawable);
             normalBackgroundDrawable = new CornerBorderDrawable();
             stateListDrawable.addState(new int[]{}, normalBackgroundDrawable);
 
-            this.setClickable(true);
             ViewUtil.setBackground(stateListDrawable, this);
         }
     }
