@@ -382,9 +382,12 @@ public class HttpRequest {
                 return false;
             }
 
+
             /// 系统提供的方法要 java 7以上才能用
             mTotalSizeToDownload = StringUtil.parseLong(mConn.getHeaderField("Content-Length"));
             inputStream = mConn.getInputStream();
+
+//            String header = mConn.getHeaderField("set-Cookie");
 
             if(mDownloadTemporayPath != null){
                 writeToFile(inputStream, mConn.getContentType());
