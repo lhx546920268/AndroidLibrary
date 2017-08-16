@@ -130,6 +130,14 @@ public class NavigationBar extends RelativeLayout {
         title_textView.setText(title);
     }
 
+    public String getTitle(){
+        if(title_textView != null){
+            return title_textView.getText().toString();
+        }
+
+        return "";
+    }
+
     ///设置阴影颜色
     public void  setShadowColor(@ColorInt int shadowColor){
 
@@ -142,7 +150,7 @@ public class NavigationBar extends RelativeLayout {
         needLayout = true;
         if(title_view != null) {
 
-            title_view.setVisibility(View.GONE);
+            removeView(title_view);
         }
 
         title_view = titleView;
@@ -171,55 +179,59 @@ public class NavigationBar extends RelativeLayout {
     ///设置左边视图
     public void setLeftNavigationBarItem(View leftNavigationBarItem){
 
-        needLayout = true;
-        if(left_navigationBarItem != null) {
+        if(leftNavigationBarItem != left_navigationBarItem){
+            needLayout = true;
+            if(left_navigationBarItem != null) {
 
-            removeView(leftNavigationBarItem);
-        }
+                removeView(left_navigationBarItem);
+            }
 
-        left_navigationBarItem = leftNavigationBarItem;
+            left_navigationBarItem = leftNavigationBarItem;
 
-        if(left_navigationBarItem != null) {
+            if(left_navigationBarItem != null) {
 
-            left_navigationBarItem.setId(R.id.left_navigation_item);
+                left_navigationBarItem.setId(R.id.left_navigation_item);
 
-            ///布局item
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    LayoutParams.MATCH_PARENT);
-            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-            layoutParams.leftMargin = LEFT_RIGHT_MARGIN;
-            this.addView(left_navigationBarItem, layoutParams);
-            left_navigationBarItem.setPadding(left_navigationBarItem.getPaddingLeft(), left_navigationBarItem.getPaddingTop(),
-                    leftNavigationBarItem.getPaddingRight() + VIEW_INTERVAL, left_navigationBarItem.getPaddingBottom());
+                ///布局item
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        LayoutParams.MATCH_PARENT);
+                layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                layoutParams.leftMargin = LEFT_RIGHT_MARGIN;
+                this.addView(left_navigationBarItem, layoutParams);
+                left_navigationBarItem.setPadding(left_navigationBarItem.getPaddingLeft(), left_navigationBarItem.getPaddingTop(),
+                        leftNavigationBarItem.getPaddingRight() + VIEW_INTERVAL, left_navigationBarItem.getPaddingBottom());
+            }
         }
     }
 
     ///设置右边视图
     public void setRightNavigationBarItem(View rightNavigationBarItem){
 
-        needLayout = true;
-        if(right_navigationBarItem != null) {
+        if(rightNavigationBarItem != right_navigationBarItem){
+            needLayout = true;
+            if(right_navigationBarItem != null) {
 
-            removeView(rightNavigationBarItem);
-        }
+                removeView(right_navigationBarItem);
+            }
 
-        right_navigationBarItem = rightNavigationBarItem;
-        if(right_navigationBarItem != null) {
+            right_navigationBarItem = rightNavigationBarItem;
+            if(right_navigationBarItem != null) {
 
-            right_navigationBarItem.setId(R.id.right_navigation_item);
+                right_navigationBarItem.setId(R.id.right_navigation_item);
 
-            ///布局item
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    LayoutParams.MATCH_PARENT);
-            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-            layoutParams.rightMargin = LEFT_RIGHT_MARGIN;
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                ///布局item
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        LayoutParams.MATCH_PARENT);
+                layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                layoutParams.rightMargin = LEFT_RIGHT_MARGIN;
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-            this.addView(right_navigationBarItem, layoutParams);
+                this.addView(right_navigationBarItem, layoutParams);
 
-            right_navigationBarItem.setPadding(right_navigationBarItem.getPaddingLeft() + VIEW_INTERVAL, right_navigationBarItem
-                    .getPaddingTop(),
-                    right_navigationBarItem.getPaddingRight(), right_navigationBarItem.getPaddingBottom());
+                right_navigationBarItem.setPadding(right_navigationBarItem.getPaddingLeft() + VIEW_INTERVAL, right_navigationBarItem
+                                .getPaddingTop(),
+                        right_navigationBarItem.getPaddingRight(), right_navigationBarItem.getPaddingBottom());
+            }
         }
     }
 
