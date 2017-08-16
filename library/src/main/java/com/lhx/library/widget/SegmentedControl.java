@@ -57,6 +57,11 @@ public class SegmentedControl extends LinearLayout{
     //当前选中的
     private int mSelectedPosition;
 
+    public int getSelectedPosition(){
+
+        return mSelectedPosition;
+    }
+
     public SegmentedControl(Context context) {
         this(context, null);
     }
