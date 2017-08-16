@@ -261,9 +261,9 @@ public abstract class AppBaseFragment extends Fragment {
         }
 
         if(requestCode != 0){
-            mActivity.startActivityForResult(intent, requestCode);
+            startActivityForResult(intent, requestCode);
         }else {
-            mActivity.startActivity(intent);
+            startActivity(intent);
         }
     }
 

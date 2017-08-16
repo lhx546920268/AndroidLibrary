@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.AnimRes;
+import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,7 +27,7 @@ import com.lhx.library.inter.LoginHandler;
 public class AppBaseActivity extends AppCompatActivity {
 
     //登录请求code
-    public static final int LOGIN_REQUEST_CODE = 1018;
+    public static final int LOGIN_REQUEST_CODE = 1118;
 
     //登录完成回调
     private LoginHandler mLoginHandler;
@@ -99,29 +100,29 @@ public class AppBaseActivity extends AppCompatActivity {
 
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);
-        if(className != null){
+        if (className != null) {
             Class clazz;
             try {
 
-                clazz  = Class.forName(className);
+                clazz = Class.forName(className);
 //                if(!clazz.isAssignableFrom(AppBaseFragment.class)){
 //                    throw new RuntimeException(className + "必须是AppBaseFragment或者其子类");
 //                }
 
                 AppBaseFragment currentFragment = (AppBaseFragment) clazz.newInstance();
                 Bundle bundle = getIntent().getExtras();
-                if(bundle != null){
+                if (bundle != null) {
                     currentFragment.setArguments(bundle);
                 }
 
-                if(currentFragment != null){
+                if (currentFragment != null) {
 
                     setCurrentFragment(currentFragment);
-                }else {
+                } else {
 
                     throw new RuntimeException(className + "不能实例化");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 finish();
@@ -130,28 +131,31 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     //获取视图内容，必须包含 fragment_container
-    public @LayoutRes int getContentViewRes(){
+    public
+    @LayoutRes
+    int getContentViewRes() {
         return R.layout.app_base_activity;
     }
 
     ///设置当前显示的fragment,无动画效果
-    public void setCurrentFragment(AppBaseFragment currentFragment){
+    public void setCurrentFragment(AppBaseFragment currentFragment) {
 
         setCurrentFragment(currentFragment, 0, 0);
     }
 
     /**
      * 设置当前显示的fragment,可设置动画效果
+     *
      * @param currentFragment 当前要显示的fragment
-     * @param enter 进场动画
-     * @param exit 出场动画
+     * @param enter           进场动画
+     * @param exit            出场动画
      */
-    public void setCurrentFragment(AppBaseFragment currentFragment, @AnimRes int enter, @AnimRes int exit){
+    public void setCurrentFragment(AppBaseFragment currentFragment, @AnimRes int enter, @AnimRes int exit) {
 
         fragment = currentFragment;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        if(enter != 0 && exit != 0){
+        if (enter != 0 && exit != 0) {
 
             transaction.setCustomAnimations(enter, exit);
         }
@@ -160,7 +164,7 @@ public class AppBaseActivity extends AppCompatActivity {
         transaction.commitAllowingStateLoss();
     }
 
-    public static Intent getIntentWithFragment(Context context, Class fragmentClass){
+    public static Intent getIntentWithFragment(Context context, Class fragmentClass) {
 
         Intent intent = new Intent(context, AppBaseActivity.class);
         intent.putExtra(FRAGMENT_STRING, fragmentClass.getName());
@@ -176,11 +180,17 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     @Override
+    @CallSuper
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (fragment != null && fragment.onKeyDown(keyCode, event)) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && isTaskRoot()){
+            moveTaskToBack(true);
             return true;
+        }else {
+            if (fragment != null && fragment.onKeyDown(keyCode, event)) {
+                return true;
+            }
+            return super.onKeyDown(keyCode, event);
         }
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -195,7 +205,7 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if(fragment != null){
+        if (fragment != null) {
             fragment.onWindowFocusChanged(hasFocus);
         }
     }
@@ -204,7 +214,7 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
             grantResults) {
-        if(fragment != null){
+        if (fragment != null) {
             fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -213,11 +223,11 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode == RESULT_OK){
-            switch (requestCode){
-                case LOGIN_REQUEST_CODE : {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case LOGIN_REQUEST_CODE: {
                     //登录
-                    if(mLoginHandler != null){
+                    if (mLoginHandler != null) {
                         mLoginHandler.onLogin();
                         mLoginHandler = null;
                     }
@@ -228,29 +238,9 @@ public class AppBaseActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void startActivityForResult(Intent intent, int requestCode, LoginHandler loginHandler){
+    public void startActivityForResult(Intent intent, int requestCode, LoginHandler loginHandler) {
         mLoginHandler = loginHandler;
         mHasLoginHandler = true;
         super.startActivityForResult(intent, requestCode);
-    }
-
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        if(mHasLoginHandler){
-            mHasLoginHandler = false;
-        }else {
-            mLoginHandler = null;
-        }
-        super.startActivityForResult(intent, requestCode);
-    }
-
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode, @Nullable Bundle options) {
-        if(mHasLoginHandler){
-            mHasLoginHandler = false;
-        }else {
-            mLoginHandler = null;
-        }
-        super.startActivityForResult(intent, requestCode, options);
     }
 }
