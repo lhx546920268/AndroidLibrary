@@ -2,6 +2,7 @@ package com.lhx.library.recyclerView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -513,17 +514,49 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     //滚到对应的位置
     public void scrollTo(int section){
+        scrollTo(section, false);
+    }
 
+    public void scrollTo(int section, boolean smooth){
+        scrollTo(section, -1, smooth);
+    }
+
+    public void scrollTo(int section, int indexInSection, boolean smooth){
         if(mRecyclerView != null && section < mSections.size()){
             SectionInfo info = mSections.get(section);
-            mRecyclerView.scrollToPosition(info.getHeaderPosition());
+            int position = info.getHeaderPosition();
+            if(indexInSection >= 0){
+                position = info.getItemPosition() + indexInSection;
+            }
+
+            if(smooth){
+                mRecyclerView.smoothScrollToPosition(position);
+            }else {
+                mRecyclerView.scrollToPosition(position);
+            }
         }
     }
 
-    public void scrollTo(int section, int indexInSection){
-        if(mRecyclerView != null && section < mSections.size()){
+
+    //移动到对应位置，如果能置顶则置顶
+    public void scrollToWithOffset(int section, int offset){
+        scrollToWithOffset(section, -1, offset);
+    }
+
+    public void scrollToWithOffset(int section, int indexInSection, int offset){
+
+        if(mRecyclerView.getLayoutManager() instanceof LinearLayoutManager){
+            LinearLayoutManager layoutManager = (LinearLayoutManager)mRecyclerView.getLayoutManager();
+
             SectionInfo info = mSections.get(section);
-            mRecyclerView.scrollToPosition(info.getItemPosition() + indexInSection);
+            int position = info.getHeaderPosition();
+            if(indexInSection >= 0){
+                position = info.getItemPosition() + indexInSection;
+            }
+
+            layoutManager.scrollToPositionWithOffset(position, offset);
+        }else {
+            throw new RuntimeException("scrollToWithOffset 仅仅支持 LinearLayoutManager");
         }
     }
 }
