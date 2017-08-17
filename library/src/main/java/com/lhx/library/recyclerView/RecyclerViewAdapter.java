@@ -510,4 +510,20 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
         return target;
     }
+
+    //滚到对应的位置
+    public void scrollTo(int section){
+
+        if(mRecyclerView != null && section < mSections.size()){
+            SectionInfo info = mSections.get(section);
+            mRecyclerView.scrollToPosition(info.getHeaderPosition());
+        }
+    }
+
+    public void scrollTo(int section, int indexInSection){
+        if(mRecyclerView != null && section < mSections.size()){
+            SectionInfo info = mSections.get(section);
+            mRecyclerView.scrollToPosition(info.getItemPosition() + indexInSection);
+        }
+    }
 }
