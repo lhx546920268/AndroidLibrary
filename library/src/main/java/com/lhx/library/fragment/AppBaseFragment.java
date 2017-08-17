@@ -215,6 +215,20 @@ public abstract class AppBaseFragment extends Fragment {
         }
     }
 
+    //设置标题
+    public void setTitle(String title){
+        if(mNavigationBar != null){
+            mNavigationBar.setTitle(title);
+        }
+    }
+
+    public String getTitle(){
+        if(mNavigationBar != null){
+            return mNavigationBar.getTitle();
+        }
+        return "";
+    }
+
     //返回
     public void back(){
         mActivity.finish();
@@ -516,7 +530,10 @@ public abstract class AppBaseFragment extends Fragment {
 
     //点击物理键
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            back();
+            return true;
+        }
         return false;
     }
 

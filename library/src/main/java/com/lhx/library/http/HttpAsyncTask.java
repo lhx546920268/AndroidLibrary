@@ -7,8 +7,6 @@ import android.text.TextUtils;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,7 +22,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     protected ContentValues mParams;
 
     ///要上传的文件
-    protected HashMap<String, File> mFiles;
+    protected Map<String, File> mFiles;
 
     //http响应码
     protected int mHttpResponseCode;
@@ -51,7 +49,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     private static final float PROGRESS_UPLOAD = 0.0f;
     private static final float PROGRESS_DOWNLOAD = 1.0f;
 
-    public HttpAsyncTask(String URL, ContentValues params, HashMap<String, File> files) {
+    public HttpAsyncTask(String URL, ContentValues params, Map<String, File> files) {
         mURL = URL;
         mParams = params;
         mFiles = files;

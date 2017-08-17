@@ -5,19 +5,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextPaint;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +34,7 @@ import com.lhx.library.util.ColorUtil;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.StringUtil;
 import com.lhx.library.util.ViewUtil;
+import com.lhx.library.widget.OnSingleClickListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -49,6 +50,10 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     //类似IOS中的 UIActionSheet，从底部向上弹出
     public static final int STYLE_ACTION_SHEET = 1;
+
+    //关闭dialog
+    private static final int DISMISS_DIALOG = 1;
+    private static final String POSITION = "position";
 
     //弹窗样式
     @IntDef({STYLE_ALERT, STYLE_ACTION_SHEET})
@@ -168,6 +173,9 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     //是否需要计算内容高度 当内容或者按钮数量过多时可设置，防止内容显示不完
     private boolean mShouldMesureContentHeight = false;
+
+    //用于延迟操作
+    Handler mHandler;
 
 
     public static AlertController buildAlert(@NonNull Context context, String title, String subtitle, Drawable icon,
@@ -654,27 +662,56 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         return new CornerBorderDrawable[]{drawablePressed, drawable};
     }
 
+    public Handler getHandler() {
+        if(mHandler == null){
+            mHandler = new Handler(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(Message msg) {
+                    switch (msg.what){
+                        case DISMISS_DIALOG : {
+
+                            Bundle bundle = msg.getData();
+                            if(mOnItemClickListener != null){
+                                mOnItemClickListener.onItemClick(AlertController.this, bundle.getInt(POSITION));
+                            }
+                        }
+                        break;
+                    }
+                    return true;
+                }
+            });
+        }
+        return mHandler;
+    }
+
     //按钮列表适配器
     private class Adapter extends RecyclerView.Adapter<ViewHolder>{
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             final ViewHolder holder = new ViewHolder(View.inflate(mContext, R.layout.alert_button_item, null));
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            holder.itemView.setOnClickListener(new OnSingleClickListener() {
+                                                   @Override
+                                                   public void onSingleClick(View v) {
+                                                       if(mShouldDismissAfterClickItem){
+                                                           dismiss();
 
-                    if(mShouldDismissAfterClickItem){
-                        dismiss();
-                    }
+                                                           Bundle bundle = new Bundle();
+                                                           bundle.putInt(POSITION, holder.getAdapterPosition());
 
-                    if(mOnItemClickListener != null){
-                        mOnItemClickListener.onItemClick(AlertController.this, holder.getAdapterPosition());
-                    }
-                }
-            });
+                                                           Message message = getHandler().obtainMessage();
+                                                           message.what = DISMISS_DIALOG;
+                                                           message.setData(bundle);
+                                                           getHandler().sendMessageDelayed(message, 200);
+                                                       }else {
+                                                           if(mOnItemClickListener != null){
+                                                               mOnItemClickListener.onItemClick(AlertController.this, holder.getAdapterPosition());
+                                                           }
+                                                       }
+                                                   }
+                                               });
 
-            holder.textView.setTextSize(mButtonTextSize);
+                    holder.textView.setTextSize(mButtonTextSize);
             holder.textView.setPadding(mButtonLeftRightPadding, mButtonTopBottomPadding,
                     mButtonLeftRightPadding, mButtonTopBottomPadding);
 
