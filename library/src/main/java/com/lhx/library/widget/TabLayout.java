@@ -753,6 +753,8 @@ public class TabLayout extends FrameLayout {
                 drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                 mTextView.setCompoundDrawablePadding(SizeUtil.pxFormDip(5, getContext()));
                 mTextView.setCompoundDrawables(null, null, drawable, null);
+            }else {
+                mTextView.setCompoundDrawables(null, null, null, null);
             }
 
             RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) getLayoutParams();
