@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lhx.library.util.SizeUtil;
@@ -728,7 +727,7 @@ public class TabLayout extends FrameLayout {
     }
 
     ///菜单按钮
-    private class Tab extends RelativeLayout {
+    private class Tab extends FrameLayout {
 
         ///菜单文本
         TextView mTextView;
@@ -737,11 +736,11 @@ public class TabLayout extends FrameLayout {
             super(context);
 
             mTextView = new TextView(context);
-            mTextView.setGravity(Gravity.CENTER);
             addView(mTextView);
 
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT);
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.CENTER;
             mTextView.setLayoutParams(layoutParams);
         }
 
