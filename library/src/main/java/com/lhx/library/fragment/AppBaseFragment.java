@@ -269,8 +269,10 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void startActivityForResult(Class fragmentClass, int requestCode, Bundle bundle){
+
         Intent intent = AppBaseActivity.getIntentWithFragment(mContext, fragmentClass);
         if(bundle != null){
+            bundle.remove(AppBaseActivity.FRAGMENT_STRING);
             intent.putExtras(bundle);
         }
 

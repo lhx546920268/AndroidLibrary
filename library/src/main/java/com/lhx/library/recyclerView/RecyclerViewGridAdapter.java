@@ -11,12 +11,14 @@ import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.lhx.library.R;
 import com.lhx.library.section.EdgeInsets;
 import com.lhx.library.section.GridSectionInfo;
+import com.lhx.library.section.SectionInfo;
 import com.lhx.library.util.SizeUtil;
 
 import java.lang.annotation.Retention;
@@ -129,16 +131,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         mSectionInsets = sectionInsets;
     }
 
-    public boolean shouldDrawDivider() {
-        return mShouldDrawDivider;
-    }
-
     public void setShouldDrawDivider(boolean shouldDrawDivider) {
         mShouldDrawDivider = shouldDrawDivider;
-    }
-
-    public @ColorInt int getDividerColor() {
-        return mDividerColor;
     }
 
     public void setDividerColor(@ColorInt int dividerColor) {
@@ -194,6 +188,15 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     public EdgeInsets getSectionInsetsAtSection(int section) {
 
         return mSectionInsets;
+    }
+
+    /**
+     * divider颜色
+     * @param section 下标
+     * @return 颜色
+     */
+    public @ColorInt int getDividerColor(int section){
+        return mDividerColor;
     }
 
     public boolean headerShouldUseSectionInsets(int section){
@@ -343,9 +346,21 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                         }
                     }else {
 
-                        ///如果不是最右的item，则添加间隔，否则添加section右边的偏移量
-                        if(!onTheRight){
-                            right = sectionInfo.itemSpace;
+                        ///中间的添加两边间隔，旁边的添加一边间隔， 低于1px无法显示，所以只添加一边间隔
+                        if(sectionInfo.itemSpace >= 2){
+                            if(onTheRight){
+                                left = sectionInfo.itemSpace / 2;
+                            }else if(onTheLeft){
+                                right = sectionInfo.itemSpace / 2;
+                            }else {
+                                left = sectionInfo.itemSpace / 2;
+                                right = sectionInfo.itemSpace / 2;
+                            }
+                        }else {
+                            ///如果不是最右的item，则添加间隔，否则添加section右边的偏移量
+                            if(!onTheRight){
+                                right = sectionInfo.itemSpace;
+                            }
                         }
 
                         ///如果不是最后一行，添加item间隔
@@ -428,7 +443,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     private class GridItemDecoration extends RecyclerView.ItemDecoration{
 
         ///分割线
-        Drawable mDivider;
+        ColorDrawable mDivider;
 
         ///滚动方向
         private int mOrientation;
@@ -437,9 +452,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         GridItemDecoration(int orientation){
 
             mOrientation = orientation;
-            ColorDrawable drawable = new ColorDrawable();
-            drawable.setColor(mDividerColor);
-            mDivider = drawable;
+            mDivider = new ColorDrawable();
         }
 
         @Override
@@ -458,6 +471,13 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
                 int position = layoutParams.getViewLayoutPosition();
                 LayoutInfo layoutInfo = getLayoutInfoAtPosition(position);
+
+                if(mSections.size() > 0){
+                    SectionInfo sectionInfo = sectionInfoForPosition(position);
+                    mDivider.setColor(getDividerColor(sectionInfo.section));
+                }else {
+                    mDivider.setColor(mDividerColor);
+                }
 
                 int left;
                 int right;
