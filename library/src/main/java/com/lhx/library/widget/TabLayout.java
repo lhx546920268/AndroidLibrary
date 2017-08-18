@@ -5,7 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -703,12 +706,24 @@ public class TabLayout extends FrameLayout {
         ///选中下划线宽度
         int mSelectedIndicatorWidth;
 
+        Drawable mDrawable;
+
         public void setTitle(String title) {
             mTitle = title;
         }
 
         public void setIcon(int icon) {
             mIcon = icon;
+        }
+
+        public Drawable getDrawable(@NonNull Context context){
+            if(mIcon != 0){
+                if(mDrawable == null){
+                    mDrawable = ContextCompat.getDrawable(context, mIcon);
+                }
+                return mDrawable;
+            }
+            return null;
         }
     }
 
@@ -734,6 +749,13 @@ public class TabLayout extends FrameLayout {
         void setInfo(TabInfo info) {
 
             mTextView.setText(info.mTitle);
+            Drawable drawable = info.getDrawable(getContext());
+            if(drawable != null){
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                mTextView.setCompoundDrawablePadding(SizeUtil.pxFormDip(5, getContext()));
+                mTextView.setCompoundDrawables(null, null, drawable, null);
+            }
+
             RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) getLayoutParams();
             layoutParams.width = info.mTabWidth;
             setLayoutParams(layoutParams);
