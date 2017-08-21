@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -328,8 +329,7 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void setPageLoadFail(boolean pageLoadFail){
-        setPageLoadFail(pageLoadFail, 0, getString(R.string.common_page_load_fail_title),
-                getString(R.string.common_page_load_fail_subtitle));
+        setPageLoadFail(pageLoadFail, 0, "加载失败", "轻触屏幕重新加载");
     }
 
     /**
@@ -560,6 +560,15 @@ public abstract class AppBaseFragment extends Fragment {
         return ContextCompat.getDrawable(mContext, drawableRes);
     }
 
+    //获取dime
+    public float getDimen(@DimenRes int dimen){
+        return mContext.getResources().getDimension(dimen);
+    }
+
+    //获取px
+    public int pxFromDip(float dip){
+        return SizeUtil.pxFormDip(dip, mContext);
+    }
 
     ///获取bundle内容
     public String getExtraStringFromBundle(String key){

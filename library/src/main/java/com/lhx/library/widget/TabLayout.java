@@ -1,6 +1,7 @@
 package com.lhx.library.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,8 +10,10 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -433,9 +436,16 @@ public class TabLayout extends FrameLayout {
             if(mWillSelectedPosition != NO_SELECT && mWillSelectedPosition < mTabInfos.size()){
                 selectMenuTab(mWillSelectedPosition);
                 mWillSelectedPosition = NO_SELECT;
-            }else {
-                selectMenuTab(0);
             }
+        }
+    }
+
+    public void setTabTitle(String title, int position){
+
+        if(position >= 0 && position < mTabInfos.size()){
+            TabInfo info = mTabInfos.get(position);
+            info.setTitle(title);
+            mAdapter.notifyItemChanged(position);
         }
     }
 
@@ -452,6 +462,13 @@ public class TabLayout extends FrameLayout {
     }
 
     /**
+     * 设置所有未选中
+     */
+    public void selectNoneMenuTab(){
+        this.selectMenuTab(NO_SELECT, false);
+    }
+
+    /**
      * 选中某个按钮，可选择是否动画
      * @param position    按钮下标
      * @param animated 是否动画
@@ -462,8 +479,19 @@ public class TabLayout extends FrameLayout {
             mWillSelectedPosition = position;
             return;
         }
-        if (position == mSelectedPosition || position >= mTabInfos.size() || position < 0)
+        if (position == mSelectedPosition)
             return;
+
+        if(position >= mTabInfos.size() || position < 0){
+            int previousPosition = mSelectedPosition;
+            mSelectedPosition = position;
+            if(previousPosition >= 0 && previousPosition < mTabInfos.size()){
+                if(mRecyclerView.getChildCount() > 0){
+                    mAdapter.notifyItemChanged(previousPosition);
+                }
+            }
+            return;
+        }
 
         int previousLeft = 0;
         ViewHolder holder = null;
@@ -707,6 +735,13 @@ public class TabLayout extends FrameLayout {
 
         Drawable mDrawable;
 
+        //图片是否当初模板渲染
+        boolean mIconShouldRenderAsTemplate = true;
+
+        public void setIconShouldRenderAsTemplate(boolean iconShouldRenderAsTemplate) {
+            this.mIconShouldRenderAsTemplate = iconShouldRenderAsTemplate;
+        }
+
         public void setTitle(String title) {
             mTitle = title;
         }
@@ -719,6 +754,14 @@ public class TabLayout extends FrameLayout {
             if(mIcon != 0){
                 if(mDrawable == null){
                     mDrawable = ContextCompat.getDrawable(context, mIcon);
+//                    if(mIconShouldRenderAsTemplate){
+//                        int[] colors = new int[]{mSelectedTitleColor, mNormalTitleColor};
+//                        int[][] states = new int[2][];
+//                        states[0] = new int[]{android.R.attr.state_selected};
+//                        states[1] = new int[]{};
+//
+//                        DrawableCompat.setTintList(mDrawable, new ColorStateList(states, colors));
+//                    }
                 }
                 return mDrawable;
             }
@@ -732,10 +775,15 @@ public class TabLayout extends FrameLayout {
         ///菜单文本
         TextView mTextView;
 
+        TabInfo mInfo;
+
         public Tab(Context context) {
             super(context);
 
             mTextView = new TextView(context);
+            mTextView.setLines(1);
+            mTextView.setPadding(SizeUtil.pxFormDip(5, context), 0, SizeUtil.pxFormDip(5, context), 0);
+            mTextView.setEllipsize(TextUtils.TruncateAt.END);
             addView(mTextView);
 
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -747,6 +795,7 @@ public class TabLayout extends FrameLayout {
         ///设置Tab信息
         void setInfo(TabInfo info) {
 
+            mInfo = info;
             mTextView.setText(info.mTitle);
             Drawable drawable = info.getDrawable(getContext());
             if(drawable != null){
@@ -767,6 +816,11 @@ public class TabLayout extends FrameLayout {
 
             mTextView.setTextSize(selected ? mSelectedTitleSize : mNormalTitleSize);
             mTextView.setTextColor(selected ? mSelectedTitleColor : mNormalTitleColor);
+            Drawable drawable = mInfo.getDrawable(getContext());
+            if(drawable != null && mInfo.mIconShouldRenderAsTemplate){
+                DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(drawable, selected ? mSelectedTitleColor : mNormalTitleColor);
+            }
         }
     }
 
