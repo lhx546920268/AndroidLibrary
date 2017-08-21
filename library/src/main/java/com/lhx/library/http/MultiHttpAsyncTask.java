@@ -104,6 +104,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
         if(mTasks.size() == 0){
             onAllTaskComplete(mHasOneFail);
         }
+
     }
 
     @Override
@@ -116,6 +117,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
         mHasOneFail = true;
         if(mShouldCancelWhileOneFail){
             cancelAllTask();
+            onAllTaskComplete(mHasOneFail);
         }
     }
 

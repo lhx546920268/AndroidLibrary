@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.lhx.library.R;
+import com.lhx.library.recyclerView.StickRecyclerView;
 import com.lhx.library.widget.BackToTopButton;
 
 /**
@@ -16,7 +17,7 @@ import com.lhx.library.widget.BackToTopButton;
 public class RecyclerViewFragment extends PageFragment{
 
     //
-    protected RecyclerView mRecyclerView;
+    protected StickRecyclerView mRecyclerView;
 
     @Override
     @CallSuper
@@ -38,4 +39,5 @@ public class RecyclerViewFragment extends PageFragment{
             backToTopButton.setRecyclerView(mRecyclerView);
         }
     }
+
 }

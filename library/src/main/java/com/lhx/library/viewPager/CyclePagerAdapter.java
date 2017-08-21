@@ -1,7 +1,12 @@
 package com.lhx.library.viewPager;
 
+import android.content.Context;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.view.animation.Interpolator;
+import android.widget.Scroller;
+
+import java.lang.reflect.Field;
 
 /**
  * 循环轮播器 view可复用
@@ -31,6 +36,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
         super(viewPager);
 
         viewPager.addOnPageChangeListener(this);
+        setScroller();
     }
 
     @Override
@@ -175,4 +181,44 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
      * @return 真实的数量
      */
     public abstract int getRealCount();
+
+    //设置scroller
+    private void setScroller( ){
+        try {
+            Field field = null;
+            field = ViewPager.class.getDeclaredField("mScroller");
+            field.setAccessible(true);
+
+            PagerScroller scroller = new PagerScroller(mViewPager.getContext());
+            field.set(mViewPager, scroller);
+
+        }catch(NoSuchFieldException e){
+            e.printStackTrace();
+        }catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public class PagerScroller extends Scroller {
+        private int mDuration = 1000;
+
+        public void setmDuration(int mDuration) {
+            this.mDuration = mDuration;
+        }
+
+        public PagerScroller(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void startScroll(int startX, int startY, int dx, int dy, int duration) {
+            super.startScroll(startX, startY, dx, dy, mDuration);
+        }
+
+        @Override
+        public void startScroll(int startX, int startY, int dx, int dy) {
+            super.startScroll(startX, startY, dx, dy, mDuration);
+        }
+    }
 }

@@ -22,6 +22,7 @@ import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.listview.StickListViewFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
+import com.lhx.demo.recyclerview.StickRecyclerViewFragment;
 import com.lhx.demo.recyclerview.TetrisFragment;
 import com.lhx.demo.refresh.RefreshActivity;
 import com.lhx.demo.tab.TabLayoutFragment;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("loadMore (加载更多 recyclerView)");
         infos.add("TetrisLayout (recyclerView)");
         infos.add("ListView stick");
+        infos.add("RecyclerView stick");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -131,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
                     case 11 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, StickListViewFragment
                                 .class));
+                        break;
+                    case 12 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
+                                StickRecyclerViewFragment.class));
                         break;
                 }
 

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.lhx.demo"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     compile project(':library')
     compile 'com.android.support:support-v4:25.0.0'
     compile 'com.android.support:design:26.0.0-alpha1'
+    compile 'com.beloo.widget:ChipsLayoutManager:0.3.0@aar'
 }

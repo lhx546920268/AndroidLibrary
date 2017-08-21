@@ -1,9 +1,9 @@
-package com.lhx.library.listView;
+package com.lhx.library.recyclerView;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
-import android.icu.util.Measure;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,70 +12,31 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
-import android.widget.AbsListView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 /**
- * 可悬浮item的listView
+ * 可悬浮item的RecyclerView
  */
 
-public class StickListView extends ListView {
+public class StickRecyclerView extends RecyclerView {
 
-    static final String TAG = "StickListView";
+    static final String TAG = "StickRecyclerView";
 
     //ui回调
-    private StickListViewHandler mStickListViewHandler;
+    private StickRecyclerViewHandler mStickRecyclerViewHandler;
 
-    //外部的滑动监听
-    private OnScrollListener mOuterOnScrollListener;
+    private Recycler mRecycler;
+
+    //外部 ViewCacheExtension
+    private ViewCacheExtension mOuterViewCacheExtension;
 
     //滑动监听
-    private OnScrollListener mOnScrollListener = new OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if(mOuterOnScrollListener != null){
-                mOuterOnScrollListener.onScrollStateChanged(view, scrollState);
-            }
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-            if(mOuterOnScrollListener != null){
-                mOuterOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
-            }
-
-            if(mStickListViewHandler != null){
-
-                firstVisibleItem -= getHeaderViewsCount();
-
-                if(mStickListViewHandler.shouldStickAtPosition(firstVisibleItem)){
-                    View child = getChildAt(0);
-                    if(child.getTop() != getPaddingTop()){
-                        //当前的悬浮item已超出listView 顶部
-                        layoutStickItem(firstVisibleItem, firstVisibleItem);
-                    }else {
-                        mStickItem = null;
-                        mStickPosition = NO_POSITION;
-                    }
-                }else {
-
-                    //悬浮的item已在 firstVisibleItem 前面了
-                    int position = mStickListViewHandler.getCurrentStickPosition(firstVisibleItem);
-                    if(position < firstVisibleItem && mStickListViewHandler.shouldStickAtPosition(position)){
-                        layoutStickItem(position, firstVisibleItem);
-                    }else if(firstVisibleItem < position){
-                        mStickItem = null;
-                        mStickPosition = NO_POSITION;
-                    }
-                }
-            }
-        }
-    };
+    private OnScrollListener mOnScrollListener;
 
     //
     static final int NO_POSITION = -1;
+
+    //是否可以悬浮
+    private boolean mStickEnable;
 
     //当前要绘制的item
     private View mStickItem;
@@ -93,50 +54,100 @@ public class StickListView extends ListView {
     private int mTouchSlop;
 
     //开始的点击位置
-    private PointF mTouchPoint = new PointF();
+    private PointF mTouchPoint;
 
-    public StickListView(Context context) {
+    public StickRecyclerView(Context context) {
         this(context, null, 0);
     }
 
-    public StickListView(Context context, AttributeSet attrs) {
+    public StickRecyclerView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public StickListView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public StickRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        setOnScrollListener(mOnScrollListener);
     }
 
+    public void setStickRecyclerViewHandler(StickRecyclerViewHandler stickRecyclerViewHandler) {
+        mStickRecyclerViewHandler = stickRecyclerViewHandler;
+        setStickEnable(mStickRecyclerViewHandler != null);
+    }
 
-    @Override
-    public void setOnScrollListener(OnScrollListener onScrollListener) {
-        if(onScrollListener != mOnScrollListener){
-            //保存外部的滑动监听
-            mOuterOnScrollListener = onScrollListener;
-        }else {
-            super.setOnScrollListener(onScrollListener);
+    public void setOuterViewCacheExtension(ViewCacheExtension viewCacheExtension){
+        mOuterViewCacheExtension = viewCacheExtension;
+    }
+
+    //设置是否可以悬浮
+    private void setStickEnable(boolean stickEnable){
+
+        if(mStickEnable != stickEnable){
+            mStickEnable = stickEnable;
+
+            if(mStickEnable && mOnScrollListener == null){
+
+                mTouchPoint = new PointF();
+                mOnScrollListener = new OnScrollListener() {
+
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                        int childCount = recyclerView.getChildCount();
+                        if(mStickRecyclerViewHandler != null && childCount > 0){
+
+                            View child = recyclerView.getChildAt(0);
+                            int firstVisibleItem = recyclerView.getChildLayoutPosition(child);
+
+                            if(mStickRecyclerViewHandler.shouldStickAtPosition(firstVisibleItem)){
+                                if(child.getTop() != getPaddingTop()){
+                                    //当前的悬浮item已超出listView 顶部
+                                    layoutStickItem(firstVisibleItem, firstVisibleItem);
+                                }else {
+                                    mStickItem = null;
+                                    mStickPosition = NO_POSITION;
+                                }
+                            }else{
+
+                                //悬浮的item已在 firstVisibleItem 前面了
+                                int position = mStickRecyclerViewHandler.getCurrentStickPosition(firstVisibleItem);
+                                if(position < firstVisibleItem && mStickRecyclerViewHandler.shouldStickAtPosition(position)){
+                                    layoutStickItem(position, firstVisibleItem);
+                                }else if(firstVisibleItem < position){
+                                    mStickItem = null;
+                                    mStickPosition = NO_POSITION;
+                                }
+                            }
+                        }
+                    }
+                };
+
+                setViewCacheExtension(new ViewCacheExtension() {
+                    @Override
+                    public View getViewForPositionAndType(Recycler recycler, int position, int type) {
+
+                        mRecycler = recycler;
+                        if (mOuterViewCacheExtension != null) {
+                            return mOuterViewCacheExtension.getViewForPositionAndType(recycler, position, type);
+                        }
+
+                        return null;
+                    }
+                });
+
+                addOnScrollListener(mOnScrollListener);
+            }
         }
-    }
-
-    public StickListViewHandler getStickListViewHandler() {
-        return mStickListViewHandler;
-    }
-
-    public void setStickListViewHandler(StickListViewHandler stickListViewHandler) {
-        mStickListViewHandler = stickListViewHandler;
     }
 
     //布局固定的item
     private void layoutStickItem(int stickPosition, int firstVisibleItem){
 
-        stickPosition += getHeaderViewsCount();
-
-        ListAdapter adapter = getAdapter();
+        Adapter adapter = getAdapter();
         if(mStickItem == null || stickPosition != mStickPosition){
-            mStickItem = adapter.getView(stickPosition, null, this);
+
+
+            mStickItem = mRecycler.getViewForPosition(stickPosition);
             ViewGroup.LayoutParams params = mStickItem.getLayoutParams();
             if(params == null){
                 params = generateDefaultLayoutParams();
@@ -155,15 +166,15 @@ public class StickListView extends ListView {
             int heightMeasureSpec = MeasureSpec.makeMeasureSpec(Math.min(getHeight() - getPaddingTop() - getPaddingBottom
                     (), heightSize), heightMode);
             mStickItem.measure(widthMeasureSpec, heightMeasureSpec);
+
             mStickItem.layout(0, 0, mStickItem.getMeasuredWidth(), mStickItem.getMeasuredHeight());
         }
 
         mStickPosition = stickPosition;
 
-
         //判断下一个item
         int nextPosition = firstVisibleItem + 1;
-        if(nextPosition < adapter.getCount() && mStickListViewHandler.shouldStickAtPosition(nextPosition)){
+        if(nextPosition < adapter.getItemCount() && mStickRecyclerViewHandler.shouldStickAtPosition(nextPosition)){
             View child = getChildAt(1);
             mTranslateY = child.getTop() - mStickItem.getBottom();
         }else {
@@ -257,7 +268,7 @@ public class StickListView extends ListView {
     }
 
     //悬浮固定item回调
-    public interface StickListViewHandler{
+    public interface StickRecyclerViewHandler{
 
         //是否需要悬浮固定
         boolean shouldStickAtPosition(int position);

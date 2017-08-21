@@ -13,8 +13,11 @@ import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.listView.AbsListViewAdapter;
 import com.lhx.library.listView.StickListView;
 import com.lhx.library.section.SectionHandler;
+import com.lhx.library.section.SectionInfo;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.ToastUtil;
+import com.lhx.library.viewHoler.ViewHolder;
+import com.lhx.library.widget.TabLayout;
 
 import java.util.ArrayList;
 
@@ -47,19 +50,7 @@ public class StickListViewFragment extends AppBaseFragment {
 //        header.setBackgroundColor(Color.GREEN);
 //        mStickListView.addHeaderView(header);
 
-        mStickListView.setStickListViewHandler(new StickListView.StickListViewHandler() {
-            @Override
-            public boolean shouldStickAtPosition(int position) {
-                return position == 1 || position == 10;
-            }
-
-            @Override
-            public int getCurrentStickPosition(int firstVisibleItem) {
-                return firstVisibleItem < 10 ? 1 : 10;
-            }
-        });
-
-        mStickListView.setAdapter(new AbsListViewAdapter(mContext) {
+        final AbsListViewAdapter adapter = new AbsListViewAdapter(mContext) {
             @Override
             public void onLoadMore() {
 
@@ -101,18 +92,62 @@ public class StickListViewFragment extends AppBaseFragment {
             }
 
             @Override
+            public View getSectionHeaderForSection(int section, View convertView, ViewGroup parent) {
+                if(convertView == null){
+
+                    convertView = LayoutInflater.from(mContext).inflate(R.layout.stick_header, parent, false);
+                    TabLayout tabLayout = ViewHolder.get(convertView, R.id.tab_layout);
+                    tabLayout.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
+                        @Override
+                        public int numberOfTabs() {
+                            return 2;
+                        }
+
+                        @Override
+                        public void configureTabInfo(TabLayout.TabInfo tab, int position) {
+                            tab.setTitle("按钮" + position);
+                        }
+                    });
+                    tabLayout.setShouldDisplayTopSeparator(true);
+                    tabLayout.setShouldDisplayBottomSeparator(true);
+                    tabLayout.setDividderWidth(SizeUtil.pxFormDip(0.5f, mContext));
+                    tabLayout.setDividerColor(getColor(R.color.divider_color));
+                    tabLayout.setDivierHeight(SizeUtil.pxFormDip(20, mContext));
+                    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                        @Override
+                        public void onTabSelected(int position, TabLayout tabLayout) {
+
+                            ToastUtil.alert(mContext, "点击" + position);
+                        }
+
+                        @Override
+                        public void onTabUnselected(int position, TabLayout tabLayout) {
+
+                        }
+
+                        @Override
+                        public void onTabReselected(int position, TabLayout tabLayout) {
+
+                        }
+                    });
+                }
+
+                return convertView;
+            }
+
+            @Override
             public int getItemViewTypeForIndexPath(int indexInSection, int section, @ItemType int type) {
-                return 1;
+                return type;
             }
 
             @Override
             public int numberOfItemViewTypes() {
-                return 1;
+                return 2;
             }
 
             @Override
             public int numberOfSection() {
-                return 1;
+                return 10;
             }
 
             @Override
@@ -121,10 +156,31 @@ public class StickListViewFragment extends AppBaseFragment {
             }
 
             @Override
+            public boolean shouldExistSectionHeaderForSection(int section) {
+                return true;
+            }
+
+            @Override
             public void onItemClick(int indexInSection, int section) {
                 ToastUtil.alert(mContext, "第" + indexInSection + "个");
             }
+        };
+
+        mStickListView.setStickListViewHandler(new StickListView.StickListViewHandler() {
+            @Override
+            public boolean shouldStickAtPosition(int position) {
+                SectionInfo info = adapter.sectionInfoForPosition(position);
+                return info.getHeaderPosition() == position;
+            }
+
+            @Override
+            public int getCurrentStickPosition(int firstVisibleItem) {
+                SectionInfo info = adapter.sectionInfoForPosition(firstVisibleItem);
+                return info.getHeaderPosition();
+            }
         });
+
+        mStickListView.setAdapter(adapter);
     }
 
     //添加数据

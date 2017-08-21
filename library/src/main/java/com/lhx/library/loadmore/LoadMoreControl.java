@@ -72,6 +72,11 @@ public class LoadMoreControl {
         });
     }
 
+    //设置标题
+    public void setTitle(String title){
+        mTextView.setText(title);
+    }
+
     public View getContentView(){
 
         return mContentView;

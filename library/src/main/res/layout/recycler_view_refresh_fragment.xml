@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:id="@+id/ptr_layout">
 
-        <android.support.v7.widget.RecyclerView
+        <com.lhx.library.recyclerView.StickRecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
