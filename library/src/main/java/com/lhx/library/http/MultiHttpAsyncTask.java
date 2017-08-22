@@ -3,7 +3,6 @@ package com.lhx.library.http;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.support.annotation.CallSuper;
-import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;

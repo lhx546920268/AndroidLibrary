@@ -21,8 +21,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -37,7 +35,6 @@ import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.OnSingleClickListener;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

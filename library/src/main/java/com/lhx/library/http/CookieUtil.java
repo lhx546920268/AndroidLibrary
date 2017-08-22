@@ -1,7 +1,6 @@
 package com.lhx.library.http;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.CookieHandler;

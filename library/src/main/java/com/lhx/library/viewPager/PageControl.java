@@ -3,7 +3,6 @@ package com.lhx.library.viewPager;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;

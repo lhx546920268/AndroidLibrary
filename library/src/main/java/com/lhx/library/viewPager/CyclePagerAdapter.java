@@ -3,7 +3,6 @@ package com.lhx.library.viewPager;
 import android.content.Context;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
-import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
 import java.lang.reflect.Field;

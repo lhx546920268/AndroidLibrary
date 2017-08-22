@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.lhx.library.R;
+import com.lhx.library.listView.StickListView;
 import com.lhx.library.widget.BackToTopButton;
 
 /**
@@ -16,7 +16,7 @@ import com.lhx.library.widget.BackToTopButton;
 public class ListViewFragment extends PageFragment {
 
     //
-    protected ListView mListView;
+    protected StickListView mListView;
 
     @Override
     @CallSuper

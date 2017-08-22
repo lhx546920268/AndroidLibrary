@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:id="@+id/ptr_layout">
 
-        <ListView
+        <com.lhx.library.listView.StickListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"

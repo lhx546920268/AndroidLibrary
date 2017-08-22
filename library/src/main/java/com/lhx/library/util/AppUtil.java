@@ -1,6 +1,5 @@
 package com.lhx.library.util;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +7,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -17,7 +14,6 @@ import android.widget.Toast;
 import com.lhx.library.dialog.AlertController;
 
 import java.util.Locale;
-import com.lhx.library.util.ToastUtil;
 
 /**
  * app有关的工具类

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;

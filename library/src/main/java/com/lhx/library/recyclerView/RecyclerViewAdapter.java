@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,7 +17,6 @@ import com.lhx.library.viewHoler.RecyclerViewHolder;
 import com.lhx.library.widget.OnSingleClickListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Recycler 布局控制器

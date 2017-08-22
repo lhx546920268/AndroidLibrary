@@ -13,14 +13,12 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.util.SizeUtil;
-import com.lhx.library.widget.OnSingleClickListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

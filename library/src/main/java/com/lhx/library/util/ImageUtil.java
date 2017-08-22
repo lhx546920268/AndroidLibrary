@@ -2,7 +2,6 @@ package com.lhx.library.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 
 /**
  * 图片工具类

@@ -1,15 +1,11 @@
 package com.lhx.library.listView;
 
 import android.content.Context;
-import android.database.DataSetObserver;
-import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import com.lhx.library.R;
 import com.lhx.library.loadmore.LoadMoreControl;

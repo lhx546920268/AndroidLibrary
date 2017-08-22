@@ -12,7 +12,6 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.lhx.library.dialog.AlertController;
 import com.lhx.library.util.SizeUtil;
 
 import java.util.ArrayList;

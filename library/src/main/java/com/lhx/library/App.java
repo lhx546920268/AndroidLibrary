@@ -1,7 +1,6 @@
 package com.lhx.library;
 
 import android.graphics.Color;
-import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 
 /**
