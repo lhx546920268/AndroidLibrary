@@ -39,6 +39,11 @@ public class SectionInfo {
             return sectionBegin;
         }
     }
+
+    public int getItemPosition(int position){
+        return position - getItemPosition();
+    }
+
     ///判断position是否是头部
     public boolean isHeaderForPosition(int position){
 

@@ -354,7 +354,6 @@ public class TabLayout extends FrameLayout {
     ///刷新数据
     public void reloadData() {
 
-        mSelectedPosition = NO_SELECT;
         if (mTabLayoutDataSet != null && mContentWidth > 0) {
 
             mTabInfos.clear();

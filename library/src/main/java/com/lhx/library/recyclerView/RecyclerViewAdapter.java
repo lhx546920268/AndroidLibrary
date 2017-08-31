@@ -53,6 +53,8 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     static final int LOAD_MORE_VIEW_TYPE = 9999; //加载更多视图类型
     static final int EMPTY_VIEW_TYPE = 9998; //空视图类型
+    static final int HEADER_VIEW_TYPE = 9997; //头部视图类型
+    static final int FOOTER_VIEW_TYPE = 9996; //底部视图类型
 
     ///构造方法
     public RecyclerViewAdapter(@NonNull RecyclerView recyclerView) {
@@ -189,6 +191,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     @Override
+    public void onItemClick(int indexInSection, int section, View view) {
+
+    }
+
+    @Override
     public void onHeaderClick(int section) {
 
     }
@@ -198,20 +205,41 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     }
 
-//    @Override
-//    public boolean shouldSetOnClickListenerAtItem(int indexInSection, int section) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean shouldSetOnClickListenerAtHeader(int section) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean shouldSetOnClickListenerAtFooter(int section) {
-//        return false;
-//    }
+    //是否存在头部
+    public boolean shouldExistHeader(){
+        return false;
+    }
+
+    //是否是头部
+    private boolean isHeader(int position){
+        return position == 0 && shouldExistHeader();
+    }
+
+    public RecyclerViewHolder onCreateHeaderHolder(final ViewGroup parent){
+        return null;
+    }
+
+    public void onBindHeaderHolder(RecyclerViewHolder holder){
+
+    }
+
+    //是否存在底部
+    public boolean shouldExistFooter(){
+        return false;
+    }
+
+    //是否是底部
+    private boolean isFooter(int position){
+        return position == mRealCount - 1 && shouldExistFooter();
+    }
+
+    public RecyclerViewHolder onCreateFooterHolder(final ViewGroup parent){
+        return null;
+    }
+
+    public void onBindFooterHolder(RecyclerViewHolder holder){
+
+    }
 
     /**
      * 获取item
@@ -318,6 +346,14 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 holder.itemView.setLayoutParams(params);
 
                 break;
+            case HEADER_VIEW_TYPE : {
+                onBindHeaderHolder(holder);
+            }
+            break;
+            case FOOTER_VIEW_TYPE : {
+                onBindFooterHolder(holder);
+            }
+            break;
             default : {
                 SectionInfo sectionInfo = sectionInfoForPosition(position);
 
@@ -336,7 +372,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 }
 
                 ///item
-                onBindItemViewHolderForIndexPath(holder, position - sectionInfo.getItemPosition(), sectionInfo
+                onBindItemViewHolderForIndexPath(holder, sectionInfo.getItemPosition(position), sectionInfo
                         .section);
                 break;
             }
@@ -354,6 +390,12 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             case EMPTY_VIEW_TYPE : {
 
                 return new RecyclerViewHolder(getEmptyView());
+            }
+            case HEADER_VIEW_TYPE : {
+                return onCreateHeaderHolder(parent);
+            }
+            case FOOTER_VIEW_TYPE : {
+                return onCreateFooterHolder(parent);
             }
             default : {
                 final RecyclerViewHolder holder = onCreateViewHolderForViewType(viewType, parent);
@@ -373,7 +415,8 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                             onFooterClick(sectionInfo.section);
                         }else {
 
-                            onItemClick(position - sectionInfo.getItemPosition(), sectionInfo.section);
+                            onItemClick(sectionInfo.getItemPosition(position), sectionInfo.section);
+                            onItemClick(sectionInfo.getItemPosition(position), sectionInfo.section, v);
                         }
                     }
                 });
@@ -393,7 +436,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public final long getItemId(int position) {
-        if(isEmptyView(position) || isEmptyView(position))
+        if(isEmptyView(position) || isLoadMoreItem(position) || isHeader(position) || isFooter(position))
             return 0;
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
@@ -415,6 +458,14 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public final int getItemViewType(int position) {
+
+        if(isHeader(position)){
+            return HEADER_VIEW_TYPE;
+        }
+
+        if(isFooter(position)){
+            return FOOTER_VIEW_TYPE;
+        }
 
         if(isEmptyView(position)){
             return EMPTY_VIEW_TYPE;
@@ -456,6 +507,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             ///计算列表行数量
             int numberOfSection = numberOfSection();
             int count = 0;
+
+            if(shouldExistHeader()){
+                count ++;
+            }
+
             for(int section = 0;section < numberOfSection;section ++){
 
                 int numberOfItem = numberOfItemInSection(section);
@@ -474,6 +530,10 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                     count ++;
                 if(sectionInfo.isExistFooter)
                     count ++;
+            }
+
+            if(shouldExistFooter()){
+                count ++;
             }
 
             mRealCount = count;

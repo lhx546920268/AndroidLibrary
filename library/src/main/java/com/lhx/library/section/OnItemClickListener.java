@@ -1,5 +1,7 @@
 package com.lhx.library.section;
 
+import android.view.View;
+
 /**
  * item 点击回调
  */
@@ -11,7 +13,10 @@ public interface OnItemClickListener {
      * @param indexInSection section中的行下标
      * @param section section下标
      */
+    @Deprecated
     void onItemClick(int indexInSection, int section);
+
+    void onItemClick(int indexInSection, int section, View view);
 
     /**
      * 是否添加点击事件

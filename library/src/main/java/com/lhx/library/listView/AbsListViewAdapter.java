@@ -129,6 +129,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     }
 
     @Override
+    public void onItemClick(int indexInSection, int section, View view) {
+
+    }
+
+    @Override
     public void onHeaderClick(int section) {
 
     }
@@ -404,7 +409,8 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
                         onFooterClick(sectionInfo.section);
                     }else {
 
-                        onItemClick(position - sectionInfo.getItemPosition(), sectionInfo.section);
+                        onItemClick(sectionInfo.getItemPosition(position), sectionInfo.section);
+                        onItemClick(sectionInfo.getItemPosition(position), sectionInfo.section, v);
                     }
                 }
             });

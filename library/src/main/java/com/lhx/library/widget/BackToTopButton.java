@@ -25,6 +25,8 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
     //显示第几个时显示回到顶部按钮
     private int mBackToTopPosition = 20;
 
+    private BackToTopHandler mBackToTopHandler;
+
     public BackToTopButton(Context context) {
         this(context, null, 0);
     }
@@ -43,6 +45,10 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
                     mRecyclerView.scrollToPosition(0);
                 }else if(mListView != null){
                     mListView.setSelection(0);
+                }
+
+                if(mBackToTopHandler != null){
+                    mBackToTopHandler.onBackToTop();
                 }
 
                 setVisibility(GONE);
@@ -87,6 +93,10 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
         }
     }
 
+    public void setBackToTopHandler(BackToTopHandler backToTopHandler) {
+        mBackToTopHandler = backToTopHandler;
+    }
+
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if(scrollState == SCROLL_STATE_IDLE){
@@ -103,6 +113,8 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
     }
+
+
 
 
     class BackToTopListener extends RecyclerView.OnScrollListener{
@@ -126,5 +138,11 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
                 }
             }
         }
+    }
+
+    public interface BackToTopHandler{
+
+        //回到顶部
+        void onBackToTop();
     }
 }

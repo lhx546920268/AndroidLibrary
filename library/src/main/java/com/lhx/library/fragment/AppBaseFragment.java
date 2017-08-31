@@ -116,11 +116,11 @@ public abstract class AppBaseFragment extends Fragment {
 //        Log.d("AppBaseFragment", "onAttach");
     }
 //
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        Log.d("AppBaseFragment", "onDestroy");
-//    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("AppBaseFragment", "onDestroy");
+    }
 //
 //    @Override
 //    public void onDestroyView() {
@@ -292,7 +292,7 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     public void setPageLoading(boolean pageLoading){
-        setPageLoading(pageLoading, pageLoading ? getString(R.string.common_page_loading_text) : null);
+        setPageLoading(pageLoading, pageLoading ? "正在载入..." : null);
     }
 
     /**

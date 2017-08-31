@@ -94,7 +94,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
             public int getSpanSize(int position) {
 
                 int type = getItemViewType(position);
-                if(type == LOAD_MORE_VIEW_TYPE || type == EMPTY_VIEW_TYPE){
+                if(type == LOAD_MORE_VIEW_TYPE || type == EMPTY_VIEW_TYPE ||
+                        type == HEADER_VIEW_TYPE || type == FOOTER_VIEW_TYPE){
                     return mDifferentColumnProduct;
                 }else {
                     return RecyclerViewGridAdapter.this.spanCountForPosition(position);
@@ -236,6 +237,10 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
             ///计算列表行数量
             int numberOfSection = numberOfSection();
             int count = 0;
+            if(shouldExistHeader()){
+                count ++;
+            }
+
             for(int section = 0;section < numberOfSection;section ++){
 
                 int numberOfItem = numberOfItemInSection(section);
@@ -268,6 +273,10 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                     count ++;
             }
 
+            if(shouldExistFooter()){
+                count ++;
+            }
+
             mRealCount = count;
 
             if(loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
@@ -293,6 +302,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
             int type = getItemViewType(position);
             switch (type){
                 case EMPTY_VIEW_TYPE :
+                case HEADER_VIEW_TYPE :
+                case FOOTER_VIEW_TYPE :
                     left = top = right = bottom = 0;
                     break;
                 case LOAD_MORE_VIEW_TYPE :
@@ -344,11 +355,11 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
                         ///中间的添加两边间隔，旁边的添加一边间隔， 低于1px无法显示，所以只添加一边间隔
                         if(sectionInfo.itemSpace >= 2){
-                            if(onTheRight){
+                            if(onTheRight && !onTheLeft){
                                 left = sectionInfo.itemSpace / 2;
-                            }else if(onTheLeft){
+                            }else if(onTheLeft && !onTheRight){
                                 right = sectionInfo.itemSpace / 2;
-                            }else {
+                            }else if(!onTheLeft && !onTheRight){
                                 left = sectionInfo.itemSpace / 2;
                                 right = sectionInfo.itemSpace / 2;
                             }
