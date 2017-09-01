@@ -4,8 +4,9 @@ import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
+import com.lhx.library.util.StringUtil;
+
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -107,15 +108,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     //把结果转成string
     public String resultToString(byte[] reulst){
-        if(reulst != null && reulst.length > 0){
-            try {
-                return new String(reulst, mStringEncoding);
-            }catch (UnsupportedEncodingException e){
-                e.printStackTrace();
-            }
-        }
-
-        return "";
+       return StringUtil.stringFromBytes(reulst, mStringEncoding);
     }
 
     @Override
@@ -143,7 +136,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
             boolean result = mHttpRequest.startRequest();
             mHttpResponseCode = mHttpRequest.getHttpResponseCode();
-            mErrorCode = mHttpRequest.mErrorCode;
+            mErrorCode = mHttpRequest.getErrorCode();
             byte[] data = null;
             if(result){
                 data = mHttpRequest.getResponseData();

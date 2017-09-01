@@ -415,8 +415,6 @@ public class HttpRequest {
             if(mState == HTTP_REQUEST_STATE_LOADING){
                 if(ioe instanceof UnknownHostException){
                     fail(ERROR_CODE_NETWORK, 0);
-                }else if(ioe instanceof SocketTimeoutException){
-                    fail(ERROR_CODE_TIME_OUT, 0);
                 }else {
                     fail(ERROR_CODE_IO, 0);
                 }
