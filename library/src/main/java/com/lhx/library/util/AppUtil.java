@@ -147,8 +147,9 @@ public class AppUtil {
     public static void showSoftInputMethod(Context context, View view) {
         try {
             // 打开软键盘
+            view.requestFocus();
             ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .showSoftInputFromInputMethod(view.getWindowToken(), InputMethodManager.SHOW_FORCED);
+                    .showSoftInput(view, InputMethodManager.SHOW_FORCED);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -232,6 +232,16 @@ public abstract class AppBaseFragment extends Fragment {
         mActivity.finish();
     }
 
+    public void back(int resultCode){
+        mActivity.setResult(resultCode);
+        mActivity.finish();
+    }
+
+    public void back(int resultCode, Intent data){
+        mActivity.setResult(resultCode, data);
+        mActivity.finish();
+    }
+
     public NavigationBar getNavigationBar() {
         return mNavigationBar;
     }
@@ -622,7 +632,10 @@ public abstract class AppBaseFragment extends Fragment {
         }
 
         if(mActivity != null){
-            return mActivity.getIntent().getExtras();
+            bundle = mActivity.getIntent().getExtras();
+            if(bundle != null){
+                return bundle;
+            }
         }
         return null;
     }

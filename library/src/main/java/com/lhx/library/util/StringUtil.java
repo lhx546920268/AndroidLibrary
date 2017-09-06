@@ -56,11 +56,6 @@ public class StringUtil {
         return value;
     }
 
-    /**
-     * 解析字符串为长整数字
-     * @param string 要解析的字符串
-     * @return 长整数字
-     */
     public static long parseLong(String string){
         long value = 0;
         if(!isEmpty(string)){
@@ -70,8 +65,30 @@ public class StringUtil {
                 e.printStackTrace();
             }
         }
+        return value;
+    }
 
+    public static float parseFloat(String string){
+        float value = 0;
+        if(!isEmpty(string)){
+            try {
+                value = Float.parseFloat(string);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        }
+        return value;
+    }
 
+    public static double parseDouble(String string){
+        double value = 0;
+        if(!isEmpty(string)){
+            try {
+                value = Double.parseDouble(string);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        }
         return value;
     }
 
