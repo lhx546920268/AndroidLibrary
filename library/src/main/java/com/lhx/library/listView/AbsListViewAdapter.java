@@ -2,6 +2,7 @@ package com.lhx.library.listView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -367,8 +368,14 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         //判断重用的view是否正确
         int type = getItemViewType(position);
         if(convertView != null){
-            int viewType = (int)convertView.getTag(R.id.list_view_type_tag_key);
-            if(viewType != type){
+            Object tag = convertView.getTag(R.id.list_view_type_tag_key);
+
+            if(tag != null){
+                int viewType = (int)tag;
+                if(viewType != type){
+                    convertView = null;
+                }
+            }else {
                 convertView = null;
             }
         }

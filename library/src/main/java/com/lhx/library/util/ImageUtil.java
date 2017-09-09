@@ -1,7 +1,17 @@
 package com.lhx.library.util;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * 图片工具类
@@ -49,5 +59,71 @@ public class ImageUtil {
         options.inSampleSize = Math.max(imgWidth / width, imgHeight / height);
 
         return options;
+    }
+
+    /**把图片保存在本地 异步保存，主线程回调
+     * @param context  xx
+     * @param bitmap 要保存的图片 可通过 getDrawingCache 获取
+     * @param toSystemAlbum 是否要保存到系统相册
+     * @param onSaveBitmapHandler 保存完成回调
+     */
+    public static void saveBitmap(final Context context, final Bitmap bitmap, final boolean toSystemAlbum,
+                                 final OnSaveBitmapHandler onSaveBitmapHandler) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // 首先保存图片
+                FileOutputStream fos = null;
+                boolean success = false;
+                try {
+
+                    File file = FileUtil.createTemporaryFile(context, ".jpg");
+                    fos = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.flush();
+
+                    if(toSystemAlbum){
+                        // 其次把文件插入到系统图库
+                        MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), file.getName(),
+                                null);
+                        // 最后通知图库更新
+                        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                    }
+
+                    success = true;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+
+                    final boolean succ = success;
+                    if(onSaveBitmapHandler != null){
+                        ThreadUtil.runOnMainThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                onSaveBitmapHandler.onComplete(succ);
+                            }
+                        });
+                    }
+                    if(fos != null){
+                        try {
+                            fos.close();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+    ///保存图片回调
+    public interface OnSaveBitmapHandler{
+
+        //保存完成
+        void onComplete(boolean success);
     }
 }

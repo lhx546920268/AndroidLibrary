@@ -71,6 +71,13 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         }
     }
 
+    //手动刷新
+    public void autoRefresh(){
+        if(mRefreshLayout != null && !mRefreshLayout.isRefreshing()){
+            mRefreshLayout.autoRefresh();
+        }
+    }
+
     //是否正在刷新
     public boolean isRefreshing(){
 

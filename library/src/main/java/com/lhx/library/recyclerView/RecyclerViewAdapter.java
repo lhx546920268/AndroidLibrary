@@ -166,6 +166,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     @Override
+    public int numberOfSection() {
+        return 1;
+    }
+
+    @Override
     public int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type){
         return 0;
     }

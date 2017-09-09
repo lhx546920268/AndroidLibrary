@@ -416,7 +416,7 @@ public class HttpRequest {
                 if(ioe instanceof UnknownHostException){
                     fail(ERROR_CODE_NETWORK, 0);
                 }else {
-                    fail(ERROR_CODE_IO, 0);
+                    fail(ERROR_CODE_TIME_OUT, 0);
                 }
             }
         } finally {

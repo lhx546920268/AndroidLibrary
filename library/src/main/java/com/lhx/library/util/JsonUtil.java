@@ -16,7 +16,7 @@ public class JsonUtil {
 
         if(object != null && !StringUtil.isEmpty(key)){
             String str = object.optString(key);
-            if(!StringUtil.isEmpty(str)){
+            if(!StringUtil.isEmpty(str) && !"null".equals(str)){
                 return str;
             }
         }
@@ -27,7 +27,7 @@ public class JsonUtil {
 
         if(array != null && index < array.length()){
             String str = array.optString(index);
-            if(!StringUtil.isEmpty(str)){
+            if(!StringUtil.isEmpty(str) && !"null".equals(str)){
                 return str;
             }
         }

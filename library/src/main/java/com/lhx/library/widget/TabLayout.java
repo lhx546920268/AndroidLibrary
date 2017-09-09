@@ -688,8 +688,8 @@ public class TabLayout extends FrameLayout {
 
                     int position = holder.getLayoutPosition();
                     if (position != mSelectedPosition) {
-                        onTabSelected(position, mSelectedPosition);
                         selectMenuTab(position, true);
+                        onTabSelected(position, mSelectedPosition);
                     }else {
                         onTabReselected(position);
                     }
