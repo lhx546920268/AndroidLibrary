@@ -6,12 +6,15 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import com.just.library.AgentWeb;
 import com.just.library.ChromeClientCallbackManager;
 import com.just.library.WebDefaultSettingsManager;
+import com.just.library.WebLifeCycle;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.util.StringUtil;
@@ -40,6 +43,10 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     //链接
     protected String mURL;
 
+    public AgentWeb getAgentWeb() {
+        return mAgentWeb;
+    }
+
     @Override
     @CallSuper
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
@@ -48,6 +55,10 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         mShouldUseWebTitle = getExtraBooleanFromBundle(WEB_USE_WEB_TITLE, true);
 
         String url = getExtraStringFromBundle(WEB_URL);
+        if(StringUtil.isEmpty(url)){
+            url = getURL();
+        }
+
         //没有http头的加上
         if(!TextUtils.isEmpty(url)){
             int index = url.indexOf("http://");
@@ -60,6 +71,9 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         }
         mURL = url;
         mHtmlString = getExtraStringFromBundle(WEB_HTML_STRING);
+        if(StringUtil.isEmpty(mHtmlString)){
+            mHtmlString = getHtmlString();
+        }
 
         String title = getExtraStringFromBundle(WEB_TITLE);
         if(!TextUtils.isEmpty(title)){
@@ -82,6 +96,17 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
                         .setIndicatorColorWithHeight(App.WebProgressColor, 2)//
                         .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
                         .setReceivedTitleCallback(this)
+                        .setWebViewClient(new WebViewClient(){
+
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+                                if(shouldOpenURL(view, url)){
+                                    return true;
+                                }
+                                return super.shouldOverrideUrlLoading(view, url);
+                            }
+                        })
                         .setSecurityType(AgentWeb.SecurityType.strict)
                         .createAgentWeb()//
                         .ready()//
@@ -114,14 +139,19 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     @Override
     public void onReceivedTitle(WebView view, String title) {
         if(mShouldUseWebTitle){
-            getNavigationBar().setTitle(title);
+            if(showNavigationBar()){
+                setTitle(title);
+            }
         }
     }
 
     @Override
     public void onResume() {
         if(mAgentWeb != null){
-            mAgentWeb.getWebLifeCycle().onResume();
+            WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
+            if(lifeCycle != null){
+                lifeCycle.onResume();
+            }
         }
         super.onResume();
     }
@@ -129,7 +159,10 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     @Override
     public void onPause() {
         if(mAgentWeb != null){
-            mAgentWeb.getWebLifeCycle().onPause();
+            WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
+            if(lifeCycle != null){
+                lifeCycle.onPause();
+            }
         }
         super.onPause();
     }
@@ -144,10 +177,35 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     }
 
     @Override
-    public void onDestroyView() {
-        if(mAgentWeb != null){
-            mAgentWeb.getWebLifeCycle().onDestroy();
+    public void onDestroy() {
+        if(shouldOnDestroy()){
+            if(mAgentWeb != null){
+                WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
+                if(lifeCycle != null){
+                    lifeCycle.onDestroy();
+                }
+            }
         }
-        super.onDestroyView();
+
+        super.onDestroy();
+    }
+
+    //获取要打开的链接
+    public String getURL(){
+        return "";
+    }
+
+    public String getHtmlString(){
+        return "";
+    }
+
+    ///当前url是否可以打开
+    public boolean shouldOpenURL(WebView view, String url){
+        return true;
+    }
+
+    ///是否需要销毁 tabBar 需要返回 false
+    public boolean shouldOnDestroy(){
+        return true;
     }
 }

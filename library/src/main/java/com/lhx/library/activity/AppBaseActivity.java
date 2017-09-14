@@ -21,6 +21,9 @@ import com.lhx.library.inter.LoginHandler;
 @SuppressWarnings("unchecked")
 public class AppBaseActivity extends AppCompatActivity {
 
+    //activity里面fragment的类名
+    public static final String FRAGMENT_STRING = "fragmentString";
+
     //登录请求code
     public static final int LOGIN_REQUEST_CODE = 1118;
 
@@ -30,12 +33,17 @@ public class AppBaseActivity extends AppCompatActivity {
     //是否有登录回调
     private boolean mHasLoginHandler = false;
 
+    //activity 名称 为fragment的类名 或者 activity类名
+    private String mName;
+
     ///当前显示的Fragment
     private AppBaseFragment fragment;
 
-    public static final String FRAGMENT_STRING = "fragmentString";
+    public String getName() {
+        return mName;
+    }
 
-//    @Override
+    //    @Override
 //    protected void onRestart() {
 //        Log.d("AppBaseActivity", "onRestart");
 //        super.onRestart();
@@ -104,6 +112,8 @@ public class AppBaseActivity extends AppCompatActivity {
 //                    throw new RuntimeException(className + "必须是AppBaseFragment或者其子类");
 //                }
 
+                mName = className;
+
                 AppBaseFragment currentFragment = (AppBaseFragment) clazz.newInstance();
                 Bundle bundle = getIntent().getExtras();
                 if (bundle != null) {
@@ -122,7 +132,21 @@ public class AppBaseActivity extends AppCompatActivity {
                 e.printStackTrace();
                 finish();
             }
+        }else {
+            mName = getClass().getName();
         }
+
+        //添加到堆栈中
+        ActivityStack.addActivity(this);
+    }
+
+    @Override
+    @CallSuper
+    protected void onDestroy() {
+
+        //从堆栈移除
+        ActivityStack.removeActivity(this);
+        super.onDestroy();
     }
 
     //获取视图内容，必须包含 fragment_container

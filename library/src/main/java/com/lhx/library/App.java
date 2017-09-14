@@ -37,7 +37,7 @@ public class App {
     public static int HttpFirstPage = 1;
 
     //长按钮圆角
-    public static int LongButtonCornerRadius = 10;
+    public static int LongButtonCornerRadius = 20;
 
     //web进度条颜色
     public static int WebProgressColor = Color.parseColor("#007AFF");

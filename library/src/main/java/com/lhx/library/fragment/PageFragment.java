@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.lhx.library.App;
+import com.lhx.library.R;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.BackToTopButton;
 
@@ -111,7 +112,8 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, SizeUtil.pxFormDip(20, mContext), SizeUtil.pxFormDip(20, mContext));
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
+            params.alignWithParent = true;
             mBackToTopButton.setVisibility(View.GONE);
             mBackToTopButton.setLayoutParams(params);
             getContentContainer().addView(mBackToTopButton);

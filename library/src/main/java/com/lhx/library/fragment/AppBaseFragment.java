@@ -12,6 +12,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
+import com.lhx.library.activity.ActivityStack;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
 import com.lhx.library.dialog.LoadingDialog;
@@ -240,6 +242,27 @@ public abstract class AppBaseFragment extends Fragment {
     public void back(int resultCode, Intent data){
         mActivity.setResult(resultCode, data);
         mActivity.finish();
+    }
+
+    public void backToFragment(@NonNull Class fragmentClass){
+        backTo(fragmentClass.getName());
+    }
+
+    public void backToFragment(@NonNull Class fragmentClass, int resultCode){
+        backTo(fragmentClass.getName(), resultCode);
+    }
+
+    public void backTo(@NonNull String toName){
+        backTo(toName, Integer.MAX_VALUE);
+    }
+
+    /**
+     * 返回某个指定的 fragment
+     * @param toName 对应的fragment类名 或者 activity类名 {@link AppBaseActivity#mName}
+     * @param resultCode {@link android.app.Activity#setResult(int)}
+     */
+    public void backTo(@NonNull String toName, int resultCode){
+        ActivityStack.finishActivies(toName, resultCode);
     }
 
     public NavigationBar getNavigationBar() {
@@ -587,7 +610,10 @@ public abstract class AppBaseFragment extends Fragment {
 
     public double getExtraDoubleFromBundle(String key){
         Bundle nBundle = getBundle();
-        return nBundle.getDouble(key);
+        if(nBundle != null){
+            return nBundle.getDouble(key);
+        }
+        return 0;
     }
 
     public int getExtraIntFromBundle(String key){
@@ -596,17 +622,26 @@ public abstract class AppBaseFragment extends Fragment {
 
     public int getExtraIntFromBundle(String key, int defValue){
         Bundle nBundle = getBundle();
-        return nBundle.getInt(key, defValue);
+        if(nBundle != null){
+            return nBundle.getInt(key, defValue);
+        }
+        return defValue;
     }
 
     public long getExtraLongFromBundle(String key){
         Bundle nBundle = getBundle();
-        return nBundle.getLong(key);
+        if(nBundle != null){
+            return nBundle.getLong(key);
+        }
+        return 0;
     }
 
     public boolean getExtraBooleanFromBundle(String key, boolean def){
         Bundle nBundle = getBundle();
-        return nBundle.getBoolean(key, def);
+        if(nBundle != null){
+            return nBundle.getBoolean(key, def);
+        }
+        return def;
     }
 
     public boolean getExtraBooleanFromBundle(String key){
