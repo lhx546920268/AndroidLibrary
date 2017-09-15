@@ -355,13 +355,14 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
                         ///中间的添加两边间隔，旁边的添加一边间隔， 低于1px无法显示，所以只添加一边间隔
                         if(sectionInfo.itemSpace >= 2){
+                            int space = sectionInfo.itemSpace * (sectionInfo.numberOfColumns - 1) / sectionInfo.numberOfColumns;
                             if(onTheRight && !onTheLeft){
-                                left = sectionInfo.itemSpace / 2;
+                                left = space;
                             }else if(onTheLeft && !onTheRight){
-                                right = sectionInfo.itemSpace / 2;
+                                right = space;
                             }else if(!onTheLeft && !onTheRight){
-                                left = sectionInfo.itemSpace / 2;
-                                right = sectionInfo.itemSpace / 2;
+                                left = space / 2;
+                                right = space / 2;
                             }
                         }else {
                             ///如果不是最右的item，则添加间隔，否则添加section右边的偏移量
