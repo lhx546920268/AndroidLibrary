@@ -28,5 +28,6 @@ dependencies {
     compile 'com.android.support:support-v4:25.0.0'
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     compile 'com.just.agentweb:agentweb:1.2.6'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 

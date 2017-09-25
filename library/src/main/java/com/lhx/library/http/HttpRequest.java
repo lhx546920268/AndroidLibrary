@@ -161,21 +161,21 @@ public class HttpRequest {
         switch (errCode){
             case ERROR_CODE_NONE :
                 return "请求成功";
-            case ERROR_CODE_HTTP :
-                return String.valueOf(httpCode);
-            case ERROR_CODE_TIME_OUT :
-                return "请求超时";
-            case ERROR_CODE_BAD_URL :
-                return "URL不合法";
-            case ERROR_CODE_IO :
-                return "IO异常";
-            case ERROR_CODE_NETWORK :
-                return "网络状态不佳";
-            case ERROR_CODE_FILE_NOT_EXIST :
-                return "上传的文件不存在";
-            case ERROR_CODE_NOT_KNOW :
+//            case ERROR_CODE_HTTP :
+//                return String.valueOf(httpCode);
+//            case ERROR_CODE_TIME_OUT :
+//                return "请求超时";
+//            case ERROR_CODE_BAD_URL :
+//                return "URL不合法";
+//            case ERROR_CODE_IO :
+//                return "IO异常";
+//            case ERROR_CODE_NETWORK :
+//                return "网络状态不佳";
+//            case ERROR_CODE_FILE_NOT_EXIST :
+//                return "上传的文件不存在";
+//            case ERROR_CODE_NOT_KNOW :
                 default :
-                    return "未知错误";
+                    return "网络状态不佳";
         }
     }
 

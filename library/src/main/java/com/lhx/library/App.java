@@ -1,6 +1,7 @@
 package com.lhx.library;
 
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 
 /**
@@ -40,5 +41,11 @@ public class App {
     public static int LongButtonCornerRadius = 20;
 
     //web进度条颜色
-    public static int WebProgressColor = Color.parseColor("#007AFF");
+    public static @ColorInt int WebProgressColor = Color.parseColor("#007AFF");
+
+    //image 加载中的背景颜色
+    public static @ColorInt int ImagePlaceHolderColor = Color.WHITE;
+
+    public static @DrawableRes int ImagePlaceHolder = 0;
+    public static @DrawableRes int ImagePlaceHolderCircle = 0;
 }
