@@ -192,8 +192,8 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     //启动一个activity
-    public Intent startActivity(Class clazz) {
-        Intent intent = new Intent(this, clazz);
+    public Intent startActivity(Class activityClass) {
+        Intent intent = new Intent(this, activityClass);
         startActivity(intent);
         return intent;
     }

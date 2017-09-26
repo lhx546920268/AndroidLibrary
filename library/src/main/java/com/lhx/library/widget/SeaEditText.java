@@ -45,11 +45,12 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
     private void initialization(AttributeSet attrs) {
 
         if(attrs != null){
-//            TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.SeaEditText);
-//            int res = array.getResourceId(R.styleable.clear_icon, 0);
-//            if(res != 0){
-//                setClearDrawable(ContextCompat.getDrawable(getContext(), res));
-//            }
+            TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.SeaEditText);
+            int res = array.getResourceId(R.styleable.SeaEditText_clear_icon, 0);
+            if(res != 0){
+                setClearDrawable(ContextCompat.getDrawable(getContext(), res));
+            }
+            array.recycle();
         }
 
         addTextChangedListener(this);
