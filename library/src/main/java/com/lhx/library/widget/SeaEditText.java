@@ -54,12 +54,13 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
         }
 
         addTextChangedListener(this);
+        setOnFocusChangeListener(this);
     }
 
     public void setClearDrawable(Drawable clearDrawable) {
-        if(mClearDrawable != mClearDrawable){
+        if(clearDrawable != mClearDrawable){
             mClearDrawable = clearDrawable;
-            mClearDrawable.setBounds(0, 0, mClearDrawable.getMinimumWidth(), mClearDrawable.getMinimumHeight());
+            mClearDrawable.setBounds(0, 0, mClearDrawable.getIntrinsicWidth(), mClearDrawable.getIntrinsicHeight());
         }
     }
 
