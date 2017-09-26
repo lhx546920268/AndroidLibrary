@@ -1,5 +1,6 @@
 package com.lhx.library.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -183,7 +184,7 @@ public class AppBaseActivity extends AppCompatActivity {
         transaction.commitAllowingStateLoss();
     }
 
-    public static Intent getIntentWithFragment(Context context, Class fragmentClass) {
+    public static Intent getIntentWithFragment(Context context, Class<? extends AppBaseFragment> fragmentClass) {
 
         Intent intent = new Intent(context, AppBaseActivity.class);
         intent.putExtra(FRAGMENT_STRING, fragmentClass.getName());
@@ -192,7 +193,7 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     //启动一个activity
-    public Intent startActivity(Class activityClass) {
+    public Intent startActivity(Class<? extends Activity> activityClass) {
         Intent intent = new Intent(this, activityClass);
         startActivity(intent);
         return intent;

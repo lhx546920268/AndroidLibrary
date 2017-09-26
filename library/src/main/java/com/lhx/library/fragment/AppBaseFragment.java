@@ -287,19 +287,19 @@ public abstract class AppBaseFragment extends Fragment {
     }
 
     //启动一个带activity的fragment
-    public void startActivity(Class fragmentClass){
+    public void startActivity(Class<? extends AppBaseFragment> fragmentClass){
         startActivity(fragmentClass, null);
     }
 
-    public void startActivity(Class fragmentClass, Bundle bundle){
+    public void startActivity(Class<? extends AppBaseFragment> fragmentClass, Bundle bundle){
         startActivityForResult(fragmentClass, 0, bundle);
     }
 
-    public void startActivityForResult(Class fragmentClass, int requestCode){
+    public void startActivityForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode){
         startActivityForResult(fragmentClass, requestCode, null);
     }
 
-    public void startActivityForResult(Class fragmentClass, int requestCode, Bundle bundle){
+    public void startActivityForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode, Bundle bundle){
 
         Intent intent = AppBaseActivity.getIntentWithFragment(mContext, fragmentClass);
         if(bundle != null){
