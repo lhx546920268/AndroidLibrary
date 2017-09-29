@@ -130,6 +130,8 @@ public class CacheUtil {
     public static <T extends Object> T getObject(Context context, String key) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        key = AppUtil.getAppPackageName(context) + "." + key;
         String temp = prefs.getString(key, "");
 
         ByteArrayInputStream bais =  new ByteArrayInputStream(Base64.decode(temp.getBytes(), Base64.DEFAULT));

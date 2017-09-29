@@ -2,17 +2,9 @@ package com.lhx.library.http;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.support.annotation.CallSuper;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
 
-import com.lhx.library.dialog.LoadingDialog;
-import com.lhx.library.security.MD5;
-import com.lhx.library.util.DateUtil;
 import com.lhx.library.util.StringUtil;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,6 +53,11 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         }
     }
 
+    //是否正在执行
+    public boolean isExecuting(){
+        return mTask != null && mTask.isExecuting();
+    }
+
     //开始请求
     public void start(){
         onStart(this);
@@ -77,8 +74,10 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         String url = getRequestURL();
 
         ContentValues params = getParams();
+        Map<String, File> files = getFiles();
+        processParams(params, files);
 
-        mTask = new HttpAsyncTask(url, params , getFiles() ) {
+        mTask = new HttpAsyncTask(url, params , files) {
             @Override
             public void onConfigure(HttpRequest request) {
 

@@ -23,7 +23,9 @@
     <color name="light_gray">#d3d3d3</color>
     <!--超级浅灰色-->
     <color name="super_light_gray">#f0f0f0</color>
-    
+    <!--深灰色-->
+    <color name="dark_gray_color">#868686</color>
+
     <color name="light_blue">#ff007aff</color>
 
     <!--分割线颜色-->
@@ -31,4 +33,8 @@
 
     <!--fragment背景-->
     <color name="fragment_gray_background">#f0f0f0</color>
+
+    <!--editText hint color-->
+    <color name="hint_color">#c7c7cd</color>
+
 </resources>

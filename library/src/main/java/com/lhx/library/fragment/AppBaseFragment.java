@@ -321,7 +321,6 @@ public abstract class AppBaseFragment extends Fragment {
 
     ///重新载入页面 子类按需重写
     protected void onReloadPage(){
-
     }
 
     public void setPageLoading(boolean pageLoading){
@@ -346,12 +345,18 @@ public abstract class AppBaseFragment extends Fragment {
                 TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
                 textView.setText(loadingText);
 
+                onPageLoadingViewShow(mPageLoadingView);
+
                 mContentContainer.addView(mPageLoadingView);
             }else if(mPageLoadingView != null){
                 mContentContainer.removeView(mPageLoadingView);
                 mPageLoadingView = null;
             }
         }
+    }
+
+    public void onPageLoadingViewShow(View pageLoadingView){
+
     }
 
     public boolean isPageLoading(){
@@ -392,6 +397,9 @@ public abstract class AppBaseFragment extends Fragment {
 
                 textView = (TextView)mPageLoadFailView.findViewById(R.id.subtitle);
                 textView.setText(subtitle);
+
+                onPageLoadFailShow(mPageLoadFailView);
+
                 mContentContainer.addView(mPageLoadFailView);
 
             }else if(mPageLoadFailView != null) {
@@ -399,6 +407,10 @@ public abstract class AppBaseFragment extends Fragment {
                 mPageLoadFailView = null;
             }
         }
+    }
+
+    public void onPageLoadFailShow(View pageLoadFailView){
+
     }
 
     public boolean isPageLoadFail(){

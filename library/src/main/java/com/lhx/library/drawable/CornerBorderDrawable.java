@@ -154,8 +154,7 @@ public class CornerBorderDrawable extends Drawable {
             path.lineTo(bounds.left, bounds.bottom - mLeftBottomCornerRadius);
             if(mLeftBottomCornerRadius > 0){
                 path.arcTo(new RectF(bounds.left, bounds.bottom - mLeftBottomCornerRadius * 2, bounds.left +
-                        mLeftBottomCornerRadius * 2,
-                        bounds.bottom), 180, -90, false);
+                        mLeftBottomCornerRadius * 2, bounds.bottom), 180, -90, false);
             }
 
             path.lineTo(bounds.right - mRightBottomCornerRadius, bounds.bottom);

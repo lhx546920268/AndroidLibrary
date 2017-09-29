@@ -76,6 +76,7 @@ public class TabLayout extends FrameLayout {
 
     ///内容宽度
     private int mContentWidth;
+    private int mContentHeight;
 
     ///回调
     private Set<OnTabSelectedListener> mOnTabSelectedListeners = new HashSet<>();
@@ -332,12 +333,21 @@ public class TabLayout extends FrameLayout {
         }
     }
 
+
+    public void setStyle(int style) {
+        if(mStyle != style){
+            mStyle = style;
+            reloadData();
+        }
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         ///宽度改变时刷新数据
         int width = getMeasuredWidth();
+        mContentHeight = getMeasuredHeight();
         if (width != mContentWidth) {
             mContentWidth = width;
             reloadData();
@@ -498,6 +508,9 @@ public class TabLayout extends FrameLayout {
 
         boolean scroll = scrollToVisibleRect();
         mAnimating = animated && !scroll;
+        if(!scroll){
+            mRecyclerView.scrollToPosition(mSelectedPosition);
+        }
 
         if (mRecyclerView.getChildCount() > 0) {
 
@@ -677,6 +690,7 @@ public class TabLayout extends FrameLayout {
 
             final ViewHolder holder = new ViewHolder(Tab);
 
+            mLinearLayoutManager.generateDefaultLayoutParams();
             RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
             Tab.setLayoutParams(layoutParams);
@@ -778,6 +792,8 @@ public class TabLayout extends FrameLayout {
         public Tab(Context context) {
             super(context);
 
+
+
             mTextView = new TextView(context);
             mTextView.setLines(1);
             mTextView.setPadding(SizeUtil.pxFormDip(5, context), 0, SizeUtil.pxFormDip(5, context), 0);
@@ -806,6 +822,7 @@ public class TabLayout extends FrameLayout {
 
             RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) getLayoutParams();
             layoutParams.width = info.mTabWidth;
+            layoutParams.height = mContentHeight;
             setLayoutParams(layoutParams);
         }
 
