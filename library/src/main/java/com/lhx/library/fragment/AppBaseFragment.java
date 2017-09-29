@@ -452,6 +452,21 @@ public abstract class AppBaseFragment extends Fragment {
         mContentContainer.addView(mEmptyView);
     }
 
+    /**隐藏空视图
+     */
+    public void showEmptyView(boolean show,String text){
+
+        if (show){
+
+            setShowEmptyView(text);
+        }
+        else {
+
+            if (mEmptyView != null){
+                mContentContainer.removeView(mEmptyView);
+            }
+        }
+    }
     //设置底部视图
     public void setBottomView(View bottomView){
         setBottomView(bottomView, ViewGroup.LayoutParams.WRAP_CONTENT);
