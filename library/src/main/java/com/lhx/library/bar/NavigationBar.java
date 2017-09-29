@@ -136,6 +136,11 @@ public class NavigationBar extends RelativeLayout {
         return "";
     }
 
+    public TextView getTitleTextView(){
+
+        return title_textView;
+    }
+
     ///设置阴影颜色
     public void  setShadowColor(@ColorInt int shadowColor){
 

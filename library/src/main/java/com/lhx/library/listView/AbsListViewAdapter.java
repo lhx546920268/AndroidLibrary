@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.lhx.library.R;
 import com.lhx.library.loadmore.LoadMoreControl;
@@ -64,6 +66,18 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             mLoadMoreControl.setLoadMoreControlHandler(this);
         }
         return mLoadMoreControl;
+    }
+
+    //获取空视图ImageView
+    public ImageView getEmptyImageView(){
+        View view = getEmptyView();
+        return (ImageView)view.findViewById(R.id.icon);
+    }
+
+    //获取空视图textView
+    public TextView getEmptyTextView(){
+        View view = getEmptyView();
+        return (TextView) view.findViewById(R.id.text);
     }
 
     public View getEmptyView() {

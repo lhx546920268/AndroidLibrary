@@ -5,12 +5,28 @@
     android:background="@color/super_light_gray">
 
     <!--通用空视图-->
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/gray"
-        android:text="没有数据"
         android:layout_gravity="center"
-        android:textSize="17sp"
-        android:id="@+id/text"/>
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/icon"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:text="没有数据"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="17sp"
+            android:id="@+id/text"/>
+
+    </LinearLayout>
 </FrameLayout>

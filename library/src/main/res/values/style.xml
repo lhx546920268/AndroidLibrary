@@ -22,6 +22,11 @@
         <item name="android:windowExitAnimation">@anim/action_sheet_exit</item>
     </style>
 
+    <style name="pop_push_animate" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/right_to_left</item>
+        <item name="android:windowExitAnimation">@anim/left_to_right</item>
+    </style>
+
     <!--listView-->
 
     <style name="listview">

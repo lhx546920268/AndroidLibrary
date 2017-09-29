@@ -2,6 +2,7 @@ package com.lhx.library.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -55,6 +56,7 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
 
         addTextChangedListener(this);
         setOnFocusChangeListener(this);
+        setHintTextColor(ContextCompat.getColor(getContext(), R.color.hint_color));
     }
 
     public void setClearDrawable(Drawable clearDrawable) {
@@ -108,6 +110,12 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
             }
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+
     }
 
     /**

@@ -167,6 +167,33 @@ public class StringUtil {
         return layout.getHeight();
     }
 
+    /**
+     * 判断是否为纯字母
+     */
+    public static boolean isAlpha(String str){
+        if(TextUtils.isEmpty(str))
+            return false;
+        return Pattern.compile("^[A-Za-z]+$").matcher(str).matches();
+    }
+
+    /**
+     * 判断是否为字母或数字组合
+     */
+    public static boolean isAlphaNumber(String str){
+
+        if(TextUtils.isEmpty(str))
+            return false;
+        return Pattern.compile("^[A-Za-z0-9]+$").matcher(str).matches();
+    }
+
+    /**
+     * 判断是否为纯数字
+     */
+    public static boolean isNumber(String str){
+        if(TextUtils.isEmpty(str))
+            return false;
+        return Pattern.compile("^[0-9]+$").matcher(str).matches();
+    }
 
     /**
      * 判断是否为手机号
