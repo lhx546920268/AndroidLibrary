@@ -203,9 +203,9 @@ public class StringUtil {
      */
     public static boolean isMoile(String mobile) {
 
-        if (TextUtils.isEmpty(mobile))
+        if (TextUtils.isEmpty(mobile) || mobile.length() != 11)
             return false;
-        return Pattern.compile("^1[3|4|5|7|8][0-9]\\d{8}$").matcher(mobile).matches();
+        return Pattern.compile("^1[3|4|5|7|8]\\d{9}$").matcher(mobile).matches();
     }
 
     /**
