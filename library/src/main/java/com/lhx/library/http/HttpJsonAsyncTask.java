@@ -2,6 +2,7 @@ package com.lhx.library.http;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.lhx.library.util.StringUtil;
 
@@ -96,7 +97,7 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         try {
             JSONObject object = new JSONObject(string);
             if(resultFromJSONObject(object)){
-                onSuccess(this, object);
+                onSuccess(this, processResult(object));
             }else {
                 onFail(this);
             }
@@ -132,6 +133,11 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
     //处理参数 比如签名
     public void processParams(ContentValues values, Map<String, File> files){
 
+    }
+
+    //处理请求结果
+    public @NonNull JSONObject processResult(JSONObject result){
+        return result;
     }
 
     //请求路径

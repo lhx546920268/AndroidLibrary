@@ -1,23 +1,12 @@
 package com.lhx.library.widget;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,15 +17,8 @@ import android.widget.TextView;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
-import com.lhx.library.activity.ActivityStack;
-import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
-import com.lhx.library.dialog.LoadingDialog;
-import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.util.SizeUtil;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * 基础视图容器
@@ -64,10 +46,6 @@ public class AppBaseContainer extends LinearLayout {
     private boolean mPageLoadFail = false;
     private View mPageLoadFailView;
 
-    ///显示加载菊花
-    private boolean mLoading = false;
-    private LoadingDialog mLoadingDialog;
-
     //显示空视图信息
     private View mEmptyView;
 
@@ -76,6 +54,9 @@ public class AppBaseContainer extends LinearLayout {
 
     //添加固定在顶部的视图
     private View mTopView;
+
+    //事件回调
+    public OnEventHandler mOnEventHandler;
 
     public AppBaseContainer(Context context) {
         this(context, null);
@@ -95,36 +76,44 @@ public class AppBaseContainer extends LinearLayout {
     //初始化
     private void initialize(){
 
+        setOrientation(LinearLayout.VERTICAL);
         setBackgroundColor(Color.WHITE);
-
-        ///创建导航栏
-        if(showNavigationBar())
-        {
-            mNavigationBar = new NavigationBar(mContext);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
-                    .MATCH_PARENT, SizeUtil.pxFormDip(App.NavigationBarHeightDip, getContext()));
-            addView(mNavigationBar, 0, layoutParams);
-        }
 
         mContentContainer = new RelativeLayout(mContext);
         mContentContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-
-        mContentView.setId(R.id.app_base_fragment_content_id);
-        if(mContentView.getLayoutParams() == null){
-
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT);
-            mContentView.setLayoutParams(layoutParams);
-        }
-
-
-        mContentContainer.addView(mContentView, 0);
+        addView(mContentContainer);
     }
 
-    ///是否需要显示导航栏
-    public boolean showNavigationBar(){
-        return true;
+    public OnEventHandler getOnEventHandler() {
+        return mOnEventHandler;
+    }
+
+    public void setOnEventHandler(OnEventHandler onEventHandler) {
+        mOnEventHandler = onEventHandler;
+    }
+
+    ///设置是否需要显示导航栏
+    public void setShowNavigationBar(boolean show){
+        if(show){
+            ///创建导航栏
+            if(mNavigationBar == null){
+                mNavigationBar = new NavigationBar(mContext);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
+                        .MATCH_PARENT, SizeUtil.pxFormDip(App.NavigationBarHeightDip, getContext()));
+                addView(mNavigationBar, 0, layoutParams);
+            }
+
+            mNavigationBar.setVisibility(VISIBLE);
+        }else {
+            if(mNavigationBar != null){
+                mNavigationBar.setVisibility(GONE);
+            }
+        }
+    }
+
+    public boolean isNavigationBarShowing(){
+        return mNavigationBar != null && mNavigationBar.getVisibility() == VISIBLE;
     }
 
     ///获取内容视图
@@ -137,10 +126,55 @@ public class AppBaseContainer extends LinearLayout {
             throw new RuntimeException(this.getClass().getName() + "contentView 已经设置");
         }
         mContentView = contentView;
+
+        mContentView.setId(R.id.app_base_fragment_content_id);
+        if(mContentView.getLayoutParams() == null){
+
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT);
+            mContentView.setLayoutParams(layoutParams);
+        }
+
+        mContentContainer.addView(mContentView, 0);
+
+        layoutChildViews();
     }
 
     public void setContentView(@LayoutRes int layoutResId){
         setContentView(LayoutInflater.from(mContext).inflate(layoutResId, mContentContainer, false));
+    }
+
+    ///获取子视图
+    public <T extends View> T sea_findViewById(int resId){
+        T view = (T)mContentView.findViewById(resId);
+        if(view == null && mBottomView != null){
+            view = (T)mBottomView.findViewById(resId);
+        }
+
+        if(view == null && mTopView != null){
+            view = (T)mTopView.findViewById(resId);
+        }
+
+        return view;
+    }
+
+    //重新布局子视图
+    private void layoutChildViews(){
+
+        if(mContentView != null){
+
+            if(mTopView != null){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+                params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
+                mContentView.setLayoutParams(params);
+            }
+
+            if(mBottomView != null){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+                params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
+                mContentView.setLayoutParams(params);
+            }
+        }
     }
 
     //显示返回按钮
@@ -152,7 +186,9 @@ public class AppBaseContainer extends LinearLayout {
                 textView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-
+                        if(mOnEventHandler != null){
+                            mOnEventHandler.onBack();
+                        }
                     }
                 });
             }
@@ -181,11 +217,6 @@ public class AppBaseContainer extends LinearLayout {
     public RelativeLayout getContentContainer(){
         return mContentContainer;
     }
-    
-
-    ///重新载入页面 子类按需重写
-    protected void onReloadPage(){
-    }
 
     public void setPageLoading(boolean pageLoading){
         setPageLoading(pageLoading, pageLoading ? "正在载入..." : null);
@@ -209,7 +240,10 @@ public class AppBaseContainer extends LinearLayout {
                 TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
                 textView.setText(loadingText);
 
-                onPageLoadingViewShow(mPageLoadingView);
+                if(mOnEventHandler != null){
+                    mOnEventHandler.onPageLoadingShow(mPageLoadingView, (RelativeLayout.LayoutParams)
+                            mPageLoadingView.getLayoutParams());
+                }
 
                 mContentContainer.addView(mPageLoadingView);
             }else if(mPageLoadingView != null){
@@ -217,10 +251,6 @@ public class AppBaseContainer extends LinearLayout {
                 mPageLoadingView = null;
             }
         }
-    }
-
-    public void onPageLoadingViewShow(View pageLoadingView){
-
     }
 
     public boolean isPageLoading(){
@@ -238,94 +268,92 @@ public class AppBaseContainer extends LinearLayout {
      * @param title 标题
      * @param subtitle 副标题
      */
-    public void setPageLoadFail(boolean pageLoadFail, @DrawableRes int logoResId, String title, String subtitle){
-        if(mPageLoadFail != pageLoadFail){
+    public void setPageLoadFail(boolean pageLoadFail, @DrawableRes int logoResId, String title, String subtitle) {
+        if (mPageLoadFail != pageLoadFail) {
             mPageLoadFail = pageLoadFail;
 
-            if(mPageLoadFail){
+            if (mPageLoadFail) {
                 mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail,
                         mContentContainer, false);
                 mPageLoadFailView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
                         setPageLoadFail(false);
-                        onReloadPage();
+
+                        if (mOnEventHandler != null) {
+                            mOnEventHandler.onClickPageLoadFai();
+                        }
                     }
                 });
 
-                ImageView imageView = (ImageView)mPageLoadFailView.findViewById(R.id.logo);
+                ImageView imageView = (ImageView) mPageLoadFailView.findViewById(R.id.logo);
                 imageView.setImageResource(logoResId);
 
-                TextView textView = (TextView)mPageLoadFailView.findViewById(R.id.title);
+                TextView textView = (TextView) mPageLoadFailView.findViewById(R.id.title);
                 textView.setText(title);
 
-                textView = (TextView)mPageLoadFailView.findViewById(R.id.subtitle);
+                textView = (TextView) mPageLoadFailView.findViewById(R.id.subtitle);
                 textView.setText(subtitle);
 
-                onPageLoadFailShow(mPageLoadFailView);
+                if(mOnEventHandler != null){
+                    mOnEventHandler.onPageLoadFailShow(mPageLoadFailView, (RelativeLayout.LayoutParams)
+                            mPageLoadFailView.getLayoutParams());
+                }
 
                 mContentContainer.addView(mPageLoadFailView);
 
-            }else if(mPageLoadFailView != null) {
+            } else if (mPageLoadFailView != null) {
                 mContentContainer.removeView(mPageLoadFailView);
                 mPageLoadFailView = null;
             }
         }
     }
 
-    public void onPageLoadFailShow(View pageLoadFailView){
-
-    }
-
     public boolean isPageLoadFail(){
         return mPageLoadFail;
-    }
-
-    //显示加载菊花
-    public boolean isLoading() {
-        return mLoading;
-    }
-
-    public void setLoading(boolean loading) {
-        if(loading != mLoading){
-            mLoading = loading;
-            if(mLoading){
-                if(mLoadingDialog == null){
-                    mLoadingDialog = new LoadingDialog(mContext);
-                }
-
-                mLoadingDialog.show();
-            }else {
-                mLoadingDialog.dismiss();
-                mLoadingDialog = null;
-            }
-        }
     }
 
     /**
      * 设置显示空视图
      * @param text 显示的信息
+     * @param iconRes 图标logo
      */
-    public void setShowEmptyView(String text){
+    public void setShowEmptyView(boolean show, String text, @DrawableRes int iconRes){
 
-        if(mEmptyView == null){
-            mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, mContentContainer, false);
+        if(show){
+            if(mEmptyView == null){
+                mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, mContentContainer, false);
+            }
+
+            if(!TextUtils.isEmpty(text)){
+                TextView textView = (TextView)mEmptyView.findViewById(R.id.text);
+                textView.setText(text);
+            }
+
+            if(iconRes != 0){
+                ImageView imageView = (ImageView)mEmptyView.findViewById(R.id.icon);
+                imageView.setImageResource(iconRes);
+            }
+
+            if(isPageLoading()){
+                setPageLoading(false);
+            }
+
+            if(isPageLoadFail()){
+                setPageLoadFail(false);
+            }
+
+            if(mOnEventHandler != null){
+                mOnEventHandler.onShowEmptyView(mEmptyView, (RelativeLayout.LayoutParams)mEmptyView.getLayoutParams());
+            }
+
+            mContentContainer.addView(mEmptyView);
+        }else {
+            if(mEmptyView != null){
+                mContentContainer.removeView(mEmptyView);
+                mEmptyView = null;
+            }
         }
-
-        if(!TextUtils.isEmpty(text)){
-            TextView textView = (TextView)mEmptyView.findViewById(R.id.text);
-            textView.setText(text);
-        }
-
-        if(isPageLoading()){
-            setPageLoading(false);
-        }
-
-        if(isPageLoadFail()){
-            setPageLoadFail(false);
-        }
-
-        mContentContainer.addView(mEmptyView);
     }
 
     //设置底部视图
@@ -350,7 +378,7 @@ public class AppBaseContainer extends LinearLayout {
                 params = (RelativeLayout.LayoutParams)mBottomView.getLayoutParams();
             }else {
                 params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                        height);
             }
 
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -366,9 +394,7 @@ public class AppBaseContainer extends LinearLayout {
                 mContentContainer.addView(mBottomView);
             }
 
-            params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
-            params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
-            mContentView.setLayoutParams(params);
+            layoutChildViews();
         }
     }
 
@@ -403,8 +429,7 @@ public class AppBaseContainer extends LinearLayout {
                     .LayoutParams){
                 params = (RelativeLayout.LayoutParams)mTopView.getLayoutParams();
             }else {
-                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        height);
+                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
             }
 
             params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -420,19 +445,53 @@ public class AppBaseContainer extends LinearLayout {
                 mContentContainer.addView(mTopView);
             }
 
-            params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
-            params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
-            mContentView.setLayoutParams(params);
+            layoutChildViews();
         }
     }
 
     public void setTopView(@LayoutRes int res){
         if(res != 0){
-            setTopView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false), 0);
+            setTopView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false), ViewGroup.LayoutParams.WRAP_CONTENT);
         }
     }
 
     public View getTopView() {
         return mTopView;
+    }
+
+
+    //事件回调
+    public interface OnEventHandler{
+
+        /**
+         * 点击页面加载失败视图
+         */
+        void onClickPageLoadFai();
+
+        /**
+         * 点击返回按钮
+         */
+        void onBack();
+
+        /**
+         * 页面加载视图显示
+         * @param pageLoadingView 页面加载视图
+         * @param params 页面加载视图布局参数
+         */
+        void onPageLoadingShow(View pageLoadingView, RelativeLayout.LayoutParams params);
+
+        /**
+         * 页面加载失败视图显示
+         * @param pageLoadFailView 页面加载失败视图
+         * @param params 布局参数
+         */
+        void onPageLoadFailShow(View pageLoadFailView, RelativeLayout.LayoutParams params);
+
+        /**
+         * 空视图显示
+         * @param emptyView 空视图
+         * @param params 布局参数
+         */
+        void onShowEmptyView(View emptyView, RelativeLayout.LayoutParams params);
     }
 }

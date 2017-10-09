@@ -9,47 +9,41 @@ import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lhx.library.R;
+import com.lhx.library.widget.AppBaseContainer;
 import com.lhx.library.widget.OnSingleClickListener;
 
 /**
  * 基础dailog
  */
 
-public abstract class BaseDialog extends Dialog {
+public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEventHandler{
 
     protected Context mContext;
 
     //容器
-    private FrameLayout mContainer;
+    private AppBaseContainer mContainer;
 
-    //内容
-    private View mContentView;
-
-    ///页面是否正在载入
-    private boolean mPageLoading = false;
-    private View mPageLoadingView;
-
-    ///页面是否载入失败
-    private boolean mPageLoadFail = false;
-    private View mPageLoadFailView;
+    public AppBaseContainer getContainer() {
+        return mContainer;
+    }
 
     public BaseDialog(@NonNull Context context) {
         super(context, R.style.Theme_dialog_noTitle_noBackground);
         mContext = context;
-        initialization();
+        initialize();
     }
 
     //初始化
-    private void initialization(){
+    private void initialize(){
 
-        mContainer = new FrameLayout(mContext);
-        mContentView = getContentView();
-        mContentView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        mContainer.addView(mContentView);
+        mContainer = new AppBaseContainer(mContext);
+        mContainer.setShowNavigationBar(showNavigationBar());
+        mContainer.setContentView(getContentView());
+        mContainer.setOnEventHandler(this);
 
         setContentView(mContainer);
     }
@@ -74,8 +68,7 @@ public abstract class BaseDialog extends Dialog {
     }
 
     public void setPageLoading(boolean pageLoading){
-        setPageLoading(pageLoading, pageLoading ? mContext.getString(R.string
-                .common_page_loading_text) : null);
+        mContainer.setPageLoading(pageLoading);
     }
 
     /**
@@ -84,33 +77,12 @@ public abstract class BaseDialog extends Dialog {
      * @param loadingText 载入文字
      */
     public void setPageLoading(boolean pageLoading, String loadingText){
-        if(mPageLoading != pageLoading){
-            mPageLoading = pageLoading;
-
-            if(mPageLoadFail){
-                setPageLoadFail(false);
-            }
-            if(mPageLoading){
-                mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading, mContainer, false);
-                TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
-                textView.setText(loadingText);
-
-                onPageLoadingViewShow(mPageLoadingView);
-
-                mContainer.addView(mPageLoadingView);
-            }else if(mPageLoadingView != null){
-                mContainer.removeView(mPageLoadingView);
-                mPageLoadingView = null;
-            }
-        }
+        mContainer.setPageLoading(pageLoading, loadingText);
     }
 
-    public void onPageLoadingViewShow(View pageLoadingView){
-
-    }
 
     public void setPageLoadFail(boolean pageLoadFail){
-        setPageLoadFail(pageLoadFail, 0, "加载失败", "轻触屏幕重新加载");
+        mContainer.setPageLoadFail(pageLoadFail);
     }
 
     /**
@@ -121,41 +93,7 @@ public abstract class BaseDialog extends Dialog {
      * @param subtitle 副标题
      */
     public void setPageLoadFail(boolean pageLoadFail, @DrawableRes int logoResId, String title, String subtitle){
-        if(mPageLoadFail != pageLoadFail){
-            mPageLoadFail = pageLoadFail;
-
-            if(mPageLoadFail){
-                mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail, mContainer, false);
-                mPageLoadFailView.setOnClickListener(new OnSingleClickListener() {
-                    @Override
-                    public void onSingleClick(View v) {
-                        setPageLoadFail(false);
-                        onReloadPage();
-                    }
-                });
-
-                ImageView imageView = (ImageView)mPageLoadFailView.findViewById(R.id.logo);
-                imageView.setImageResource(logoResId);
-
-                TextView textView = (TextView)mPageLoadFailView.findViewById(R.id.title);
-                textView.setText(title);
-
-                textView = (TextView)mPageLoadFailView.findViewById(R.id.subtitle);
-                textView.setText(subtitle);
-
-                onPageLoadFailShow(mPageLoadFailView);
-
-                mContainer.addView(mPageLoadFailView);
-
-            }else if(mPageLoadFailView != null) {
-                mContainer.removeView(mPageLoadFailView);
-                mPageLoadFailView = null;
-            }
-        }
-    }
-
-    public void onPageLoadFailShow(View pageLoadFailView){
-
+        mContainer.setPageLoadFail(pageLoadFail, logoResId, title, subtitle);
     }
 
     ///重新加载
@@ -163,7 +101,69 @@ public abstract class BaseDialog extends Dialog {
 
     }
 
+    /**
+     * 点击页面加载失败视图
+     */
+    @Override
+    public void onClickPageLoadFai() {
+        onReloadPage();
+    }
+
+    /**
+     * 点击返回按钮
+     */
+    @Override
+    public void onBack() {
+        dismiss();
+    }
+
+    /**
+     * 页面加载视图显示
+     *
+     * @param pageLoadingView 页面加载视图
+     * @param params          页面加载视图布局参数
+     */
+    @Override
+    public void onPageLoadingShow(View pageLoadingView, RelativeLayout.LayoutParams params) {
+
+    }
+
+    /**
+     * 页面加载失败视图显示
+     *
+     * @param pageLoadFailView 页面加载失败视图
+     * @param params           布局参数
+     */
+    @Override
+    public void onPageLoadFailShow(View pageLoadFailView, RelativeLayout.LayoutParams params) {
+
+    }
+
+    /**
+     * 空视图显示
+     *
+     * @param emptyView 空视图
+     * @param params    布局参数
+     */
+    @Override
+    public void onShowEmptyView(View emptyView, RelativeLayout.LayoutParams params) {
+
+    }
+
+    /**
+     * 配置弹窗信息
+     * @param window 弹窗
+     */
     public abstract void onConfigure(Window window);
 
+    /**
+     * 获取内容视图
+     * @return 内容视图
+     */
     public abstract @NonNull View getContentView();
+
+    /**
+     * 是否显示导航栏
+     */
+    public abstract boolean showNavigationBar();
 }
