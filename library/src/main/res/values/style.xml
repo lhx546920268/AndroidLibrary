@@ -22,9 +22,16 @@
         <item name="android:windowExitAnimation">@anim/action_sheet_exit</item>
     </style>
 
+    <!--pop to push动画-->
     <style name="pop_push_animate" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/right_to_left</item>
         <item name="android:windowExitAnimation">@anim/left_to_right</item>
+    </style>
+    
+    <!--垂直展开收缩动画-->
+    <style name="vertical_expension_animate" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/zero_to_full_vertical</item>
+        <item name="android:windowExitAnimation">@anim/full_to_zero_vertical</item>
     </style>
 
     <!--listView-->

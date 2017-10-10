@@ -4,17 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.lhx.library.R;
 import com.lhx.library.widget.AppBaseContainer;
-import com.lhx.library.widget.OnSingleClickListener;
 
 /**
  * 基础dailog

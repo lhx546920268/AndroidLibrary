@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set android:duration="200" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--从右到左偏移-->
-    <translate android:fromXDelta="100%" android:toXDelta="0%"/>
+    <!--垂直从满到0-->
+    <scale android:fromXScale="100%" android:toYScale="0%"/>
 </set>

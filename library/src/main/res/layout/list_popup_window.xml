@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@color/translucent_black">
+
+    <!--弹窗列表-->
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listview"
+        android:overScrollMode="never"
+        android:background="#ededed"
+        android:id="@+id/list_view"/>
+</FrameLayout>
