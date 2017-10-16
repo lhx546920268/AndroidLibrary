@@ -11,10 +11,10 @@ import android.widget.RelativeLayout;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
+import com.lhx.library.refresh.DefaultPtrFrameLayout;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.BackToTopButton;
 
-import in.srain.cube.views.ptr.PtrClassicFrameLayout;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
@@ -29,7 +29,7 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     protected int mCurPage;
 
     //下拉刷新控件
-    protected PtrClassicFrameLayout mRefreshLayout;
+    protected DefaultPtrFrameLayout mRefreshLayout;
 
     //回到顶部按钮
     private BackToTopButton mBackToTopButton;

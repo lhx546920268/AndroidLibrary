@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,7 @@ import java.util.List;
  * 带有下拉菜单的tab
  */
 
-public class TabDropDownLayout extends FrameLayout {
+public class DropDownTabLayout extends FrameLayout implements View.OnClickListener {
 
     //未选中
     public static final int NO_POSITION = -1;
@@ -51,6 +50,9 @@ public class TabDropDownLayout extends FrameLayout {
 
     //当前选中的按钮
     private int mSelectedPosition = NO_POSITION;
+
+    //以前选中的
+    private int mPreviousPosition = NO_POSITION;
 
     //当下拉列表消失时是否保持选中状态
     private boolean mKeepSelectedAfterDismissList = true;
@@ -88,16 +90,18 @@ public class TabDropDownLayout extends FrameLayout {
     ///分割线颜色
     private @ColorInt int mDividerColor;
 
+    //
+    private OnDropDownTapSelectedListener mOnDropDownTapSelectedListener;
 
-    public TabDropDownLayout(@NonNull Context context) {
+    public DropDownTabLayout(@NonNull Context context) {
         this(context, null);
     }
 
-    public TabDropDownLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public DropDownTabLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TabDropDownLayout(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
+    public DropDownTabLayout(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
         initialize();
@@ -150,14 +154,14 @@ public class TabDropDownLayout extends FrameLayout {
 
         //复用以前创建的tab
         for(int i = 0; i < count;i ++){
-            Tab tab = getTab(i);
-            setTabForTabInfo(tab, mTabInfos.get(i));
+            setTab(i);
         }
 
         if(childCount < mTabInfos.size()){
             //需要创建更多tab
             for(int i = childCount;i < mTabInfos.size();i ++){
-                setTabForTabInfo(createTab(), mTabInfos.get(i));
+                createTab();
+                setTab(i);
             }
         }else if(childCount > mTabInfos.size()) {
             //删除多余的tab
@@ -177,13 +181,47 @@ public class TabDropDownLayout extends FrameLayout {
         Tab tab = new Tab(mContext);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
         params.weight = 1;
+        tab.setOnClickListener(this);
         tab.setLayoutParams(params);
         mTabContainer.addView(tab);
         return tab;
     }
 
     //设置tab
-    private void setTabForTabInfo(Tab tab, TabInfo tabInfo){
+    private void setTab(int position){
+        TabInfo tabInfo = mTabInfos.get(position);
+
+        Tab tab = (Tab)mTabContainer.getChildAt(position);
+        tab.mTextView.setText(tabInfo.getDisplayTitle());
+
+        setTabSelected(position);
+
+        tab.mDivider.setBackgroundColor(mDividerColor);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)tab.mDivider.getLayoutParams();
+        params.width = mDividerWidth;
+        params.height = mDivierHeight;
+
+        tab.mPosition = position;
+    }
+
+    //设置选中
+    private void setTabSelected(int position){
+
+        boolean selected = mSelectedPosition == position && mShouldSelected;
+
+        TabInfo tabInfo = mTabInfos.get(position);
+
+        Tab tab = (Tab)mTabContainer.getChildAt(position);
+        tab.mTextView.setTextColor(selected ? mSelectedTextColor : mNormalTextColor);
+        tab.mTextView.setTextSize(selected ? mSelectedTextSize : mNormalTextSize);
+
+        tab.mTextView.setCompoundDrawables(null, null, tabInfo.getDisplayIcon(selected), null);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        Tab tab = (Tab)v;
 
     }
 
@@ -267,6 +305,10 @@ public class TabDropDownLayout extends FrameLayout {
         mBottomSeparator.setVisibility(display ? VISIBLE : GONE);
     }
 
+    public void setOnDropDownTapSelectedListener(OnDropDownTapSelectedListener listener) {
+        mOnDropDownTapSelectedListener = listener;
+    }
+
     //菜单 tab
     private static class Tab extends FrameLayout{
 
@@ -276,6 +318,8 @@ public class TabDropDownLayout extends FrameLayout {
         //分割线
         View mDivider;
 
+        //位置
+        int mPosition;
 
         public Tab(@NonNull Context context) {
             this(context, null);
@@ -336,5 +380,57 @@ public class TabDropDownLayout extends FrameLayout {
 
         //按钮右边图标 (高亮 如果不为null，点击的时候与 rightSelectedIcon1 来回切换
         public Drawable rightSelectedIcon2;
+
+        //当前显示的drawable
+        public Drawable displayRightIcon;
+
+        //获取要显示的标题
+        public String getDisplayTitle() {
+            if(infos != null && selectedPosition >= 0 && selectedPosition < infos.size()){
+                ListInfo listInfo = infos.get(selectedPosition);
+                return listInfo.title;
+            }
+            return title;
+        }
+
+        //获取要显示的图标
+        public Drawable getDisplayIcon(boolean selected){
+
+            Drawable drawable = rightNormalIcon;
+            if(selected){
+                if(rightSelectedIcon1 != null && rightSelectedIcon2 != null){
+                    if(displayRightIcon == rightSelectedIcon1){
+                        drawable = rightSelectedIcon2;
+                    }else {
+                        drawable = rightSelectedIcon1;
+                    }
+                }else if(rightSelectedIcon1 != null){
+                    drawable = rightSelectedIcon1;
+                }
+            }
+
+            if(drawable != null){
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            }
+
+            displayRightIcon = drawable;
+            return drawable;
+        }
+    }
+
+    //按钮点击回调
+    public interface OnDropDownTapSelectedListener{
+
+        //选择某个tab
+        void onDropDownTabSelected(TabInfo tabInfo, DropDownTabLayout tabLayout);
+
+        //取消选择某个tab
+        void onDropDownTabUnselected(TabInfo tabInfo, DropDownTabLayout tabLayout);
+
+        //重复选择某个tab
+        void onDropDownTabReselected(TabInfo tabInfo, DropDownTabLayout tabLayout);
+
+        //选择下拉菜单中的某个值
+        void onDropDownTabListItemSelected(TabInfo tabInfo, DropDownTabLayout tabLayout);
     }
 }

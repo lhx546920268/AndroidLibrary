@@ -443,6 +443,10 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         return mContext.getResources().getDimension(dimen);
     }
 
+    public int getDimensionPixelSize(@DimenRes int dimen){
+        return mContext.getResources().getDimensionPixelSize(dimen);
+    }
+
     //获取px
     public int pxFromDip(float dip){
         return SizeUtil.pxFormDip(dip, mContext);

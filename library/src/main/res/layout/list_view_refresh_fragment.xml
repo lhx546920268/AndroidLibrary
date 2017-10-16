@@ -4,7 +4,7 @@
               android:layout_height="match_parent">
 
     <!--有下拉刷新的listviw fragment-->
-    <in.srain.cube.views.ptr.PtrClassicFrameLayout
+    <com.lhx.library.refresh.DefaultPtrFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/ptr_layout">
@@ -15,6 +15,6 @@
             android:overScrollMode="never"
             style="@style/listview"
             android:id="@+id/list_view"/>
-    </in.srain.cube.views.ptr.PtrClassicFrameLayout>
+    </com.lhx.library.refresh.DefaultPtrFrameLayout>
 
 </FrameLayout>

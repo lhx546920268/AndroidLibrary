@@ -17,7 +17,17 @@ import com.lhx.library.R;
 public class ToastUtil {
 
     //当前显示的toast
-    public static Toast currentToast;
+    private static Toast currentToast;
+
+
+    //获取toast
+    public static Toast getToast(Context context){
+        close();
+        currentToast = new Toast(context);
+
+        return currentToast;
+    }
+
 
     //关闭上一个toast
     public static void close(){

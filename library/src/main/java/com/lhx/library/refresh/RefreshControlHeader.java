@@ -45,7 +45,7 @@ public class RefreshControlHeader implements RefreshUIHandler{
 
     @Override
     public void onReachCriticalPoint(RefreshControl refreshControl) {
-        mTextView.setText("释放刷新");
+        mTextView.setText("松开即可刷新");
         mProgressBar.setVisibility(View.GONE);
     }
 

@@ -5,7 +5,7 @@
 
     <!--可下拉刷新的recycerView-->
 
-    <in.srain.cube.views.ptr.PtrClassicFrameLayout
+    <com.lhx.library.refresh.DefaultPtrFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/ptr_layout">
@@ -15,5 +15,5 @@
             android:layout_height="match_parent"
             android:overScrollMode="never"
             android:id="@+id/recycler_view"/>
-    </in.srain.cube.views.ptr.PtrClassicFrameLayout>
+    </com.lhx.library.refresh.DefaultPtrFrameLayout>
 </FrameLayout>

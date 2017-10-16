@@ -166,8 +166,6 @@ public class ListPopupWindow extends BasePopupWindow {
         mNormalColor = Color.BLACK;
         mRowHeight = SizeUtil.pxFormDip(45, mContext);
 
-        setAnimationStyle(R.style.vertical_expension_animate);
-
         mAdapter = new ListPopupWindowAdapter(mContext);
         mListView.setAdapter(mAdapter);
 
@@ -198,7 +196,7 @@ public class ListPopupWindow extends BasePopupWindow {
         if(mInfos != null && mInfos.size() > 0){
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)mListView.getLayoutParams();
             if(mListMaxHeight != ViewGroup.LayoutParams.WRAP_CONTENT){
-                params.height = Math.min(SizeUtil.pxFormDip(mInfos.size() * 45, mContext), mListMaxHeight);
+                params.height = Math.min(mInfos.size() * mRowHeight, mListMaxHeight);
             }else {
                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             }
