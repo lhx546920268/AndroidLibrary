@@ -52,6 +52,17 @@ public class DateUtil {
     }
 
     /**
+     * 时间转成给定格式
+     * @param time 要转的时间字符串
+     * @param timeFormat 当前时间格式
+     * @param targetFromat 目标格式
+     * @return 格式化的时间
+     */
+    public static String formatTime(String time, String timeFormat, String targetFromat){
+        return formatDate(praseTime(time, timeFormat), targetFromat);
+    }
+
+    /**
      * 把时间戳转成给定格式
      * @param timestamp 要转的时间戳
      * @param targetFromat 目标格式

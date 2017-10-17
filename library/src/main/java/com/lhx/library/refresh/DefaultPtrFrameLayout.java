@@ -46,6 +46,7 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
 
         setHeaderView(mHeader);
         addPtrUIHandler(this);
+        setDurationToCloseHeader(2000);
     }
 
     @Override
@@ -56,8 +57,7 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
 
     @Override
     public void onUIRefreshPrepare(PtrFrameLayout frame) {
-        mTextView.setText("松开即可刷新");
-        mProgressBar.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -74,7 +74,16 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
 
     @Override
     public void onUIPositionChange(PtrFrameLayout frame, boolean isUnderTouch, byte status, PtrIndicator ptrIndicator) {
-        mProgressBar.setVisibility(View.GONE);
-        mTextView.setText("下拉刷新");
+
+        int offsetToRefresh = ptrIndicator.getOffsetToRefresh();
+        int offset = ptrIndicator.getCurrentPosY();
+
+        if(isUnderTouch && status == PtrFrameLayout.PTR_STATUS_PREPARE){
+            if(offset >= offsetToRefresh){
+                mTextView.setText("松开即可刷新");
+            }else {
+                mTextView.setText("下拉刷新");
+            }
+        }
     }
 }

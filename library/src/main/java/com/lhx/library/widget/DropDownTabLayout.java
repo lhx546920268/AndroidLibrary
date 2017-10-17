@@ -11,13 +11,16 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.lhx.library.R;
+import com.lhx.library.popupWindow.BasePopupWindow;
 import com.lhx.library.popupWindow.ListInfo;
 import com.lhx.library.popupWindow.ListPopupWindow;
 import com.lhx.library.util.SizeUtil;
@@ -41,6 +44,9 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
 
     //下拉列表
     private ListPopupWindow mListPopupWindow;
+
+    //下拉列表位置 空的时候为 this
+    private View mListAnchor;
 
     //按钮字体大小 sp
     private int mNormalTextSize, mSelectedTextSize;
@@ -85,13 +91,17 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
     private int mDividerWidth;
 
     //分割线高度
-    private int mDivierHeight;
+    private int mDividerHeight;
 
     ///分割线颜色
     private @ColorInt int mDividerColor;
 
-    //
+    //tab点击回调
     private OnDropDownTapSelectedListener mOnDropDownTapSelectedListener;
+
+    //UI回调
+    private OnDropDownTabUIHandler mOnDropDownTabUIHandler;
+
 
     public DropDownTabLayout(@NonNull Context context) {
         this(context, null);
@@ -107,6 +117,11 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         initialize();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
+    }
+
     //初始化
     private void initialize(){
 
@@ -116,7 +131,7 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         mSelectedTextColor = Color.RED;
 
         mDividerWidth = mContext.getResources().getDimensionPixelSize(R.dimen.divider_size);
-        mDivierHeight = SizeUtil.pxFormDip(15, mContext);
+        mDividerHeight = SizeUtil.pxFormDip(15, mContext);
         mDividerColor = ContextCompat.getColor(mContext, R.color.divider_color);
 
         mTabContainer = new LinearLayout(mContext);
@@ -125,6 +140,14 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams
                 .MATCH_PARENT);
         addView(mTabContainer, params);
+
+        mSelectedIndicator = new View(getContext());
+        mSelectedIndicator.setVisibility(INVISIBLE);
+        mSelectedIndicator.setBackgroundColor(mSelectedIndicatorColor);
+        params = new FrameLayout.LayoutParams(120, mSelectedIndicatorHeight);
+        params.gravity = Gravity.BOTTOM;
+        mSelectedIndicator.setLayoutParams(params);
+        addView(mSelectedIndicator);
     }
 
     public void setTabInfos(List<TabInfo> tabInfos) {
@@ -194,20 +217,28 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         Tab tab = (Tab)mTabContainer.getChildAt(position);
         tab.mTextView.setText(tabInfo.getDisplayTitle());
 
-        setTabSelected(position);
+        setTabSelected(position, mSelectedPosition == position);
 
         tab.mDivider.setBackgroundColor(mDividerColor);
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)tab.mDivider.getLayoutParams();
         params.width = mDividerWidth;
-        params.height = mDivierHeight;
+        params.height = mDividerHeight;
 
         tab.mPosition = position;
     }
 
-    //设置选中
-    private void setTabSelected(int position){
+    //取消讯中
+    public void deselectTab(){
+        setTabSelected(mSelectedPosition, false);
+        mSelectedPosition = NO_POSITION;
+    }
 
-        boolean selected = mSelectedPosition == position && mShouldSelected;
+    //设置选中
+    private void setTabSelected(int position, boolean selected){
+        if(!positionIsValid(position))
+            return;
+
+        selected = selected && mShouldSelected;
 
         TabInfo tabInfo = mTabInfos.get(position);
 
@@ -216,13 +247,145 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         tab.mTextView.setTextSize(selected ? mSelectedTextSize : mNormalTextSize);
 
         tab.mTextView.setCompoundDrawables(null, null, tabInfo.getDisplayIcon(selected), null);
+        tab.setBackgroundColor(selected ? tabInfo.selectedBackgroundColor : Color.TRANSPARENT);
     }
 
     @Override
     public void onClick(View v) {
 
         Tab tab = (Tab)v;
+        if(tab.mPosition != mSelectedPosition){
+            TabInfo tabInfo = mTabInfos.get(tab.mPosition);
 
+            boolean enable = true;
+            if(mOnDropDownTabUIHandler != null){
+                enable = mOnDropDownTabUIHandler.shouldSelectTab(tabInfo, this);
+            }
+
+            if(!enable)
+                return;
+
+            setTabSelected(mSelectedPosition, false);
+            mSelectedPosition = tabInfo.position;
+            setTabSelected(mSelectedPosition, true);
+
+            if(mOnDropDownTapSelectedListener != null){
+                mOnDropDownTapSelectedListener.onDropDownTabSelected(tabInfo, this);
+            }
+
+            if(tabInfo.showListEnable()){
+                boolean show = false;
+                if(mOnDropDownTabUIHandler != null){
+                    show = mOnDropDownTabUIHandler.shouldShowList(tabInfo, this);
+                }
+
+                if(show){
+                    showList();
+                }else {
+                    dismissList();
+                }
+            }else {
+                dismissList();
+            }
+        }else {
+            TabInfo tabInfo = mTabInfos.get(mSelectedPosition);
+            if(tabInfo.showListEnable()){
+
+                if(getListPopupWindow().isShowing()){
+                    dismissList();
+                }else {
+                    showList();
+                }
+            }else {
+                if(tabInfo.rightSelectedIcon2 != null){
+                    setTabSelected(tab.mPosition, true);
+                }else {
+                    dismissList();
+                }
+            }
+        }
+
+        updateIndicator();
+    }
+
+    //显示列表
+    public void showList(){
+        if(positionIsValid(mSelectedPosition)){
+            getListPopupWindow();
+
+            TabInfo tabInfo = mTabInfos.get(mSelectedPosition);
+            mListPopupWindow.setInfos(tabInfo.infos);
+
+            if(!mListPopupWindow.isShowing()){
+                mListPopupWindow.showAsDropDown(mListAnchor);
+            }
+        }
+    }
+
+    //关闭列表
+    public void dismissList(){
+
+        if(mListPopupWindow != null && mListPopupWindow.isShowing()){
+            mListPopupWindow.dismiss();
+        }
+    }
+
+    //更新下划线位置
+    private void updateIndicator(){
+        if(positionIsValid(mSelectedPosition)){
+
+            mSelectedIndicator.setVisibility(VISIBLE);
+            TabInfo tabInfo = mTabInfos.get(mSelectedPosition);
+
+        }else {
+            mSelectedIndicator.setVisibility(GONE);
+        }
+    }
+
+    //是否有效
+    private boolean positionIsValid(int position){
+        return mTabInfos != null && position >= 0 && position < mTabInfos.size();
+    }
+
+    public ListPopupWindow getListPopupWindow(){
+        if(mListPopupWindow == null){
+            mListPopupWindow = new ListPopupWindow(mContext);
+            mListPopupWindow.setOnItemClickListener(new ListPopupWindow.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position, ListInfo info) {
+
+                }
+            });
+            mListPopupWindow.setShouldDismissAfterSelect(true);
+            mListPopupWindow.setShouldDismissWhenTouchOutside(false);
+            mListPopupWindow.setNormalColor(mNormalTextColor);
+            mListPopupWindow.setSelectedColor(mSelectedTextColor);
+            mListPopupWindow.addOnDismissHandler(new BasePopupWindow.OnDismissHandler() {
+                @Override
+                public void onDismiss() {
+                    listDidDismiss();
+                }
+            });
+        }
+
+        return mListPopupWindow;
+    }
+
+    //弹窗消失处理
+    private void listDidDismiss(){
+        if(positionIsValid(mSelectedPosition)){
+            boolean keep = mKeepSelectedAfterDismissList;
+            if(mOnDropDownTabUIHandler != null){
+                keep = mOnDropDownTabUIHandler.shouldKeepSelectedAfterDismissList(mTabInfos.get(mSelectedPosition), this);
+            }
+            if(!keep){
+                TabInfo tabInfo = mTabInfos.get(mSelectedPosition);
+                deselectTab();
+                if(mOnDropDownTapSelectedListener != null){
+                    mOnDropDownTapSelectedListener.onDropDownTabUnselected(tabInfo, this);
+                }
+            }
+        }
     }
 
     public void setSelectedIndicatorColor(int selectedIndicatorColor) {
@@ -250,7 +413,7 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
     public void setSelectedIndicatorWidthPadding(int selectedIndicatorWidthPadding) {
         if(selectedIndicatorWidthPadding != mSelectedIndicatorWidthPadding){
             mSelectedIndicatorWidthPadding = selectedIndicatorWidthPadding;
-
+            updateIndicator();
         }
     }
 
@@ -263,9 +426,9 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         }
     }
 
-    public void setDivierHeight(int divierHeight) {
-        if(mDivierHeight != divierHeight){
-            mDivierHeight = divierHeight;
+    public void setDividerHeight(int dividerHeight) {
+        if(mDividerHeight != dividerHeight){
+            mDividerHeight = dividerHeight;
         }
     }
 
@@ -307,6 +470,17 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
 
     public void setOnDropDownTapSelectedListener(OnDropDownTapSelectedListener listener) {
         mOnDropDownTapSelectedListener = listener;
+    }
+
+    public void setListAnchor(View listAnchor) {
+        mListAnchor = listAnchor;
+        if(mListAnchor == null){
+            mListAnchor = this;
+        }
+    }
+
+    public void setOnDropDownTabUIHandler(OnDropDownTabUIHandler onDropDownTabUIHandler) {
+        mOnDropDownTabUIHandler = onDropDownTabUIHandler;
     }
 
     //菜单 tab
@@ -416,6 +590,11 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
             displayRightIcon = drawable;
             return drawable;
         }
+
+        //是否可以显示下拉列表
+        public boolean showListEnable(){
+            return infos != null && infos.size() > 0;
+        }
     }
 
     //按钮点击回调
@@ -427,10 +606,20 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         //取消选择某个tab
         void onDropDownTabUnselected(TabInfo tabInfo, DropDownTabLayout tabLayout);
 
-        //重复选择某个tab
-        void onDropDownTabReselected(TabInfo tabInfo, DropDownTabLayout tabLayout);
-
         //选择下拉菜单中的某个值
         void onDropDownTabListItemSelected(TabInfo tabInfo, DropDownTabLayout tabLayout);
+    }
+
+    //按钮UI回调
+    public interface OnDropDownTabUIHandler{
+
+        //选中一级菜单的时候是否需要显示下拉列表 default is 'false'，只有当选中的一级菜单是高亮状态的时候才显示下拉
+        boolean shouldShowList(TabInfo tabInfo, DropDownTabLayout tabLayout);
+
+        //是否可以选中某个一级菜单
+        boolean shouldSelectTab(TabInfo tabInfo, DropDownTabLayout tabLayout);
+
+        //是否保持选中 当列表关闭时
+        boolean shouldKeepSelectedAfterDismissList(TabInfo tabInfo, DropDownTabLayout tabLayout);
     }
 }
