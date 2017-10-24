@@ -33,6 +33,8 @@ public class DialogUtil {
     public static void showLoadingDialog(Context context, boolean cancelable, DialogInterface.OnCancelListener
             onCancelListener) {
 
+        if(mLoadingDialog != null && mLoadingDialog.isShowing())
+            return;
         mLoadingDialog = new LoadingDialog(context);
         mLoadingDialog.setCancelable(cancelable);
         mLoadingDialog.setCanceledOnTouchOutside(cancelable);

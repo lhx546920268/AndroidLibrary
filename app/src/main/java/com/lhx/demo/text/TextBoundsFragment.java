@@ -35,6 +35,8 @@ public class TextBoundsFragment extends AppBaseFragment implements View.OnClickL
         textView.setText("其实我不懂fewgeoijgeogijreg你写个xxxgeoi个哦我" +
                 "价格哦该机构改革个欧冠我加热欧冠我今儿个个欧冠我就饿哦嘎嘎嘎人 干扰个我加热结果 ");
         textView.setOnClickListener(this);
+
+        setPageLoading(true);
     }
 
     @Override

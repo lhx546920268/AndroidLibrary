@@ -24,6 +24,7 @@ import com.lhx.library.util.SizeUtil;
  * 基础视图容器
  */
 
+@SuppressWarnings("unchecked")
 public class AppBaseContainer extends LinearLayout {
 
     ///内容视图
@@ -238,7 +239,10 @@ public class AppBaseContainer extends LinearLayout {
                 mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,
                         mContentContainer, false);
                 TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
-                textView.setText(loadingText);
+
+                if(textView != null){
+                    textView.setText(loadingText);
+                }
 
                 if(mOnEventHandler != null){
                     mOnEventHandler.onPageLoadingShow(mPageLoadingView, (RelativeLayout.LayoutParams)
@@ -287,13 +291,19 @@ public class AppBaseContainer extends LinearLayout {
                 });
 
                 ImageView imageView = (ImageView) mPageLoadFailView.findViewById(R.id.logo);
-                imageView.setImageResource(logoResId);
+                if(imageView != null){
+                    imageView.setImageResource(logoResId);
+                }
 
                 TextView textView = (TextView) mPageLoadFailView.findViewById(R.id.title);
-                textView.setText(title);
+                if(textView != null){
+                    textView.setText(title);
+                }
 
                 textView = (TextView) mPageLoadFailView.findViewById(R.id.subtitle);
-                textView.setText(subtitle);
+                if(textView != null){
+                    textView.setText(subtitle);
+                }
 
                 if(mOnEventHandler != null){
                     mOnEventHandler.onPageLoadFailShow(mPageLoadFailView, (RelativeLayout.LayoutParams)
@@ -327,12 +337,16 @@ public class AppBaseContainer extends LinearLayout {
 
             if(!TextUtils.isEmpty(text)){
                 TextView textView = (TextView)mEmptyView.findViewById(R.id.text);
-                textView.setText(text);
+                if(textView != null){
+                    textView.setText(text);
+                }
             }
 
             if(iconRes != 0){
                 ImageView imageView = (ImageView)mEmptyView.findViewById(R.id.icon);
-                imageView.setImageResource(iconRes);
+                if(imageView != null){
+                    imageView.setImageResource(iconRes);
+                }
             }
 
             if(isPageLoading()){

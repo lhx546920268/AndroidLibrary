@@ -10,6 +10,7 @@ import java.util.Iterator;
  * 视图重用控制器
  */
 
+@SuppressWarnings("unchecked")
 public class ReuseViewsController<T extends View>{
 
     //可见的图片
