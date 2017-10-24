@@ -93,6 +93,15 @@ public class FileUtil {
     }
 
     /**
+     * 获取储存Image的目录
+     *
+     * @return
+     */
+    public static String getStorageDirectory() {
+        return android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "mwdmall" + "/ImageCache";
+    }
+
+    /**
      * 通过 mimeType 获取文件扩展名称
      * @param mimeType 文件的mimeType
      * @return 文件拓展名
