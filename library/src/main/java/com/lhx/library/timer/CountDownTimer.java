@@ -5,7 +5,7 @@ import android.os.Message;
 import android.os.SystemClock;
 
 /**
- * 计时器
+ * 计时器 当使用 COUNT_DOWN_UNLIMITED 必须手动停止该计时器
  */
 
 public abstract class CountDownTimer implements Handler.Callback{

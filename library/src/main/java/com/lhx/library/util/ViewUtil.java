@@ -43,4 +43,13 @@ public class ViewUtil {
             }
         }
     }
+
+    public static int getViewVisiableHeight(View view, int containerHeight){
+        if(view == null)
+            return 0;
+
+        int top = view.getTop();
+        int height = view.getHeight();
+        return Math.min(containerHeight - Math.abs(top), height);
+    }
 }
