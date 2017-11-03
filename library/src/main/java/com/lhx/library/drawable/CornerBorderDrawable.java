@@ -84,6 +84,27 @@ public class CornerBorderDrawable extends Drawable {
         return drawable;
     }
 
+    public static CornerBorderDrawable setCircleDrawable(View targetView, @ColorInt int backgroundColor){
+        CornerBorderDrawable drawable = new CornerBorderDrawable();
+        drawable.setShouldAbsoluteCircle(true);
+        drawable.setBackgroundColor(backgroundColor);
+        drawable.attatchView(targetView);
+
+        return drawable;
+    }
+
+    public static CornerBorderDrawable setCircleDrawable(View targetView, @ColorInt int backgroundColor,
+                                                         int borderWidth, @ColorInt int borderColor){
+        CornerBorderDrawable drawable = new CornerBorderDrawable();
+        drawable.setShouldAbsoluteCircle(true);
+        drawable.setBackgroundColor(backgroundColor);
+        drawable.setBorderWidth(borderWidth);
+        drawable.setBorderColor(borderColor);
+        drawable.attatchView(targetView);
+
+        return drawable;
+    }
+
     public CornerBorderDrawable() {
         initialize();
     }

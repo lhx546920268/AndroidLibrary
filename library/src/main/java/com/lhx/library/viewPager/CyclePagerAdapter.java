@@ -89,6 +89,14 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
         }
     }
 
+    //移动到某个位置
+    public void scrollToPosition(int position, boolean smooth){
+        if(mRealCount > 1 && position >= 0 && position < mRealCount){
+            mViewPager.setCurrentItem(position + 1, smooth);
+        }
+    }
+
+
     /**
      * 通过viewPager 位置获取真实的数据源位置
      * @param position viewPager 位置
@@ -106,6 +114,19 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
             }else {
                 return  position - 1;
             }
+        }
+    }
+
+    /**
+     * 通过数据源位置获取布局位置
+     * @param position 数据源位置
+     * @return 布局位置
+     */
+    public int getAdatperPosition(int position){
+        if(mRealCount <= 1){
+            return position;
+        }else {
+            return position + 1;
         }
     }
 

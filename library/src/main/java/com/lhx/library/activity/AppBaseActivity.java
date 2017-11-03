@@ -3,14 +3,20 @@ package com.lhx.library.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.AnimRes;
 import android.support.annotation.CallSuper;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -18,6 +24,10 @@ import android.view.Window;
 import com.lhx.library.R;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.inter.LoginHandler;
+import com.lhx.library.util.SizeUtil;
+
+import java.io.Serializable;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class AppBaseActivity extends AppCompatActivity {
@@ -40,8 +50,19 @@ public class AppBaseActivity extends AppCompatActivity {
     ///当前显示的Fragment
     private AppBaseFragment fragment;
 
+    //是否可见
+    private boolean mVisiable;
+
     public String getName() {
         return mName;
+    }
+
+    public void setName(String name){
+        mName = name;
+    }
+
+    public boolean isVisiable() {
+        return mVisiable;
     }
 
     //    @Override
@@ -56,12 +77,20 @@ public class AppBaseActivity extends AppCompatActivity {
 //        super.onStart();
 //    }
 //
-//    @Override
-//    protected void onResume() {
+    @Override
+    protected void onResume() {
 //        Log.d("AppBaseActivity", "onResume");
-//        super.onResume();
-//    }
-//
+        super.onResume();
+        mVisiable = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mVisiable = false;
+    }
+
+    //
 //    @Override
 //    protected void onStop() {
 //        Log.d("AppBaseActivity", "onStop");
@@ -93,7 +122,10 @@ public class AppBaseActivity extends AppCompatActivity {
 //        Log.d("AppBaseActivity", "onCreate");
         super.onCreate(savedInstanceState);
 
-        setContentView(getContentViewRes());
+        int layoutRes = getContentViewRes();
+        if(layoutRes != 0){
+            setContentView(layoutRes);
+        }
 
         //java.net.SocketException: sendto failed: ECONNRESET (Connection reset by peer)
         if (Build.VERSION.SDK_INT > 9) {
@@ -104,7 +136,7 @@ public class AppBaseActivity extends AppCompatActivity {
 
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);
-        if (className != null) {
+        if (className != null && layoutRes != 0) {
             Class clazz;
             try {
 
@@ -150,7 +182,7 @@ public class AppBaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    //获取视图内容，必须包含 fragment_container
+    //获取视图内容，如果为0，则忽略 可以包含 fragment_container
     public
     @LayoutRes
     int getContentViewRes() {
@@ -262,5 +294,89 @@ public class AppBaseActivity extends AppCompatActivity {
         mLoginHandler = loginHandler;
         mHasLoginHandler = true;
         super.startActivityForResult(intent, requestCode);
+
+    }
+
+    //获取px
+    public int pxFromDip(float dip){
+        return SizeUtil.pxFormDip(dip, this);
+    }
+    //获取颜色
+    public @ColorInt int getColorCompat(@ColorRes int colorRes){
+        return ContextCompat.getColor(this, colorRes);
+    }
+
+    //获取drawable
+    public Drawable getDrawableCompat(@DrawableRes int drawableRes){
+        return ContextCompat.getDrawable(this, drawableRes);
+    }
+
+    ///获取bundle内容
+    public String getExtraStringFromBundle(String key){
+
+        Bundle nBundle = getBundle();
+        if(nBundle == null) return "";
+        return nBundle.getString(key);
+    }
+
+    public double getExtraDoubleFromBundle(String key){
+        Bundle nBundle = getBundle();
+        if(nBundle != null){
+            return nBundle.getDouble(key);
+        }
+        return 0;
+    }
+
+    public int getExtraIntFromBundle(String key){
+        return getExtraIntFromBundle(key, 0);
+    }
+
+    public int getExtraIntFromBundle(String key, int defValue){
+        Bundle nBundle = getBundle();
+        if(nBundle != null){
+            return nBundle.getInt(key, defValue);
+        }
+        return defValue;
+    }
+
+    public long getExtraLongFromBundle(String key){
+        Bundle nBundle = getBundle();
+        if(nBundle != null){
+            return nBundle.getLong(key);
+        }
+        return 0;
+    }
+
+    public boolean getExtraBooleanFromBundle(String key, boolean def){
+        Bundle nBundle = getBundle();
+        if(nBundle != null){
+            return nBundle.getBoolean(key, def);
+        }
+        return def;
+    }
+
+    public boolean getExtraBooleanFromBundle(String key){
+        return getExtraBooleanFromBundle(key, false);
+    }
+
+    public List<String> getExtraStringListFromBundle(String key){
+        Bundle nBundle = getBundle();
+        return nBundle.getStringArrayList(key);
+    }
+
+    public Serializable getExtraSerializableFromBundle(String key){
+        Bundle nBundle = getBundle();
+        return nBundle.getSerializable(key);
+    }
+
+    //获取对应bundle
+    public Bundle getBundle(){
+
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            return bundle;
+        }
+
+        return null;
     }
 }

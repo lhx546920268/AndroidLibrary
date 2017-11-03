@@ -159,6 +159,19 @@ public class AppBaseContainer extends LinearLayout {
         return view;
     }
 
+    //设置topView 浮动
+    public void setTopViewFloat(boolean flag){
+        if(mContentView != null && mTopView != null){
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+            if(flag){
+                params.addRule(RelativeLayout.BELOW, 0);
+            }else {
+                params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
+            }
+            mContentView.setLayoutParams(params);
+        }
+    }
+
     //重新布局子视图
     private void layoutChildViews(){
 

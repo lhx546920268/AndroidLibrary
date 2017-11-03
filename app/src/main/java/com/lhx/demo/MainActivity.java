@@ -22,6 +22,7 @@ import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.listview.StickListViewFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
+import com.lhx.demo.recyclerview.CycleRecyclerViewFragment;
 import com.lhx.demo.recyclerview.StickRecyclerViewFragment;
 import com.lhx.demo.recyclerview.TetrisFragment;
 import com.lhx.demo.refresh.RefreshActivity;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 12 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
-                                StickRecyclerViewFragment.class));
+                                CycleRecyclerViewFragment.class));
                         break;
                 }
 

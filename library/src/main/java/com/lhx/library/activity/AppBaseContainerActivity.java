@@ -1,5 +1,4 @@
-package com.lhx.library.fragment;
-
+package com.lhx.library.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,8 +12,8 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,104 +21,68 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.lhx.library.activity.ActivityStack;
-import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
+import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.util.DialogUtil;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.AppBaseContainer;
 
-import java.io.Serializable;
-import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 基础视图activity 和 appBaseFragment 类似 不要通过 setContentView 设置内容视图
  */
-@SuppressWarnings("unchecked")
-public abstract class AppBaseFragment extends Fragment implements AppBaseContainer.OnEventHandler {
+
+public abstract class AppBaseContainerActivity extends AppBaseActivity implements AppBaseContainer.OnEventHandler {
 
     ///容器视图
     private AppBaseContainer mContainer;
 
-    ///关联的context
-    protected Context mContext;
-
-    //该activity 必须在 onActivityCreated 之后使用，否则为空，最好是使用 mContext
-    protected Activity mActivity;
-
-    public AppBaseFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mActivity = getActivity();
-//        Log.d("AppBaseFragment", "onActivityCreated");
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        Log.d("AppBaseFragment", "onStart");
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        Log.d("AppBaseFragment", "onStop");
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d("AppBaseFragment", "onResume");
-//    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mContext = context;
-//        Log.d("AppBaseFragment", "onAttach");
-    }
-//
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("AppBaseFragment", "onDestroy");
-    }
-//
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        Log.d("AppBaseFragment", "onDestroyView");
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        Log.d("AppBaseFragment", "onDetach");
-//    }
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        Log.d("AppBaseFragment", "onCreateView");
         if(mContainer == null){
             ///创建容器视图
-            mContainer = new AppBaseContainer(mContext);
+            mContainer = new AppBaseContainer(this);
             mContainer.setOnEventHandler(this);
 
             ///创建导航栏
             mContainer.setShowNavigationBar(showNavigationBar());
 
             //内容视图
-            initialize(inflater, mContainer, savedInstanceState);
+            initialize(getLayoutInflater(), mContainer, savedInstanceState);
         }
 
-        return mContainer;
+        setContentView(mContainer);
+        setName(getClass().getName());
+    }
+
+    @Override
+    public int getContentViewRes() {
+        return 0;
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        if(mContainer != view){
+            mContainer.setContentView(view);
+            return;
+        }
+        super.setContentView(view, params);
+    }
+
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        mContainer.setContentView(layoutResID);
+    }
+
+    @Override
+    public void setContentView(View view) {
+        if(mContainer != view){
+            mContainer.setContentView(view);
+            return;
+        }
+        super.setContentView(view);
     }
 
     ///子类可重写这个方法设置 contentView
@@ -135,49 +98,31 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         return  mContainer.getContentView();
     }
 
-    protected void setContentView(View contentView) {
-        mContainer.setContentView(contentView);
-    }
-
-    protected void setContentView(@LayoutRes int layoutResId){
-        mContainer.setContentView(layoutResId);
-    }
-
     //显示返回按钮
     public void setShowBackButton(boolean show){
         mContainer.setShowBackButton(show);
     }
 
     //设置标题
-    public void setTitle(String title){
+    public void setNavigationBarTitle(String title){
         mContainer.setTitle(title);
     }
 
-    public String getTitle(){
+    public String getNavigationBarTitle(){
         return mContainer.getTitle();
     }
 
-    //返回
-    public void back(){
-        mActivity.finish();
+    @Override
+    public String getName() {
+        return super.getName();
     }
 
-    public void back(int resultCode){
-        mActivity.setResult(resultCode);
-        mActivity.finish();
+    public void backToActivity(@NonNull Class<? extends AppBaseActivity> activityClass){
+        backTo(activityClass.getName());
     }
 
-    public void back(int resultCode, Intent data){
-        mActivity.setResult(resultCode, data);
-        mActivity.finish();
-    }
-
-    public void backToFragment(@NonNull Class<? extends AppBaseFragment> fragmentClass){
-        backTo(fragmentClass.getName());
-    }
-
-    public void backToFragment(@NonNull Class<? extends AppBaseFragment> fragmentClass, int resultCode){
-        backTo(fragmentClass.getName(), resultCode);
+    public void backToActivity(@NonNull Class<? extends AppBaseActivity> activityClass, int resultCode){
+        backTo(activityClass.getName(), resultCode);
     }
 
     public void backTo(@NonNull String toName){
@@ -210,26 +155,26 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     }
 
     ///获取子视图
-    public <T extends View> T findViewById(int resId){
+    public <T extends View> T sea_findViewById(int resId){
         return mContainer.sea_findViewById(resId);
     }
 
     //启动一个带activity的fragment
-    public void startActivity(Class<? extends AppBaseFragment> fragmentClass){
-        startActivity(fragmentClass, null);
+    public void startFragment(Class<? extends AppBaseFragment> fragmentClass){
+        startFragment(fragmentClass, null);
     }
 
-    public void startActivity(Class<? extends AppBaseFragment> fragmentClass, Bundle bundle){
-        startActivityForResult(fragmentClass, 0, bundle);
+    public void startFragment(Class<? extends AppBaseFragment> fragmentClass, Bundle bundle){
+        startFragmentForResult(fragmentClass, 0, bundle);
     }
 
-    public void startActivityForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode){
-        startActivityForResult(fragmentClass, requestCode, null);
+    public void startFragmentForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode){
+        startFragmentForResult(fragmentClass, requestCode, null);
     }
 
-    public void startActivityForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode, Bundle bundle){
+    public void startFragmentForResult(Class<? extends AppBaseFragment> fragmentClass, int requestCode, Bundle bundle){
 
-        Intent intent = AppBaseActivity.getIntentWithFragment(mContext, fragmentClass);
+        Intent intent = AppBaseActivity.getIntentWithFragment(this, fragmentClass);
         if(bundle != null){
             bundle.remove(AppBaseActivity.FRAGMENT_STRING);
             intent.putExtras(bundle);
@@ -262,7 +207,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
      */
     @Override
     public final void onBack() {
-        back();
+        finish();
     }
 
     /**
@@ -300,7 +245,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     //打开activity 不要动画
     public void closeAnimate(){
-        mActivity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     public void setPageLoading(boolean pageLoading){
@@ -346,7 +291,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     public void setLoading(boolean loading) {
         if(loading){
-            DialogUtil.showLoadingDialog(mContext, false, null);
+            DialogUtil.showLoadingDialog(this, false, null);
         }else {
             DialogUtil.dismissLoadingDialog();
         }
@@ -406,124 +351,5 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         if(mContainer == null)
             return null;
         return mContainer.getTopView();
-    }
-
-    //点击物理键
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
-            back();
-            return true;
-        }
-        return false;
-    }
-
-    //分发点击物理键事件
-    public boolean dispatchKeyEvent(KeyEvent event) {
-
-        return false;
-    }
-
-    //屏幕焦点改变
-    public void onWindowFocusChanged(boolean hasFocus) {
-
-    }
-
-    //获取颜色
-    public @ColorInt int getColor(@ColorRes int colorRes){
-        return ContextCompat.getColor(mContext, colorRes);
-    }
-
-    //获取drawable
-    public Drawable getDrawable(@DrawableRes int drawableRes){
-        return ContextCompat.getDrawable(mContext, drawableRes);
-    }
-
-    //获取dime
-    public float getDimen(@DimenRes int dimen){
-        return mContext.getResources().getDimension(dimen);
-    }
-
-    public int getDimensionPixelSize(@DimenRes int dimen){
-        return mContext.getResources().getDimensionPixelSize(dimen);
-    }
-
-    //获取px
-    public int pxFromDip(float dip){
-        return SizeUtil.pxFormDip(dip, mContext);
-    }
-
-    ///获取bundle内容
-    public String getExtraStringFromBundle(String key){
-
-        Bundle nBundle = getBundle();
-        if(nBundle == null) return "";
-        return nBundle.getString(key);
-    }
-
-    public double getExtraDoubleFromBundle(String key){
-        Bundle nBundle = getBundle();
-        if(nBundle != null){
-            return nBundle.getDouble(key);
-        }
-        return 0;
-    }
-
-    public int getExtraIntFromBundle(String key){
-        return getExtraIntFromBundle(key, 0);
-    }
-
-    public int getExtraIntFromBundle(String key, int defValue){
-        Bundle nBundle = getBundle();
-        if(nBundle != null){
-            return nBundle.getInt(key, defValue);
-        }
-        return defValue;
-    }
-
-    public long getExtraLongFromBundle(String key){
-        Bundle nBundle = getBundle();
-        if(nBundle != null){
-            return nBundle.getLong(key);
-        }
-        return 0;
-    }
-
-    public boolean getExtraBooleanFromBundle(String key, boolean def){
-        Bundle nBundle = getBundle();
-        if(nBundle != null){
-            return nBundle.getBoolean(key, def);
-        }
-        return def;
-    }
-
-    public boolean getExtraBooleanFromBundle(String key){
-        return getExtraBooleanFromBundle(key, false);
-    }
-
-    public List<String> getExtraStringListFromBundle(String key){
-        Bundle nBundle = getBundle();
-        return nBundle.getStringArrayList(key);
-    }
-
-    public Serializable getExtraSerializableFromBundle(String key){
-        Bundle nBundle = getBundle();
-        return nBundle.getSerializable(key);
-    }
-
-    //获取对应bundle
-    public Bundle getBundle(){
-
-        Bundle bundle = getArguments();
-        if(bundle != null){
-            return bundle;
-        }
-
-        if(mActivity != null){
-            bundle = mActivity.getIntent().getExtras();
-            if(bundle != null){
-                return bundle;
-            }
-        }
-        return null;
     }
 }

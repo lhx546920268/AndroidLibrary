@@ -6,6 +6,7 @@
                  android:supportsRtl="true">
 
         <activity android:name=".activity.AppBaseActivity"/>
+
     </application>
 
     <uses-permission android:name="android.permission.CALL_PHONE"/>
