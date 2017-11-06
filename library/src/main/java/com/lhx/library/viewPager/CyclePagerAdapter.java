@@ -3,7 +3,10 @@ package com.lhx.library.viewPager;
 import android.content.Context;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 import android.widget.Scroller;
+
+import com.lhx.library.timer.CountDownTimer;
 
 import java.lang.reflect.Field;
 
@@ -28,13 +31,23 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     private int mAutoPlayInterval = 5000;
 
     //自动轮播计时器
-    private Handler mHandler;
-    private Runnable mRunnable;
+    CountDownTimer mCountDownTimer;
 
     public CyclePagerAdapter(ViewPager viewPager) {
         super(viewPager);
 
         viewPager.addOnPageChangeListener(this);
+        viewPager.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                startAutoPlayTimer();
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                stopAutoPlayTimer();
+            }
+        });
         setScroller();
     }
 
@@ -166,25 +179,29 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     private void startAutoPlayTimer(){
         if(!mShouldAutoPlay || mRealCount <= 1)
             return;
-        if(mHandler == null){
-            mHandler = new Handler();
-            mRunnable = new Runnable() {
+        if(mCountDownTimer == null){
+            mCountDownTimer = new CountDownTimer(CountDownTimer.COUNT_DOWN_UNLIMITED, mAutoPlayInterval) {
                 @Override
-                public void run() {
+                public void onFinish() {
+
+                }
+
+                @Override
+                public void onTick(long millisLeft) {
                     nextPage();
-                    mHandler.postDelayed(mRunnable, mAutoPlayInterval);
                 }
             };
         }
-
-        mHandler.removeCallbacks(mRunnable);
-        mHandler.postDelayed(mRunnable, mAutoPlayInterval);
+        if(mCountDownTimer.isExecuting())
+            return;
+        mCountDownTimer.start();
     }
 
     //停止自动轮播计时器
     private void stopAutoPlayTimer(){
-        if(mHandler != null){
-            mHandler.removeCallbacks(mRunnable);
+        if(mCountDownTimer != null){
+            mCountDownTimer.stop();
+            mCountDownTimer = null;
         }
     }
 

@@ -109,6 +109,7 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
             }
         };
 
+        adapter.getLoadMoreControl().setShouldDisplayWhileNoMoreData(false);
         adapter.loadMoreComplete(true);
 
 
@@ -135,7 +136,7 @@ public class ListViewLoadMoreFragment extends AppBaseFragment implements Handler
         }else {
 
             addData(20);
-            adapter.loadMoreComplete(strings.size() < 100);
+            adapter.loadMoreComplete(strings.size() < 60);
         }
         return true;
     }

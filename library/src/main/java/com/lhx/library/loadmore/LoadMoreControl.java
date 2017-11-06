@@ -46,6 +46,9 @@ public class LoadMoreControl {
     ///加载更多的View
     private View mContentView;
 
+    //所有加载完后没有数据后的视图
+    private View mNoMoreDataView;
+
     ///上下文
     private Context mContext;
 
@@ -79,6 +82,12 @@ public class LoadMoreControl {
 
     public View getContentView(){
 
+        if(mLoadingStatus == LOAD_MORE_STATUS_NO_MORE_DATA){
+            if(mNoMoreDataView == null){
+                mNoMoreDataView = View.inflate(mContext, R.layout.common_load_more_no_data, null);
+            }
+            return mNoMoreDataView;
+        }
         return mContentView;
     }
 
@@ -129,9 +138,6 @@ public class LoadMoreControl {
                     break;
                 }
                 case LOAD_MORE_STATUS_NO_MORE_DATA : {
-                    mContentView.setEnabled(false);
-                    mTextView.setText("已经加载完了");
-                    mProgressBar.setVisibility(View.GONE);
                     break;
                 }
             }
