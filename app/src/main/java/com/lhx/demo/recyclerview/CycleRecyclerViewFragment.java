@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lhx.demo.R;
+import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.fragment.RecyclerViewFragment;
 import com.lhx.library.recyclerView.RecyclerViewAdapter;
 import com.lhx.library.timer.CountDownTimer;
+import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.ViewUtil;
 import com.lhx.library.viewHoler.RecyclerViewHolder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,32 +26,31 @@ import android.widget.TextView;
  *
  */
 
-public class CycleRecyclerViewFragment extends RecyclerViewFragment {
+public class CycleRecyclerViewFragment extends AppBaseFragment {
 
     Adapter mAdapter;
+
+    RecyclerView mRecyclerView;
 
     int numberOfItems = 5;
 
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        super.initialize(inflater, container, saveInstanceState);
 
+        setContentView(R.layout.cycle_recycler_view_fragment);
+        mRecyclerView = findViewById(R.id.recycler_view);
         mAdapter = new Adapter(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
 
-        final ScrollLinearLayoutManager linearLayoutManager = new ScrollLinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,
+//        ViewUtil.setViewSize(mRecyclerView, SizeUtil.dipFromPx(SizeUtil.getWindowWidth(mContext), mContext), 100);
+
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,
                 false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setNestedScrollingEnabled(false);
+//        mRecyclerView.setNestedScrollingEnabled(false);
 
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-
-            }
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -65,6 +66,7 @@ public class CycleRecyclerViewFragment extends RecyclerViewFragment {
                     }else {
                         int p = linearLayoutManager.findFirstVisibleItemPosition();
                         if(p != position){
+
 
 
                             View view = linearLayoutManager.findViewByPosition(position);
@@ -180,6 +182,13 @@ public class CycleRecyclerViewFragment extends RecyclerViewFragment {
             }
             index --;
             return index;
+        }
+
+        @Override
+        public void onItemClick(int indexInSection, int section) {
+
+            notifyDataSetChanged();
+            mRecyclerView.scrollToPosition(1);
         }
     }
 }

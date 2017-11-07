@@ -67,6 +67,9 @@ public class ListPopupWindow extends BasePopupWindow {
     //列表最大高度
     private int mListMaxHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
 
+    //选中背景颜色
+    private @ColorInt int mSelectedBackgroundColor = Color.WHITE;
+
     public void setRowHeight(int rowHeight) {
         if(mRowHeight != rowHeight){
             mRowHeight = rowHeight;
@@ -134,6 +137,10 @@ public class ListPopupWindow extends BasePopupWindow {
             mListMaxHeight = listMaxHeight;
             setListHeight();
         }
+    }
+
+    public void setSelectedBackgroundColor(int selectedBackgroundColor) {
+        mSelectedBackgroundColor = selectedBackgroundColor;
     }
 
     public void setInfos(ArrayList<ListInfo> infos) {
@@ -238,7 +245,14 @@ public class ListPopupWindow extends BasePopupWindow {
 
             imageView.setVisibility(indexInSection == mSelectedPosition ? View.VISIBLE : View.GONE);
 
+            convertView.setBackgroundColor(indexInSection == mSelectedPosition ? mSelectedBackgroundColor : Color.WHITE);
+
             return convertView;
+        }
+
+        @Override
+        protected boolean shouldDisplayEmptyView() {
+            return false;
         }
 
         @Override

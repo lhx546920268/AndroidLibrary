@@ -28,6 +28,12 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
     //文本
     private TextView mTextView;
 
+    private PtrFrameLayoutOnScrollHandler mPtrFrameLayoutOnScrollHandler;
+
+    public void setPtrFrameLayoutOnScrollHandler(PtrFrameLayoutOnScrollHandler ptrFrameLayoutOnScrollHandler) {
+        mPtrFrameLayoutOnScrollHandler = ptrFrameLayoutOnScrollHandler;
+    }
+
     public DefaultPtrFrameLayout(Context context) {
         this(context, null);
     }
@@ -85,5 +91,15 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
                 mTextView.setText("下拉刷新");
             }
         }
+        if(mPtrFrameLayoutOnScrollHandler != null){
+            mPtrFrameLayoutOnScrollHandler.onScroll(ptrIndicator);
+        }
+    }
+
+    //下拉刷新滑动监听
+    public interface PtrFrameLayoutOnScrollHandler{
+
+        //
+        void onScroll(PtrIndicator ptrIndicator);
     }
 }

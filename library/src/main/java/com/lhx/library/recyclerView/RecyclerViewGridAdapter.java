@@ -223,6 +223,9 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
 
         if(mShouldReloadData){
 
+            mDifferentColumnProduct = getDifferentColumnProduct();
+            mLayoutManager.setSpanCount(mDifferentColumnProduct);
+
             mShouldReloadData = false;
             if(mSections == null)
                 mSections = new ArrayList<>();

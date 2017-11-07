@@ -102,6 +102,37 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
     //UI回调
     private OnDropDownTabUIHandler mOnDropDownTabUIHandler;
 
+    public void setNormalTextSize(int normalTextSize) {
+        mNormalTextSize = normalTextSize;
+    }
+
+    public void setSelectedTextSize(int selectedTextSize) {
+        mSelectedTextSize = selectedTextSize;
+    }
+
+    public void setNormalTextColor(int normalTextColor) {
+        mNormalTextColor = normalTextColor;
+    }
+
+    public void setSelectedTextColor(int selectedTextColor) {
+        mSelectedTextColor = selectedTextColor;
+    }
+
+    public void setKeepSelectedAfterDismissList(boolean keepSelectedAfterDismissList) {
+        mKeepSelectedAfterDismissList = keepSelectedAfterDismissList;
+    }
+
+    public void setShouldSelected(boolean shouldSelected) {
+        mShouldSelected = shouldSelected;
+    }
+
+    public void setSelectedIndicator(View selectedIndicator) {
+        mSelectedIndicator = selectedIndicator;
+    }
+
+    public void setDividerWidth(int dividerWidth) {
+        mDividerWidth = dividerWidth;
+    }
 
     public DropDownTabLayout(@NonNull Context context) {
         this(context, null);
@@ -148,6 +179,8 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
         params.gravity = Gravity.BOTTOM;
         mSelectedIndicator.setLayoutParams(params);
         addView(mSelectedIndicator);
+
+        mListAnchor = this;
     }
 
     public void setTabInfos(List<TabInfo> tabInfos) {
@@ -266,7 +299,7 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
                 return;
 
             setTabSelected(mSelectedPosition, false);
-            mSelectedPosition = tabInfo.position;
+            mSelectedPosition = tab.mPosition;
             setTabSelected(mSelectedPosition, true);
 
             if(mOnDropDownTapSelectedListener != null){
@@ -354,6 +387,15 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
                 @Override
                 public void onItemClick(int position, ListInfo info) {
 
+                    TabInfo tabInfo = mTabInfos.get(mSelectedPosition);
+                    tabInfo.selectedPosition = position;
+
+                    Tab tab = getTab(mSelectedPosition);
+                    tab.mTextView.setText(tabInfo.title);
+                    
+                    if(mOnDropDownTapSelectedListener != null){
+                        mOnDropDownTapSelectedListener.onDropDownTabListItemSelected(tabInfo, DropDownTabLayout.this);
+                    }
                 }
             });
             mListPopupWindow.setShouldDismissAfterSelect(true);
