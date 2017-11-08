@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.RelativeLayout;
 
@@ -37,7 +38,14 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
 
         mContainer = new AppBaseContainer(mContext);
         mContainer.setShowNavigationBar(showNavigationBar());
-        mContainer.setContentView(getContentView());
+
+        View contentView = getContentView();
+        if(!(contentView.getLayoutParams() instanceof RelativeLayout.LayoutParams)){
+            contentView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+
+        mContainer.setContentView(contentView);
         mContainer.setOnEventHandler(this);
 
         setContentView(mContainer);
@@ -51,6 +59,7 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         Window window = getWindow();
         if(window != null){
             onConfigure(window);
+            onConfigure(window, (RelativeLayout.LayoutParams)mContainer.getContentView().getLayoutParams());
 
             setCancelable(true);
             setCanceledOnTouchOutside(true);
@@ -149,7 +158,17 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * 配置弹窗信息
      * @param window 弹窗
      */
-    public abstract void onConfigure(Window window);
+    @Deprecated
+    public void onConfigure(Window window){
+
+    }
+
+    /**
+     * 配置弹窗信息
+     * @param window 弹窗
+     * @param contentViewLayoutParams 内容视图布局
+     */
+    public abstract void onConfigure(Window window, RelativeLayout.LayoutParams contentViewLayoutParams);
 
     /**
      * 获取内容视图

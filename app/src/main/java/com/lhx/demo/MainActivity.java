@@ -16,6 +16,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lhx.demo.dialog.BaseDialogFragment;
 import com.lhx.demo.dialog.DialogFragment;
 import com.lhx.demo.drawable.CornerDrawableFragment;
 import com.lhx.demo.http.HttpFragment;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("TetrisLayout (recyclerView)");
         infos.add("ListView stick");
         infos.add("RecyclerView stick");
+        infos.add("Base Dialog");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -138,6 +140,10 @@ public class MainActivity extends AppCompatActivity {
                     case 12 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
                                 CycleRecyclerViewFragment.class));
+                        break;
+                    case 13 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
+                                BaseDialogFragment.class));
                         break;
                 }
 

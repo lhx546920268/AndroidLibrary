@@ -14,6 +14,7 @@ import com.lhx.library.loadmore.LoadMoreControl;
 import com.lhx.library.loadmore.LoadMoreHandler;
 import com.lhx.library.section.AbsListViewSectionHandler;
 import com.lhx.library.section.OnItemClickListener;
+import com.lhx.library.section.SectionHandler;
 import com.lhx.library.section.SectionInfo;
 import com.lhx.library.widget.OnSingleClickListener;
 
@@ -135,6 +136,16 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     @Override
     public int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type){
         return type;
+    }
+
+    @Override
+    public int getItemViewTypeForIndexPath(int indexInSection, int section, @ItemType int type) {
+        return 0;
+    }
+
+    @Override
+    public int numberOfItemViewTypes() {
+        return 1;
     }
 
     @Override

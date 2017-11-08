@@ -392,7 +392,7 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
 
                     Tab tab = getTab(mSelectedPosition);
                     tab.mTextView.setText(tabInfo.title);
-                    
+
                     if(mOnDropDownTapSelectedListener != null){
                         mOnDropDownTapSelectedListener.onDropDownTabListItemSelected(tabInfo, DropDownTabLayout.this);
                     }

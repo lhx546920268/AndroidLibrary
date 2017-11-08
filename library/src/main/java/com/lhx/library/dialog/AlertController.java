@@ -468,7 +468,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 break;
         }
 
-        mDialog.getWindow().setAttributes(layoutParams);
+        window.setAttributes(layoutParams);
     }
 
     //计算内容高度

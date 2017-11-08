@@ -34,7 +34,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     AgentWeb mAgentWeb;
 
     //是否需要使用网页标题
-    boolean mShouldUseWebTitle = true;
+    protected boolean mShouldUseWebTitle = true;
 
     //html
     protected String mHtmlString;

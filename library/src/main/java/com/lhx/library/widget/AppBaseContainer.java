@@ -129,7 +129,7 @@ public class AppBaseContainer extends LinearLayout {
         mContentView = contentView;
 
         mContentView.setId(R.id.app_base_fragment_content_id);
-        if(mContentView.getLayoutParams() == null){
+        if(!(mContentView.getLayoutParams() instanceof RelativeLayout.LayoutParams)){
 
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.MATCH_PARENT);
