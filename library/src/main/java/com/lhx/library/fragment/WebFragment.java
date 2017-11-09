@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.just.library.AgentWeb;
@@ -81,36 +82,34 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
         setShowBackButton(true);
 
+        mAgentWeb = AgentWeb.with(this)//
+                .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
+                        .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
+                .setIndicatorColorWithHeight(App.WebProgressColor, 2)//
+                .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
+                .setReceivedTitleCallback(this)
+                .setWebViewClient(new WebViewClient(){
+
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+                        if(shouldOpenURL(view, url)){
+                            return true;
+                        }
+                        return super.shouldOverrideUrlLoading(view, url);
+                    }
+                })
+                .setSecurityType(AgentWeb.SecurityType.strict)
+                .createAgentWeb()//
+                .ready()//
+                .go(null);
+
         loadWebContent();
     }
 
     //加载
     public void loadWebContent(){
         if(!StringUtil.isEmpty(mURL) || !StringUtil.isEmpty(mHtmlString)){
-
-            if(mAgentWeb == null){
-                mAgentWeb = AgentWeb.with(this)//
-                        .setAgentWebParent((ViewGroup) getContentView(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams
-                                .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
-                        .setIndicatorColorWithHeight(App.WebProgressColor, 2)//
-                        .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
-                        .setReceivedTitleCallback(this)
-                        .setWebViewClient(new WebViewClient(){
-
-                            @Override
-                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-                                if(shouldOpenURL(view, url)){
-                                    return true;
-                                }
-                                return super.shouldOverrideUrlLoading(view, url);
-                            }
-                        })
-                        .setSecurityType(AgentWeb.SecurityType.strict)
-                        .createAgentWeb()//
-                        .ready()//
-                        .go("");
-            }
 
             if(!StringUtil.isEmpty(mURL)){
                 mAgentWeb.getLoader().loadUrl(mURL);
