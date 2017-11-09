@@ -131,7 +131,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
 
     }
 
-    public static void configure(ImageView imageView){
+    public static void configure(ImageView imageView, boolean round){
         Object tag = imageView.getTag(R.id.tag_scale_type);
         if(tag instanceof ImageView.ScaleType){
 
@@ -140,7 +140,9 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             imageView.setTag(R.id.tag_background, imageView.getBackground());
         }
 
-        imageView.setBackgroundColor(mPlaceholderColor);
+        if(!round){
+            imageView.setBackgroundColor(mPlaceholderColor);
+        }
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
     }
 
@@ -152,7 +154,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, true);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getCircleDisplayImageOptions(),
                 ImageLoaderUtil.getInstance());
     }
@@ -163,7 +165,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, true);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getCircleDisplayImageOptions(defualtRes),
                 ImageLoaderUtil.getInstance());
     }
@@ -174,7 +176,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView,
                 ImageLoaderUtil.getDisplayImageOptions(defualtRes, ImageScaleType.EXACTLY), ImageLoaderUtil.getInstance());
     }
@@ -185,7 +187,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getDisplayImageOptions(defualtRes,
                 scaleType), ImageLoaderUtil.getInstance());
     }
@@ -196,7 +198,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getRectangleDisplayImageOptions(),
                 ImageLoaderUtil.getInstance());
     }
@@ -207,7 +209,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getRectangleDisplayImageOptions(scaleType),
                 ImageLoaderUtil.getInstance());
     }
@@ -218,7 +220,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, true);
         mImageLoader.displayImage(uriString, imageView,
                 ImageLoaderUtil.getRoundDisplayImageOptions(App.ImagePlaceHolder, radiusPixels),
                 ImageLoaderUtil.getInstance());
@@ -230,7 +232,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getSquareDisplayImageOptions(),
                 ImageLoaderUtil.getInstance());
     }
@@ -241,7 +243,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getSquareDisplayImageOptions(scaleType),
                 ImageLoaderUtil.getInstance());
     }
@@ -252,7 +254,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             return;
         }
         imageView.setTag(R.id.tag_first, uriString);
-        ImageLoaderUtil.configure(imageView);
+        ImageLoaderUtil.configure(imageView, false);
         mImageLoader.displayImage(uriString, imageView, ImageLoaderUtil.getRectangleDisplayImagePayOptions
                 (scaleType), ImageLoaderUtil.getInstance() );
     }

@@ -42,9 +42,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     //加载更多控制器
     LoadMoreControl mLoadMoreControl;
+    private int mLoadMoreType;
 
     //空视图
     private View mEmptyView;
+    private int mEmptyViewType;
 
     ///上下文
     private Context mContext;
@@ -291,8 +293,12 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     @Override
     public final int getItemViewType(int position) {
 
-        if(isEmptyView(position) || isLoadMoreItem(position)){
-            return numberOfItemViewTypes();
+        if(isEmptyView(position)){
+            return mEmptyViewType;
+        }
+
+        if(isLoadMoreItem(position)){
+            return mLoadMoreType;
         }
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
@@ -317,11 +323,15 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     public final int getViewTypeCount() {
 
         int count = numberOfItemViewTypes();
-        if(loadMoreEnable() && mLoadMoreControl.shouldDisplay())
+        if(loadMoreEnable()){
+            mLoadMoreType = count;
             count ++;
+        }
 
-        if(mRealCount == 0 && shouldDisplayEmptyView())
+        if(shouldDisplayEmptyView()){
+            mEmptyViewType = count;
             count ++;
+        }
 
         return count;
     }

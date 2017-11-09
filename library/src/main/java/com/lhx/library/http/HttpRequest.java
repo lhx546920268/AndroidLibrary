@@ -21,6 +21,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -148,6 +151,8 @@ public class HttpRequest {
     //请求进度回调
     private HttpProgressHandler<HttpRequest> mHttpProgressHandler;
 
+    //是否已设置cookie管理
+    private static boolean mSetupCookieManager = false;
 
     //post 请求参数格式
     private
@@ -360,9 +365,17 @@ public class HttpRequest {
 
             setState(HTTP_REQUEST_STATE_LOADING);
 
+            if(!mSetupCookieManager) {
+                mSetupCookieManager = true;
+                CookieManager cookieManager = new CookieManager();
+                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+                CookieHandler.setDefault(cookieManager);
+            }
+
             URL url = new URL(mURL);
             mConn = (HttpURLConnection) url.openConnection();
             mConn.setReadTimeout(mTimeoutInterval);
+            mConn.setDoInput(true);
             mConn.setUseCaches(false);
             mConn.setConnectTimeout(mTimeoutInterval);
             mConn.setRequestProperty("Connection", "Keep-Alive");

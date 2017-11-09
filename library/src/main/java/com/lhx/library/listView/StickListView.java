@@ -40,11 +40,13 @@ public class StickListView extends ListView {
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
+
             if(mOuterOnScrollListener != null){
                 mOuterOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
             }
 
-            if(mStickListViewHandler != null){
+
+            if(mStickListViewHandler != null && getChildCount() > 0){
 
                 firstVisibleItem -= getHeaderViewsCount();
 
