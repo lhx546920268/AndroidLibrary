@@ -30,6 +30,13 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
 
     protected Context mContext;
 
+    //设置超时 毫秒
+    int mTimeout = 15000;
+
+    public void setTimeout(int timeout) {
+        mTimeout = timeout;
+    }
+
     public boolean isApiError() {
         return mApiError;
     }
@@ -82,7 +89,7 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
             @Override
             public void onConfigure(HttpRequest request) {
 
-                request.setTimeoutInterval(15000);
+                request.setTimeoutInterval(mTimeout);
             }
         };
 
