@@ -59,6 +59,9 @@ public class TabLayout extends FrameLayout {
     //下划线高度
     private int mSelectedIndicatorHeight = 4;
 
+    //下划线是否占满
+    private boolean mSelectedIndicatorFill = false;
+
     ///顶部分割线
     private View mTopSeparator;
 
@@ -201,6 +204,10 @@ public class TabLayout extends FrameLayout {
             params.height = selectedIndicatorHeight;
             mSelectedIndicator.setLayoutParams(params);
         }
+    }
+
+    public void setSelectedIndicatorFill(boolean selectedIndicatorFill) {
+        mSelectedIndicatorFill = selectedIndicatorFill;
     }
 
     public void setDivierHeight(int divierHeight) {
@@ -398,8 +405,12 @@ public class TabLayout extends FrameLayout {
                     break;
             }
 
-            paint.setTextSize(SizeUtil.pxFromSp(mSelectedTitleSize, getContext()));
-            info.mSelectedIndicatorWidth = (int) paint.measureText(info.mTitle) + 1 + mSelectedIndicatorWidthPadding * 2;
+            if(mStyle == STYLE_UNIFORM && mSelectedIndicatorFill){
+                info.mSelectedIndicatorWidth = info.mTabWidth;
+            }else {
+                paint.setTextSize(SizeUtil.pxFromSp(mSelectedTitleSize, getContext()));
+                info.mSelectedIndicatorWidth = (int) paint.measureText(info.mTitle) + 1 + mSelectedIndicatorWidthPadding * 2;
+            }
 
             mTabInfos.add(info);
         }

@@ -154,6 +154,11 @@ public class LoadMoreControl {
         return mLoadingStatus != LOAD_MORE_STATUS_NORMAL;
     }
 
+    ///是否可以显示空视图
+    public boolean displayEmptyViewEnable(){
+        return mLoadingStatus == LOAD_MORE_STATUS_NORMAL || mLoadingStatus == LOAD_MORE_STATUS_NO_MORE_DATA;
+    }
+
     ///是否正在加载更多
     public boolean isLoadingMore(){
         return mLoadingStatus == LOAD_MORE_STATUS_LOADING;

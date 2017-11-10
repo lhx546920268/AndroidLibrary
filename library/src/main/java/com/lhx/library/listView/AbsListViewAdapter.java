@@ -28,6 +28,9 @@ import java.util.ArrayList;
 public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListViewSectionHandler,
         LoadMoreHandler, LoadMoreControl.LoadMoreControlHandler, OnItemClickListener{
 
+    //没有位置
+    private static final int NO_POSITION = -1;
+
     ///section信息数组
     private ArrayList<SectionInfo> mSections = new ArrayList<>();
 
@@ -41,12 +44,14 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     private int mRealCount = 0;
 
     //加载更多控制器
-    LoadMoreControl mLoadMoreControl;
+    private LoadMoreControl mLoadMoreControl;
     private int mLoadMoreType;
+    private int mLoadMorePosition = NO_POSITION;
 
     //空视图
     private View mEmptyView;
     private int mEmptyViewType;
+    private int mEmptyViewPosition = NO_POSITION;
 
     ///上下文
     private Context mContext;
@@ -209,7 +214,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     //是否是加载更多的UI
     private boolean isLoadMoreItem(int position){
-        return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
+        return mRealCount > 0 && position == mLoadMorePosition && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
     }
 
     //是否正在加载更多
@@ -219,7 +224,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     //是否是空视图
     private boolean isEmptyView(int position){
-        return mRealCount == 0 && shouldDisplayEmptyView();
+        return mRealCount == 0 && mEmptyViewPosition == position && shouldDisplayEmptyView();
     }
 
     @Override
@@ -254,10 +259,12 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             mRealCount = count;
 
             if(loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
+                mLoadMorePosition = count;
                 count ++;
             }
 
-            if(count == 0 && shouldDisplayEmptyView()){
+            if(mRealCount == 0 && shouldDisplayEmptyView() && getLoadMoreControl().displayEmptyViewEnable()){
+                mEmptyViewPosition = count;
                 count ++;
             }
 
