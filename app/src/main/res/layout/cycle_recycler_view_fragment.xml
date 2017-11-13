@@ -1,5 +1,7 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
+              android:orientation="vertical"
+              android:background="@color/white"
              android:layout_height="match_parent">
 
     <com.lhx.library.recyclerView.StickRecyclerView
@@ -8,4 +10,14 @@
         android:id="@+id/recycler_view"
         android:overScrollMode="never"/>
 
-</FrameLayout>
+    <com.lhx.library.viewPager.VerticalViewPager
+        android:layout_width="match_parent"
+        android:background="@color/cyan"
+        android:layout_marginTop="100dp"
+        android:id="@+id/view_pager"
+        android:layout_height="100dp">
+
+
+    </com.lhx.library.viewPager.VerticalViewPager>
+
+</LinearLayout>

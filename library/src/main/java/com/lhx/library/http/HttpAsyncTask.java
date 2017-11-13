@@ -50,6 +50,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     private static final float PROGRESS_UPLOAD = 0.0f;
     private static final float PROGRESS_DOWNLOAD = 1.0f;
 
+
     public HttpAsyncTask(String URL, ContentValues params, Map<String, File> files) {
         mURL = URL;
         mParams = params;
@@ -62,6 +63,10 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     public HttpAsyncTask(String URL) {
         this(URL, null, null);
+    }
+
+    public void setErrorCode(int errorCode){
+        mErrorCode = errorCode;
     }
 
     @Deprecated
@@ -158,9 +163,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
         //http完成
         if(mHttpRequestHandlers.size() > 0){
-            Iterator<HttpRequestHandler> iterator = mHttpRequestHandlers.iterator();
-            while (iterator.hasNext()){
-                HttpRequestHandler httpRequestHandler = iterator.next();
+            for(HttpRequestHandler httpRequestHandler : mHttpRequestHandlers){
 
                 if(mErrorCode == HttpRequest.ERROR_CODE_NONE && bytes != null){
                     httpRequestHandler.onSuccess(this, bytes);

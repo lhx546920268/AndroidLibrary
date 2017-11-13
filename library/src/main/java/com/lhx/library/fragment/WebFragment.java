@@ -116,8 +116,8 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
             }else {
                 String html = mHtmlString;
                 if(shouldAddMobileMeta()){
-                    html =  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><style>" +
-                            "{max-width:100%;}</style>" + mHtmlString;
+                    html =  "<style>img {width:100%;}</style><meta name='viewport' " +
+                            "content='width=device-width, initial-scale=1'/>" + mHtmlString;
                 }
                 mAgentWeb.getLoader().loadDataWithBaseURL(null, html, "text/html", "utf8", null);
             }

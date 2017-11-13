@@ -399,7 +399,7 @@ public class DropDownTabLayout extends FrameLayout implements View.OnClickListen
                 }
             });
             mListPopupWindow.setShouldDismissAfterSelect(true);
-            mListPopupWindow.setShouldDismissWhenTouchOutside(false);
+            mListPopupWindow.setShouldDismissWhenTouchOutside(true);
             mListPopupWindow.setNormalColor(mNormalTextColor);
             mListPopupWindow.setSelectedColor(mSelectedTextColor);
             mListPopupWindow.addOnDismissHandler(new BasePopupWindow.OnDismissHandler() {

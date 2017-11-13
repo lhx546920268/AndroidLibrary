@@ -59,7 +59,7 @@ public class TabLayoutFragment extends AppBaseFragment {
 
         TabLayout tabLayout1 = findViewById(R.id.tab_layout2);
         tabLayout1.setAutomaticallyDetectStyle(true);
-        tabLayout1.setDividderWidth(1);
+        tabLayout1.setDividerWidth(1);
         tabLayout1.setShouldDisplayBottomSeparator(true);
         tabLayout1.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
             @Override

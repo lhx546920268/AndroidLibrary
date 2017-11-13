@@ -258,14 +258,18 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
             mRealCount = count;
 
-            if(loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
-                mLoadMorePosition = count;
-                count ++;
-            }
-
             if(mRealCount == 0 && shouldDisplayEmptyView() && getLoadMoreControl().displayEmptyViewEnable()){
                 mEmptyViewPosition = count;
                 count ++;
+            }else {
+                mEmptyViewPosition = NO_POSITION;
+            }
+
+            if(mRealCount > 0 && loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
+                mLoadMorePosition = count;
+                count ++;
+            }else {
+                mLoadMorePosition = NO_POSITION;
             }
 
             mCount = count;

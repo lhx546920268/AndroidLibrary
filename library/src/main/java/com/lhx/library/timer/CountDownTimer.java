@@ -39,6 +39,22 @@ public abstract class CountDownTimer implements Handler.Callback{
         mMillisInterval = millisInterval;
     }
 
+    //设置不同的值会导致计时器停止
+    public void setMillisInterval(long millisInterval) {
+        if(mMillisInterval != millisInterval){
+            mMillisInterval = millisInterval;
+            stop();
+        }
+    }
+
+    //设置不同的值会导致计时器停止
+    public void setMillisToCountDown(long millisToCountDown) {
+        if(mMillisToCountDown != millisToCountDown){
+            mMillisToCountDown = millisToCountDown;
+            stop();
+        }
+    }
+
     //开始倒计时
     public synchronized void start(){
         mCanceled = false;

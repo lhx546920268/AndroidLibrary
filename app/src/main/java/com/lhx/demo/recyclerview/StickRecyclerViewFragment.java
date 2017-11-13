@@ -84,9 +84,9 @@ public class StickRecyclerViewFragment extends AppBaseFragment {
                     });
                     tabLayout.setShouldDisplayTopSeparator(true);
                     tabLayout.setShouldDisplayBottomSeparator(true);
-                    tabLayout.setDividderWidth(SizeUtil.pxFormDip(0.5f, mContext));
+                    tabLayout.setDividerWidth(SizeUtil.pxFormDip(0.5f, mContext));
                     tabLayout.setDividerColor(getColor(R.color.divider_color));
-                    tabLayout.setDivierHeight(SizeUtil.pxFormDip(20, mContext));
+                    tabLayout.setDividerHeight(SizeUtil.pxFormDip(20, mContext));
                     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                         @Override
                         public void onTabSelected(int position, TabLayout tabLayout) {

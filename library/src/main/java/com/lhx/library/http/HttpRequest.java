@@ -49,7 +49,8 @@ public class HttpRequest {
     public static final int ERROR_CODE_IO = 4; //输入输出流异常
     public static final int ERROR_CODE_FILE_NOT_EXIST = 5; //上传文件文件不存在
     public static final int ERROR_CODE_NETWORK = 6; //网络错误
-    public static final int ERROR_CODE_NOT_KNOW = 7; //未知错误
+    public static final int ERROR_CODE_API = 7; //接口报错
+    public static final int ERROR_CODE_NOT_KNOW = 8; //未知错误
 
     //postBody 默认格式
     protected static final String URL_ENCODE = "application/x-www-form-urlencoded";

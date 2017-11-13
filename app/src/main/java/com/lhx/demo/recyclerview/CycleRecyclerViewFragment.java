@@ -19,7 +19,14 @@ import com.lhx.library.timer.CountDownTimer;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.ViewUtil;
 import com.lhx.library.viewHoler.RecyclerViewHolder;
+import com.lhx.library.viewPager.VerticalViewPager;
+import com.lhx.library.widget.OnSingleClickListener;
+
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 /**
@@ -37,11 +44,14 @@ public class CycleRecyclerViewFragment extends AppBaseFragment {
     @Override
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
+
         setContentView(R.layout.cycle_recycler_view_fragment);
         mRecyclerView = findViewById(R.id.recycler_view);
         mAdapter = new Adapter(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
 
+
+        FrameLayout frameLayout;
 //        ViewUtil.setViewSize(mRecyclerView, SizeUtil.dipFromPx(SizeUtil.getWindowWidth(mContext), mContext), 100);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,
@@ -109,6 +119,34 @@ public class CycleRecyclerViewFragment extends AppBaseFragment {
             @Override
             public void onViewDetachedFromWindow(View v) {
                 countDownTimer.stop();
+            }
+        });
+
+        VerticalViewPager viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(new VerticalViewPager.Adapter() {
+            @Override
+            public int getCount() {
+                return 10;
+            }
+
+            @Override
+            public View getView(View convertView, int position, int viewType) {
+                if(convertView == null){
+                    convertView = View.inflate(mContext, R.layout.vertical_view_pager_item, null);
+                }
+
+                TextView textView = (TextView)convertView.findViewById(R.id.title);
+                textView.setText("第" + position + "个标题");
+
+                textView = (TextView)convertView.findViewById(R.id.subtitle);
+                textView.setText("第" + position + "个副标题");
+
+                return convertView;
+            }
+
+            @Override
+            public int getViewType(int position) {
+                return 0;
             }
         });
     }

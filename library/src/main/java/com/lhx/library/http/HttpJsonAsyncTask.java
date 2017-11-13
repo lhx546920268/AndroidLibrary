@@ -106,11 +106,15 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
             if(resultFromJSONObject(object)){
                 onSuccess(this, processResult(object));
             }else {
+                mApiError = true;
+                mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
                 onFail(this);
             }
         }catch (JSONException e){
             e.printStackTrace();
+            mApiError = true;
             mErrorMessage = "JSON解析错误";
+            mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
             onFail(this);
         }
     }

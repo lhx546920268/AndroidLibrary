@@ -94,7 +94,7 @@ public class TabLayout extends FrameLayout {
     private int mDividerWidth = 0;
     
     //分割线高度
-    private int mDivierHeight = 30;
+    private int mDividerHeight = 30;
 
     ///是否正则动画
     private boolean mAnimating;
@@ -173,9 +173,9 @@ public class TabLayout extends FrameLayout {
     }
 
     ///设置分割线宽度
-    public void setDividderWidth(int dividderWidth){
-        if(dividderWidth != mDividerWidth){
-            mDividerWidth = dividderWidth;
+    public void setDividerWidth(int dividerWidth){
+        if(dividerWidth != mDividerWidth){
+            mDividerWidth = dividerWidth;
             refreshUI();
         }
     }
@@ -210,9 +210,9 @@ public class TabLayout extends FrameLayout {
         mSelectedIndicatorFill = selectedIndicatorFill;
     }
 
-    public void setDivierHeight(int divierHeight) {
-        if(mDivierHeight != divierHeight){
-            mDivierHeight = divierHeight;
+    public void setDividerHeight(int dividerHeight) {
+        if(mDividerHeight != dividerHeight){
+            mDividerHeight = dividerHeight;
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -443,6 +443,9 @@ public class TabLayout extends FrameLayout {
             for(int i = 0;i < count;i ++){
                 TabInfo info = mTabInfos.get(i);
                 info.mTabWidth = mContentWidth / count;
+                if(mSelectedIndicatorFill){
+                    info.mSelectedIndicatorWidth = info.mTabWidth;
+                }
             }
         }else {
             mStyle = STYLE_WARP_CONTENT;
@@ -874,7 +877,7 @@ public class TabLayout extends FrameLayout {
         @Override
         public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-            if ((mDividerWidth > 0 && mDivierHeight > 0) || mSelectedIndicatorHeight > 0) {
+            if ((mDividerWidth > 0 && mDividerHeight > 0) || mSelectedIndicatorHeight > 0) {
 
                 ///绘制分割线
                 int count = parent.getChildCount();
@@ -886,7 +889,7 @@ public class TabLayout extends FrameLayout {
 
                         int top = child.getTop();
                         int bottom = child.getBottom();
-                        int padding = (bottom - top - mDivierHeight) / 2;
+                        int padding = (bottom - top - mDividerHeight) / 2;
 
                         mDividerDrawable.setColor(mDividerColor);
                         mDividerDrawable.setBounds(child.getRight() - mDividerWidth, top + padding, child.getRight(),
