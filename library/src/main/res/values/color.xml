@@ -37,4 +37,7 @@
     <!--editText hint color-->
     <color name="hint_color">#c7c7cd</color>
 
+    <!--主题颜色-->
+    <color name="theme_color">#007aff</color>
+
 </resources>

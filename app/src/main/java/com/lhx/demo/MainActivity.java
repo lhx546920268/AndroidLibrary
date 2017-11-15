@@ -32,6 +32,7 @@ import com.lhx.demo.text.TextBoundsFragment;
 import com.lhx.demo.toast.ToastFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.library.activity.AppBaseActivity;
+import com.lhx.library.media.MediaFragment;
 import com.lhx.library.util.ColorUtil;
 import com.lhx.library.viewHoler.ViewHolder;
 
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("ListView stick");
         infos.add("RecyclerView stick");
         infos.add("Base Dialog");
+        infos.add("Media");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -144,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
                     case 13 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this,
                                 BaseDialogFragment.class));
+                        break;
+                    case 14 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, MediaFragment.class));
                         break;
                 }
 
