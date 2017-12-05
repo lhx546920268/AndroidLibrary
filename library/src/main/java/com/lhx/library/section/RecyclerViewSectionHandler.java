@@ -45,16 +45,6 @@ public interface RecyclerViewSectionHandler extends SectionHandler {
     void onBindItemViewHolderForIndexPath(final RecyclerViewHolder viewHolder, int indexInSection, int section);
 
     /**
-     * getItemId 的重写方法
-     *
-     * @param indexInSection section中的行下标
-     * @param section        section下标
-     * @param type           itemView类型 如果type不等于 ITEMTYPE_VIEW,则indexPath.item 无效
-     * @return getItemId 的返回值
-     */
-    int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type);
-
-    /**
      * getItemViewType 的重写方法 default is ITEMTYPE_VIEW , ITEMTYPE_FOOTER, ITEMTYPE_HEADER
      *
      * @param indexInSection section中的行下标

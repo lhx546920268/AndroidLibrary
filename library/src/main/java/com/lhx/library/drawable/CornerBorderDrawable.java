@@ -23,51 +23,46 @@ import android.view.View;
  * 圆角边框drawable
  */
 
-public class CornerBorderDrawable extends Drawable {
+public class CornerBorderDrawable extends BaseDrawable {
 
     private static final String TAG = "CornerBorderDrawable";
 
-    ///圆角半径 px 设置这个会设置以下4个相同的数值
+    //圆角半径 px 设置这个会设置以下4个相同的数值
     private int mCornerRadius = 0;
 
-    ///左上角圆角 px
+    //左上角圆角 px
     private int mLeftTopCornerRadius = 0;
 
-    ///右上角圆角 px
+    //右上角圆角 px
     private int mRightTopCornerRadius = 0;
 
-    ///左下角圆角 px
+    //左下角圆角 px
     private int mLeftBottomCornerRadius = 0;
 
-    ///右下角圆角 px
+    //右下角圆角 px
     private int mRightBottomCornerRadius = 0;
 
-    ///是否全圆
+    //是否全圆
     private boolean mShouldAbsoluteCircle = false;
 
-    ///边框线条厚度 px
+    //边框线条厚度 px
     private int mBorderWidth = 0;
 
-    ///边框线条颜色
+    //边框线条颜色
     private @ColorInt int mBorderColor = Color.TRANSPARENT;
 
-    ///背景填充颜色
+    //背景填充颜色
     private @ColorInt int mBackgroundColor = Color.TRANSPARENT;
 
-    ///画笔
-    private Paint mPaint;
-
-    ///位图
+    //位图
     private Bitmap mBitmap;
 
-    ///位图着色器
+    //位图着色器
     private BitmapShader mBitmapShader;
 
-    ///位图画笔
+    //位图画笔
     private Paint mBitmapPaint;
 
-    ///范围
-    private RectF mRectF;
 
     public static CornerBorderDrawable setDrawable(View targetView, int cornerRadius, @ColorInt int backgroundColor){
         return setDrawable(targetView, cornerRadius, backgroundColor, 0, 0);
@@ -106,14 +101,17 @@ public class CornerBorderDrawable extends Drawable {
     }
 
     public CornerBorderDrawable() {
+        super();
         initialize();
     }
+
 
     /**
      * 通过位图构建
      * @param bitmap 位图
      */
     public CornerBorderDrawable(@NonNull Bitmap bitmap) {
+        super();
         mBitmap = bitmap;
         initialize();
     }
@@ -124,14 +122,14 @@ public class CornerBorderDrawable extends Drawable {
      * @param context context
      */
     public CornerBorderDrawable(int res, @NonNull Context context){
-
+        super();
         if(res != 0){
             mBitmap = BitmapFactory.decodeResource(context.getResources(), res);
         }
         initialize();
     }
 
-    ///初始化
+    //初始化
     private void initialize(){
         if(mBitmap != null){
             mBitmapShader = new BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
@@ -140,17 +138,6 @@ public class CornerBorderDrawable extends Drawable {
             mBitmapPaint.setAntiAlias(true);
             mBitmapPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         }
-        mPaint = new Paint();
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setAntiAlias(true); ///设置抗锯齿
-    }
-
-    @Override
-    public void setBounds(int left, int top, int right, int bottom) {
-        super.setBounds(left, top, right, bottom);
-        //必须的，否则会出现不可预料的bug，如键盘弹出后消失，直接getBounds() 返回越来越小的rect
-        mRectF = new RectF(left, top, right, bottom);
     }
 
     @Override
@@ -166,7 +153,7 @@ public class CornerBorderDrawable extends Drawable {
         Path path = new Path();
 
         if(mShouldAbsoluteCircle){
-            //全员
+            //全圆
             float radius = Math.max(bounds.width(), bounds.height()) / 2.0f;
             path.addCircle(mRectF.width() / 2.0f, mRectF.height() / 2.0f, radius, Path.Direction.CW);
         }else {
@@ -202,7 +189,7 @@ public class CornerBorderDrawable extends Drawable {
         return path;
     }
 
-    ///是否完全是一个圆，设置这个为true时会忽略 cornerRadius
+    //是否完全是一个圆，设置这个为true时会忽略 cornerRadius
     public void setShouldAbsoluteCircle(boolean shouldAbsoluteCircle){
         if(shouldAbsoluteCircle != mShouldAbsoluteCircle){
             mShouldAbsoluteCircle = shouldAbsoluteCircle;
@@ -221,7 +208,7 @@ public class CornerBorderDrawable extends Drawable {
         invalidateSelf();
     }
 
-    ///设置圆角半径
+    //设置圆角半径
     public void setCornerRadius(int cornerRadius) {
         if(mCornerRadius != cornerRadius){
             mCornerRadius = cornerRadius;
@@ -261,7 +248,7 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///设置边框线条宽度 px
+    //设置边框线条宽度 px
     public void setBorderWidth(int borderWidth) {
         if(mBorderWidth != borderWidth){
             mBorderWidth = borderWidth;
@@ -269,7 +256,7 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///设置边框线条颜色
+    //设置边框线条颜色
     public void setBorderColor(@ColorInt int borderColor) {
         if(mBorderColor != borderColor){
             mBorderColor = borderColor;
@@ -277,7 +264,7 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///设置背景填充颜色
+    //设置背景填充颜色
     public void setBackgroundColor(@ColorInt int backgroundColor){
         if(backgroundColor != mBackgroundColor){
             mBackgroundColor = backgroundColor;
@@ -285,20 +272,18 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
+    @Deprecated
     public void attatchView(View view){
         attatchView(view, false);
     }
 
-    ///如果drawable用于多个view, 使用这个方法 关联view 将copy一份
+    //如果drawable用于多个view, 使用这个方法 关联view 将copy一份
+    @Deprecated
     public void attatchView(View view, boolean shouldCopy){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            view.setBackground(shouldCopy ? this.copy() : this);
-        }else {
-            view.setBackgroundDrawable(shouldCopy ? this.copy() : this);
-        }
+       attachView(view, shouldCopy);
     }
 
-    ///复制一份
+    //复制一份
     public CornerBorderDrawable copy(){
 
         CornerBorderDrawable drawable = new CornerBorderDrawable();
@@ -319,12 +304,12 @@ public class CornerBorderDrawable extends Drawable {
         return drawable;
     }
 
-    ///绘制边框
+    //绘制边框
     private void drawBorder(Canvas canvas){
 
         boolean existBorder = mBorderWidth > 0 && Color.alpha(mBorderColor) != 0;
 
-        ///绘制边框
+        //绘制边框
         if(existBorder){
 
             RectF bounds = new RectF(mRectF);
@@ -337,10 +322,10 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///绘制背景
+    //绘制背景
     private void drawBackground(Canvas canvas){
 
-        ///绘制背景
+        //绘制背景
         if(Color.alpha(mBackgroundColor) != 0){
 
             RectF bounds = new RectF(mRectF);
@@ -355,10 +340,10 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///获取位图圆角半径
+    //获取位图圆角半径
     private void drawBitmap(Canvas canvas){
 
-        ///绘制位图
+        //绘制位图
         if(mBitmapPaint != null){
 
             RectF bounds = new RectF(mRectF);
@@ -367,7 +352,7 @@ public class CornerBorderDrawable extends Drawable {
             int margin = existBorder ? mBorderWidth / 2 : 0;
             bounds.inset(margin, margin);
 
-            ///如果绘制区域不等于位图大小，设置缩放矩阵
+            //如果绘制区域不等于位图大小，设置缩放矩阵
             if(bounds.width() != mBitmap.getWidth() || bounds.height() != mBitmap.getHeight()){
                 Matrix matrix = new Matrix();
                 matrix.setScale(bounds.width() / mBitmap.getWidth(), bounds.height() / mBitmap.getHeight());
@@ -378,23 +363,7 @@ public class CornerBorderDrawable extends Drawable {
         }
     }
 
-    ///以下是父类方法
-
-    @Override
-    public void setAlpha(int alpha) {
-        mPaint.setAlpha(alpha);
-    }
-
-    @Override
-    public void setColorFilter(ColorFilter colorFilter) {
-        mPaint.setColorFilter(colorFilter);
-    }
-
-    @Override
-    public int getOpacity() {
-        return PixelFormat.TRANSLUCENT;
-    }
-
+    //以下是父类方法
     @Override
     public int getIntrinsicHeight() {
         if(mBitmap != null){

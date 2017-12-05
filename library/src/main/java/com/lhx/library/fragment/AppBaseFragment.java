@@ -10,6 +10,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.lhx.library.R;
 import com.lhx.library.activity.ActivityStack;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
@@ -441,6 +443,14 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     //获取dime
     public float getDimen(@DimenRes int dimen){
         return mContext.getResources().getDimension(dimen);
+    }
+
+    public int getDimenIntValue(@DimenRes int dimen){
+        return mContext.getResources().getDimensionPixelOffset(dimen);
+    }
+
+    public int getInteger(@IntegerRes int intValue){
+        return mContext.getResources().getInteger(intValue);
     }
 
     public int getDimensionPixelSize(@DimenRes int dimen){

@@ -41,55 +41,113 @@ public class StringUtil {
     }
 
     /**
-     * 解析字符串为整型
-     * @param string 要解析的字符串
+     * 解析对象为整型
+     * @param object 要解析的对象
      * @return 整型
      */
-    public static int parseInt(String string){
+    public static int parseInt(Object object){
         int value = 0;
-        try {
-            value = Integer.parseInt(string);
-        }catch (NumberFormatException e){
-            e.printStackTrace();
+        if(object == null)
+            return 0;
+        if(object instanceof String){
+            try {
+                value = Integer.parseInt((String)object);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        }else if(object instanceof Integer){
+            return (int)object;
+        }else if(object instanceof Long){
+            return ((Long) object).intValue();
+        }else if(object instanceof Float){
+            return ((Float) object).intValue();
+        }else if(object instanceof Double){
+            return ((Double) object).intValue();
         }
 
         return value;
     }
 
-    public static long parseLong(String string){
+    public static long parseLong(Object object){
         long value = 0;
-        if(!isEmpty(string)){
+        if(object == null)
+            return 0;
+        if(object instanceof String){
             try {
-                value = Long.parseLong(string);
+                value = Long.parseLong((String)object);
             }catch (NumberFormatException e){
                 e.printStackTrace();
             }
+        }else if(object instanceof Integer || object instanceof Long){
+            return (long)object;
+        }else if(object instanceof Float){
+            return ((Float) object).longValue();
+        }else if(object instanceof Double){
+            return ((Double) object).longValue();
         }
+
         return value;
     }
 
-    public static float parseFloat(String string){
+    public static float parseFloat(Object object){
         float value = 0;
-        if(!isEmpty(string)){
+        if(object == null)
+            return 0;
+        if(object instanceof String){
             try {
-                value = Float.parseFloat(string);
+                value = Float.parseFloat((String)object);
             }catch (NumberFormatException e){
                 e.printStackTrace();
             }
+        }else if(object instanceof Integer){
+            return ((Integer) object).floatValue();
+        }else if(object instanceof Long){
+            return ((Long) object).floatValue();
+        }else if(object instanceof Float){
+            return (float)object;
+        }else if(object instanceof Double){
+            return ((Double) object).floatValue();
         }
+
         return value;
     }
 
-    public static double parseDouble(String string){
+    public static double parseDouble(Object object){
         double value = 0;
-        if(!isEmpty(string)){
+        if(object == null)
+            return 0;
+        if(object instanceof String){
             try {
-                value = Double.parseDouble(string);
+                value = Double.parseDouble((String)object);
             }catch (NumberFormatException e){
                 e.printStackTrace();
             }
+        }else if(object instanceof Integer){
+            return ((Integer) object).doubleValue();
+        }else if(object instanceof Long){
+            return ((Long) object).doubleValue();
+        }else if(object instanceof Float || object instanceof Double){
+            return (double)object;
         }
+
         return value;
+    }
+
+    /**
+     * 是否有某个前缀
+     * @param string 要判断的图片
+     * @param prefix 前缀
+     * @return 是否
+     */
+    public static boolean hasPrefix(String string, String prefix){
+        if(TextUtils.isEmpty(string) || TextUtils.isEmpty(prefix))
+            return false;
+
+        if(string.length() < prefix.length())
+            return false;
+
+        String str = string.substring(0, prefix.length());
+        return str.equals(prefix);
     }
 
     /**

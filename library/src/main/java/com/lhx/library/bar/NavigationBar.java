@@ -78,11 +78,12 @@ public class NavigationBar extends RelativeLayout {
 
         if (!isInEditMode()) {
 
-            setBackgroundColor(App.NavigationBarBackgroundColor);
+            setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_bar_background_color));
             ///标题
             title_textView = new TextView(context);
-            title_textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigationBarTitleTextSize);
-            title_textView.setTextColor(App.NavigationBarTintColor);
+            title_textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen
+                    .navigation_bar_title_text_size));
+            title_textView.setTextColor(ContextCompat.getColor(context, R.color.navigation_bar_tint_color));
             title_textView.setLines(1);
             title_textView.setEllipsize(TextUtils.TruncateAt.END);
             title_textView.setBackgroundColor(Color.TRANSPARENT);
@@ -98,7 +99,7 @@ public class NavigationBar extends RelativeLayout {
 
             ///阴影
             shadow_line = new View(context);
-            shadow_line.setBackgroundColor(App.NavigationBarShadowColor);
+            shadow_line.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_bar_shadow_color));
             layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, SizeUtil.pxFormDip(0.5f, context));
             layoutParams.addRule(ALIGN_PARENT_BOTTOM);
             this.addView(shadow_line, layoutParams);
@@ -249,7 +250,7 @@ public class NavigationBar extends RelativeLayout {
                 drawable = ContextCompat.getDrawable(getContext(), icon);
             }
             if (drawable == null) {
-                title = App.NavigationBarBackButtonTitle;
+                title = getContext().getString(R.string.navigation_bar_back_title);
             }
 
             TextView textView = setNavigationItem(title, null, NavigationBar
@@ -285,8 +286,9 @@ public class NavigationBar extends RelativeLayout {
 
         textView.setGravity(Gravity.CENTER);
         textView.setPadding(SizeUtil.pxFormDip(10, getContext()), 0, SizeUtil.pxFormDip(10, getContext()), 0);
-        textView.setTextColor(App.NavigationBarTintColor);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, App.NavigatonBarButtonTextSize);
+        textView.setTextColor(ContextCompat.getColor(getContext(), R.color
+                .navigation_bar_tint_color));
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(R.dimen.navigation_bar_item_text_size));
         textView.setBackgroundColor(Color.TRANSPARENT);
 
         if(drawable != null){

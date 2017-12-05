@@ -2,6 +2,7 @@ package com.lhx.library.recyclerView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -60,6 +61,12 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     public RecyclerViewAdapter(@NonNull RecyclerView recyclerView) {
 
         mRecyclerView = recyclerView;
+        if(mRecyclerView.getItemAnimator() instanceof DefaultItemAnimator){
+            ((DefaultItemAnimator)mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
+
+        setHasStableIds(true);
+
         mContext = mRecyclerView.getContext();
 
         ///添加数据改变监听
@@ -168,11 +175,6 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     @Override
     public int numberOfSection() {
         return 1;
-    }
-
-    @Override
-    public int getItemIdForIndexPath(int indexInSection, int section, @ItemType int type){
-        return 0;
     }
 
     @Override
@@ -441,24 +443,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public final long getItemId(int position) {
-        if(isEmptyView(position) || isLoadMoreItem(position) || isHeader(position) || isFooter(position))
-            return 0;
-
-        SectionInfo sectionInfo = sectionInfoForPosition(position);
-
-        ///存在头部
-        if(sectionInfo.isHeaderForPosition(position)){
-
-            return getItemIdForIndexPath(0, sectionInfo.section, ITEM_TYPE_HEADER);
-        }
-
-        ///存在底部
-        if(sectionInfo.isFooterForPosition(position)){
-
-            return getItemIdForIndexPath(0, sectionInfo.section, ITEM_TYPE_FOOTER);
-        }
-
-        return getItemIdForIndexPath(position - sectionInfo.getItemPosition(), sectionInfo.section, ITEM_TYPE_VIEW);
+        return position;
     }
 
     @Override

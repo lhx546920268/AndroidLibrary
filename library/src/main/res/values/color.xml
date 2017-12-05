@@ -26,6 +26,9 @@
     <!--深灰色-->
     <color name="dark_gray_color">#868686</color>
 
+    <!--list view 选中背景-->
+    <color name="list_view_selector_gray">#e9e9e9</color>
+
     <color name="light_blue">#ff007aff</color>
 
     <!--分割线颜色-->
@@ -39,5 +42,22 @@
 
     <!--主题颜色-->
     <color name="theme_color">#007aff</color>
+    <color name="theme_tint_color">#ffffff</color>
+
+
+    <!--导航栏背景颜色-->
+    <color name="navigation_bar_background_color">#ffffff</color>
+
+    <!--导航栏阴影颜色-->
+    <color name="navigation_bar_shadow_color">#c8c8c8</color>
+
+    <!--导航栏 tint color 也就是 标题、按钮颜色-->
+    <color name="navigation_bar_tint_color">#000000</color>
+
+    <!--web进度条颜色-->
+    <color name="web_progress_color">#007aff</color>
+
+    <!--图片加载时的背景颜色-->
+    <color name="image_placeholder_color">#f0f0f0</color>
 
 </resources>
