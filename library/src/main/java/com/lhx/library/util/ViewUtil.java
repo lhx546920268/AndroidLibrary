@@ -19,10 +19,10 @@ public class ViewUtil {
     public static void setBackground(Drawable backgroundDrawable, View view){
 
         if(view != null){
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
-                view.setBackgroundDrawable(backgroundDrawable);
-            }else {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
                 view.setBackground(backgroundDrawable);
+            }else {
+                view.setBackgroundDrawable(backgroundDrawable);
             }
         }
     }

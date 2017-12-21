@@ -8,7 +8,9 @@
     <!--ImageLoader-->
     <item name="tag_scale_type" type="id"/>
     <item name="tag_background" type="id"/>
-    <item name="tag_first" type="id"/>
-    <item name="tag_second" type="id"/>
+    <item name="tag_loading_url" type="id"/>
+
+    <!--导航栏返回按钮-->
+    <string name="navigation_bar_back_title">返回</string>
 
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <!--有下拉刷新的gridView fragment-->
+    <com.lhx.library.refresh.DefaultPtrFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ptr_layout">
+
+        <GridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:id="@+id/grid_view"/>
+    </com.lhx.library.refresh.DefaultPtrFrameLayout>
+
+</FrameLayout>

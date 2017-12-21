@@ -1,4 +1,4 @@
-package com.lhx.library.media;
+package com.lhx.library.media.model;
 
 import android.database.Cursor;
 import android.provider.MediaStore;

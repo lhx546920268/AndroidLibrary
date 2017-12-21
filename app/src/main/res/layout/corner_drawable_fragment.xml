@@ -4,11 +4,11 @@
               android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
         android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
         android:layout_marginTop="30dp">
 
         <TextView
@@ -18,32 +18,90 @@
             android:text="圆角"
             android:gravity="center"
             android:textSize="20sp"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
             android:textColor="@color/black"
             />
 
-    </FrameLayout>
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/corner_text1"
+            android:text="圆角1"
+            android:gravity="center"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/red"
+            android:layout_marginTop="30dp"/>
 
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/corner_text1"
-        android:text="圆角1"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:layout_gravity="center_horizontal"
-        android:background="@android:color/holo_orange_light"
-        android:layout_marginTop="30dp"/>
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/corner_text2"
+            android:text="圆角2"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/holo_orange_light"
+            android:layout_marginTop="30dp"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/corner_text2"
-        android:text="圆角2"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:textColor="@color/black"
+
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:background="@color/cyan"
         android:layout_gravity="center_horizontal"
-        android:background="@android:color/holo_orange_light"
-        android:layout_marginTop="30dp"/>
+        android:id="@+id/img_square"/>
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/cyan"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/img_rect"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/triangle_left"
+            android:layout_marginRight="20dp"/>
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/triangle_up"
+            android:layout_marginRight="20dp"/>
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/triangle_right"
+            android:layout_marginRight="20dp"/>
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/triangle_down"
+            android:layout_marginRight="20dp"/>
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@color/white"
+            android:id="@+id/triangle"
+            android:scaleType="centerInside"
+            android:layout_marginRight="20dp"/>
+    </LinearLayout>
 </LinearLayout>

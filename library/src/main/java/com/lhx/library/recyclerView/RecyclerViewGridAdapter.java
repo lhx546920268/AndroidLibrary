@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -70,6 +71,12 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
     public @ColorInt int mDividerColor;
 
     ///构造方法
+
+
+    public RecyclerViewGridAdapter(@NonNull RecyclerView recyclerView) {
+        this(VERTICAL_LIST, recyclerView);
+    }
+
     public RecyclerViewGridAdapter(@Orientation int orientation, RecyclerView recyclerView) {
         super(recyclerView);
 
@@ -255,18 +262,20 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                 sectionInfo.numberOfColumns = numberOfColumnInSection(section);
                 sectionInfo.isExistHeader = shouldExistSectionHeaderForSection(section);
                 sectionInfo.isExistFooter = shouldExistSectionFooterForSection(section);
-                sectionInfo.itemSpace = getItemSpaceAtSection(section);
-                sectionInfo.itemHeaderSpace = getItemHeaderSpaceAtSection(section);
-                sectionInfo.itemFooterSpace = getItemFooterSpaceAtSection(section);
-                sectionInfo.footerUseSectionInsets = footerShouldUseSectionInsets(section);
-                sectionInfo.headerUseSectionInsets = headerShouldUseSectionInsets(section);
-
                 EdgeInsets insets = getSectionInsetsAtSection(section);
                 if(insets == null){
                     insets = mSectionInsets;
                 }
                 sectionInfo.sectionInsets = insets;
                 sectionInfo.sectionBegin = count;
+
+                sectionInfo.footerUseSectionInsets = footerShouldUseSectionInsets(section);
+                sectionInfo.headerUseSectionInsets = headerShouldUseSectionInsets(section);
+
+                sectionInfo.itemSpace = getItemSpaceAtSection(section);
+                sectionInfo.itemHeaderSpace = getItemHeaderSpaceAtSection(section);
+                sectionInfo.itemFooterSpace = getItemFooterSpaceAtSection(section);
+
                 mSections.add(sectionInfo);
 
                 count += numberOfItem;

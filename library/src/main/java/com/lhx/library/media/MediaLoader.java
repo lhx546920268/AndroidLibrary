@@ -9,6 +9,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
+import com.lhx.library.media.model.MediaFolderInfo;
+import com.lhx.library.media.model.MediaInfo;
+
 import java.util.ArrayList;
 
 /**
@@ -52,7 +55,7 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
             case LOAD_IMAGE_ID : {
 
                 CursorLoader cursorLoader = (CursorLoader)loader;
-                boolean isAll = cursorLoader.getSelection() != null && cursorLoader.getSelectionArgs() != null;
+                boolean isAll = cursorLoader.getSelection() == null && cursorLoader.getSelectionArgs() == null;
                 if(data != null){
 
                     int count = data.getCount();
@@ -84,6 +87,7 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
                                     folderInfos.add(folderInfo);
                                 }
                             }
+
 
                         }while (data.moveToNext());
                     }
@@ -141,14 +145,14 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
             loader.setUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
             //时间倒序
-            mImageLoader.setSortOrder(MediaStore.Images.Media.DATE_ADDED + "desc");
+            loader.setSortOrder(MediaStore.Images.Media.DATE_ADDED + " desc");
             mImageLoader = loader;
         }
         return mImageLoader;
     }
 
     //加载图片
-    private void loadImages(LoaderManager loaderManager, String bucketId){
+    public void loadImages(LoaderManager loaderManager, String bucketId){
 
         getImageLoader();
 

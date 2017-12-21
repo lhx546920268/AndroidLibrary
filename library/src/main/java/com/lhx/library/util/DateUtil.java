@@ -55,37 +55,37 @@ public class DateUtil {
      * 时间转成给定格式
      * @param time 要转的时间字符串
      * @param timeFormat 当前时间格式
-     * @param targetFromat 目标格式
+     * @param targetFormat 目标格式
      * @return 格式化的时间
      */
-    public static String formatTime(String time, String timeFormat, String targetFromat){
-        return formatDate(praseTime(time, timeFormat), targetFromat);
+    public static String formatTime(String time, String timeFormat, String targetFormat){
+        return formatDate(parseTime(time, timeFormat), targetFormat);
     }
 
     /**
      * 把时间戳转成给定格式
      * @param timestamp 要转的时间戳
-     * @param targetFromat 目标格式
+     * @param targetFormat 目标格式
      * @return 格式化的时间
      */
-    public static String formatTime(long timestamp, String targetFromat){
-        return formatDate(new Date(timestamp), targetFromat);
+    public static String formatTime(long timestamp, String targetFormat){
+        return formatDate(new Date(getMicroTimestamp(timestamp)), targetFormat);
     }
 
     /**
      * 把时间转成给定格式
      * @param date 要转的时间
-     * @param targetFromat 目标格式
+     * @param targetFormat 目标格式
      * @return 格式化的时间
      */
-    public static String formatDate(Date date, String targetFromat){
+    public static String formatDate(Date date, String targetFormat){
 
-        if(DateFormatYMd.equals(targetFromat)){
+        if(DateFormatYMd.equals(targetFormat)){
             return mYMdDateFormat.format(date);
-        }else if(DateFormatYMdHm.equals(targetFromat)){
+        }else if(DateFormatYMdHm.equals(targetFormat)){
             return mYMdHmDateFormat.format(date);
         }else {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(targetFromat, Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat(targetFormat, Locale.getDefault());
             return dateFormat.format(date);
         }
     }
@@ -99,13 +99,18 @@ public class DateUtil {
     }
 
 
+    @Deprecated
+    public static Date praseTime(String time, String format){
+        return parseTime(time, format);
+    }
+
     /**
      * 解析时间
      * @param time 时间
      * @param format 格式
      * @return date
      */
-    public static Date praseTime(String time, String format){
+    public static Date parseTime(String time, String format){
         try {
             if(DateFormatYMd.equals(format)){
                 return mYMdDateFormat.parse(time);
@@ -164,5 +169,18 @@ public class DateUtil {
         }
 
         return String.valueOf(ms);
+    }
+
+    /**
+     * 获取符合java的时间戳
+     * @param timestamp 时间戳
+     * @return 13位时间戳
+     */
+    public static long getMicroTimestamp(long timestamp){
+        if(String.valueOf(timestamp).length() == 13){
+            return timestamp;
+        }
+
+        return timestamp * 1000;
     }
 }

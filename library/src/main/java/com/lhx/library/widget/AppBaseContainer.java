@@ -101,7 +101,7 @@ public class AppBaseContainer extends LinearLayout {
             if(mNavigationBar == null){
                 mNavigationBar = new NavigationBar(mContext);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
-                        .MATCH_PARENT, SizeUtil.pxFormDip(App.NavigationBarHeightDip, getContext()));
+                        .MATCH_PARENT, mContext.getResources().getDimensionPixelOffset(R.dimen.navigation_bar_height));
                 addView(mNavigationBar, 0, layoutParams);
             }
 

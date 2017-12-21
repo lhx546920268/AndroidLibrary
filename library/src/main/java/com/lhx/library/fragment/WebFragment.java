@@ -85,7 +85,8 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         mAgentWeb = AgentWeb.with(this)//
                 .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
-                .setIndicatorColorWithHeight(App.WebProgressColor, 2)//
+                .setIndicatorColorWithHeight(getColor(R.color.web_progress_color), getInteger(R.integer
+                        .web_progress_height_dp))//
                 .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
                 .setReceivedTitleCallback(this)
                 .setWebViewClient(new WebViewClient(){

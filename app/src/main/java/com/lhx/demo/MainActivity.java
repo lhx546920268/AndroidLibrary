@@ -1,18 +1,12 @@
 package com.lhx.demo;
 
 import android.content.Intent;
-import android.database.DataSetObserver;
-import android.graphics.Color;
-import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,16 +18,15 @@ import com.lhx.demo.listview.StickListViewFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
 import com.lhx.demo.recyclerview.CycleRecyclerViewFragment;
-import com.lhx.demo.recyclerview.StickRecyclerViewFragment;
 import com.lhx.demo.recyclerview.TetrisFragment;
 import com.lhx.demo.refresh.RefreshActivity;
+import com.lhx.demo.state.StateFragment;
 import com.lhx.demo.tab.TabLayoutFragment;
 import com.lhx.demo.text.TextBoundsFragment;
 import com.lhx.demo.toast.ToastFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.library.activity.AppBaseActivity;
-import com.lhx.library.media.MediaFragment;
-import com.lhx.library.util.ColorUtil;
+import com.lhx.library.media.fragment.MediaFragment;
 import com.lhx.library.viewHoler.ViewHolder;
 
 import java.util.ArrayList;
@@ -61,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("RecyclerView stick");
         infos.add("Base Dialog");
         infos.add("Media");
+        infos.add("State");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -87,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView textView = ViewHolder.get(convertView, R.id.text);
                 textView.setText(infos.get(position));
-                textView.setBackgroundColor(ColorUtil.whitePercentColor(0.9f, 1.0f));
+//                textView.setBackgroundColor(ColorUtil.whitePercentColor(0.9f, 1.0f));
 
                 return convertView;
             }
@@ -149,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 14 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, MediaFragment.class));
+                        break;
+                    case 15 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, StateFragment.class));
                         break;
                 }
 
