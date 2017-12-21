@@ -20,7 +20,7 @@ public class App {
     public static int NavigationBarShadowColor = Color.LTGRAY;
 
     //导航栏tint颜色
-    public static int NavigationBarTintColor = Color.BLACK;
+    public static int NavigationBarTintColor = Color.parseColor("#009784");
 
     //导航栏标题大小
     public static float NavigationBarTitleTextSize = 17.0f;
