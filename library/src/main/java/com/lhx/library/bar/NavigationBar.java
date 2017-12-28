@@ -1,6 +1,7 @@
 package com.lhx.library.bar;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
