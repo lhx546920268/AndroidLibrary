@@ -44,12 +44,23 @@ public class ViewUtil {
         }
     }
 
-    public static int getViewVisiableHeight(View view, int containerHeight){
+    /**
+     * 获取可见高度
+     * @param view 对应的view
+     * @param containerHeight 容器高度
+     * @return 可见高度
+     */
+    public static int getViewVisibleHeight(View view, int containerHeight){
         if(view == null)
             return 0;
 
         int top = view.getTop();
         int height = view.getHeight();
         return Math.min(containerHeight - Math.abs(top), height);
+    }
+
+    @Deprecated
+    public static int getViewVisiableHeight(View view, int containerHeight){
+        return getViewVisibleHeight(view, containerHeight);
     }
 }

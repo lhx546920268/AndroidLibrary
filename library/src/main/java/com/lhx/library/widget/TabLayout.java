@@ -22,7 +22,9 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.SizeUtil;
+import com.lhx.library.util.ViewUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -107,6 +109,15 @@ public class TabLayout extends FrameLayout {
 
     ///按钮正常时标题字体
     private int mNormalTitleSize = 16;
+
+    ///按钮正常时背景颜色
+    private int mNormalBackgroundColor = 0;
+
+    ///按钮选中时背景颜色
+    private int mSelectedBackgroundColor = 0;
+
+    ///按钮背景圆角
+    private int mBackgroundRadius = 0;
 
     ///按钮选中时标题颜色
     private int mSelectedTitleColor = Color.RED;
@@ -214,6 +225,27 @@ public class TabLayout extends FrameLayout {
         if(mDividerHeight != dividerHeight){
             mDividerHeight = dividerHeight;
             mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void setNormalBackgroundColor(int normalBackgroundColor) {
+        if(mNormalBackgroundColor != normalBackgroundColor){
+            mNormalBackgroundColor = normalBackgroundColor;
+            refreshUI();
+        }
+    }
+
+    public void setSelectedBackgroundColor(int selectedBackgroundColor) {
+        if(mSelectedBackgroundColor != selectedBackgroundColor){
+            mSelectedBackgroundColor = selectedBackgroundColor;
+            refreshUI();
+        }
+    }
+
+    public void setBackgroundRadius(int backgroundRadius) {
+        if(mBackgroundRadius != backgroundRadius){
+            mBackgroundRadius = backgroundRadius;
+            refreshUI();
         }
     }
 
@@ -803,14 +835,16 @@ public class TabLayout extends FrameLayout {
 
         TabInfo mInfo;
 
+        ///背景
+        CornerBorderDrawable mCornerBorderDrawable;
+
         public Tab(Context context) {
             super(context);
 
-
-
             mTextView = new TextView(context);
             mTextView.setLines(1);
-            mTextView.setPadding(SizeUtil.pxFormDip(5, context), 0, SizeUtil.pxFormDip(5, context), 0);
+            mTextView.setPadding(SizeUtil.pxFormDip(8, context), SizeUtil.pxFormDip(2, context), SizeUtil.pxFormDip
+                    (8, context), SizeUtil.pxFormDip(2, context));
             mTextView.setEllipsize(TextUtils.TruncateAt.END);
             addView(mTextView);
 
@@ -840,6 +874,7 @@ public class TabLayout extends FrameLayout {
             setLayoutParams(layoutParams);
         }
 
+
         ///设置是否选中
         public void setSelectedState(boolean selected) {
 
@@ -849,6 +884,17 @@ public class TabLayout extends FrameLayout {
             if(drawable != null && mInfo.mIconShouldRenderAsTemplate){
                 DrawableCompat.wrap(drawable);
                 DrawableCompat.setTint(drawable, selected ? mSelectedTitleColor : mNormalTitleColor);
+            }
+
+            if(mSelectedBackgroundColor != 0 || mNormalBackgroundColor != 0){
+                if(mCornerBorderDrawable == null){
+                   mCornerBorderDrawable = new CornerBorderDrawable();
+                }
+                mCornerBorderDrawable.setCornerRadius(mBackgroundRadius);
+                mCornerBorderDrawable.setBackgroundColor(selected ? mSelectedBackgroundColor : mNormalBackgroundColor);
+                mCornerBorderDrawable.attachView(mTextView);
+            }else {
+                ViewUtil.setBackground(null, this);
             }
         }
     }

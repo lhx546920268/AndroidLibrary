@@ -1,5 +1,6 @@
 package com.lhx.demo.tab;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.Toast;
 
 import com.lhx.demo.R;
 import com.lhx.library.fragment.AppBaseFragment;
+import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.TabLayout;
 
 /**
@@ -29,6 +31,8 @@ public class TabLayoutFragment extends AppBaseFragment {
 
         TabLayout tabLayout = findViewById(R.id.tab_layout1);
         tabLayout.setAutomaticallyDetectStyle(true);
+        tabLayout.setSelectedBackgroundColor(Color.CYAN);
+        tabLayout.setBackgroundRadius(SizeUtil.pxFormDip(15, mContext));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position, TabLayout tabLayout) {
