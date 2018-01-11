@@ -111,6 +111,7 @@ public class SegmentedControl extends LinearLayout{
         if(mTintColor != tintColor){
             mTintColor = tintColor;
 
+            mBackgroundDrawable.setBorderColor(mTintColor);
             if(mItems != null && mItems.size() > 0){
                 for(SegmentedItem item : mItems){
                     item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
@@ -233,7 +234,6 @@ public class SegmentedControl extends LinearLayout{
             item.position = i;
             item.setText(mButtonTitles[i]);
             item.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
-            item.setGravity(Gravity.CENTER);
             item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
             setItemCornerRadius(item, i);
             item.setSelected(i == mSelectedPosition);
@@ -273,6 +273,10 @@ public class SegmentedControl extends LinearLayout{
         public SegmentedItem(Context context) {
             super(context);
 
+            setGravity(Gravity.CENTER);
+            int paddingLeft = SizeUtil.pxFormDip(10, context);
+            int paddingTop = SizeUtil.pxFormDip(5, context);
+            setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
             initialization();
         }
 

@@ -51,12 +51,12 @@ public class TabLayoutFragment extends AppBaseFragment {
         });
         tabLayout.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
             @Override
-            public int numberOfTabs() {
+            public int numberOfTabs(TabLayout layout) {
                 return datas.length;
             }
 
             @Override
-            public void configureTabInfo(TabLayout.TabInfo tab, int pos) {
+            public void configureTabInfo(TabLayout layout, TabLayout.TabInfo tab, int pos) {
                 tab.setTitle(datas[pos]);
             }
         });
@@ -67,12 +67,12 @@ public class TabLayoutFragment extends AppBaseFragment {
         tabLayout1.setShouldDisplayBottomSeparator(true);
         tabLayout1.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
             @Override
-            public int numberOfTabs() {
+            public int numberOfTabs(TabLayout layout) {
                 return datas1.length;
             }
 
             @Override
-            public void configureTabInfo(TabLayout.TabInfo tab, int pos) {
+            public void configureTabInfo(TabLayout layout, TabLayout.TabInfo tab, int pos) {
                 tab.setTitle(datas1[pos]);
             }
         });
@@ -81,12 +81,12 @@ public class TabLayoutFragment extends AppBaseFragment {
         tabLayout2.setAutomaticallyDetectStyle(true);
         tabLayout2.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
             @Override
-            public int numberOfTabs() {
+            public int numberOfTabs(TabLayout layout) {
                 return datas2.length;
             }
 
             @Override
-            public void configureTabInfo(TabLayout.TabInfo tab, int pos) {
+            public void configureTabInfo(TabLayout layout, TabLayout.TabInfo tab, int pos) {
                 tab.setTitle(datas2[pos]);
             }
         });

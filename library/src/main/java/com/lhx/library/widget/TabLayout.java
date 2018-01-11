@@ -57,7 +57,7 @@ public class TabLayout extends FrameLayout {
 
     ///下划线宽度padding
     private int mSelectedIndicatorWidthPadding = 10;
-    
+
     //下划线高度
     private int mSelectedIndicatorHeight = 4;
 
@@ -94,7 +94,7 @@ public class TabLayout extends FrameLayout {
 
     ///分割线宽度
     private int mDividerWidth = 0;
-    
+
     //分割线高度
     private int mDividerHeight = 30;
 
@@ -102,7 +102,7 @@ public class TabLayout extends FrameLayout {
     private boolean mAnimating;
 
     ///菜单按钮宽度扩展
-    private int mTabPadding = 40;
+    private int mTabPadding = 30;
 
     ///按钮正常时标题颜色
     private int mNormalTitleColor = Color.BLACK;
@@ -420,11 +420,11 @@ public class TabLayout extends FrameLayout {
     ///获取数据
     private void fetchData(){
         Paint paint = new Paint();
-        int count = mTabLayoutDataSet.numberOfTabs();
+        int count = mTabLayoutDataSet.numberOfTabs(this);
 
         for (int i = 0; i < count; i++) {
             TabInfo info = new TabInfo();
-            mTabLayoutDataSet.configureTabInfo(info, i);
+            mTabLayoutDataSet.configureTabInfo(this, info, i);
 
             ///计算按钮的宽度
             switch (mStyle) {
@@ -441,7 +441,13 @@ public class TabLayout extends FrameLayout {
                 info.mSelectedIndicatorWidth = info.mTabWidth;
             }else {
                 paint.setTextSize(SizeUtil.pxFromSp(mSelectedTitleSize, getContext()));
-                info.mSelectedIndicatorWidth = (int) paint.measureText(info.mTitle) + 1 + mSelectedIndicatorWidthPadding * 2;
+                info.mSelectedIndicatorWidth = info.mTabWidth - mTabPadding + mSelectedIndicatorWidthPadding * 2;
+                if(i == 0){
+                    info.paddingLeft = mTabPadding / 2;
+                }else if(i == count - 1){
+                    info.paddingRight = mTabPadding / 2;
+                }
+                info.mTabWidth += info.paddingLeft + info.paddingRight;
             }
 
             mTabInfos.add(info);
@@ -451,12 +457,12 @@ public class TabLayout extends FrameLayout {
     ///获取数据并自动识别样式
     private void fetchDataAndDetectStyle(){
         Paint paint = new Paint();
-        int count = mTabLayoutDataSet.numberOfTabs();
+        int count = mTabLayoutDataSet.numberOfTabs(this);
 
         int totalContentWidth = 0;
         for (int i = 0; i < count; i++) {
             TabInfo info = new TabInfo();
-            mTabLayoutDataSet.configureTabInfo(info, i);
+            mTabLayoutDataSet.configureTabInfo(this, info, i);
 
             ///计算按钮的宽度
             paint.setTextSize(SizeUtil.pxFromSp(Math.max(mNormalTitleSize, mSelectedTitleSize), getContext()));
@@ -464,7 +470,7 @@ public class TabLayout extends FrameLayout {
             totalContentWidth += info.mTabWidth;
 
             paint.setTextSize(SizeUtil.pxFromSp(mSelectedTitleSize, getContext()));
-            info.mSelectedIndicatorWidth = (int) paint.measureText(info.mTitle) + 1 + mSelectedIndicatorWidthPadding * 2;
+            info.mSelectedIndicatorWidth = info.mTabWidth - mTabPadding + mSelectedIndicatorWidthPadding * 2;
 
             mTabInfos.add(info);
         }
@@ -481,6 +487,24 @@ public class TabLayout extends FrameLayout {
             }
         }else {
             mStyle = STYLE_WARP_CONTENT;
+            for(int i = 0;i < mTabInfos.size();i ++){
+                int paddingLeft = 0;
+                int paddingRight = 0;
+                if(mStyle == STYLE_WARP_CONTENT){
+                    paddingLeft = mTabPadding / 2;
+                    paddingRight = mTabPadding / 2;
+
+                    if(i == 0){
+                        paddingLeft *= 2;
+                    }else if(i == mTabInfos.size() - 1){
+                        paddingRight *= 2;
+                    }
+                }
+                TabInfo info = mTabInfos.get(i);
+                info.mTabWidth += paddingLeft + paddingRight;
+                info.paddingLeft = paddingLeft;
+                info.paddingRight = paddingRight;
+            }
         }
     }
 
@@ -563,7 +587,8 @@ public class TabLayout extends FrameLayout {
             holder = (ViewHolder) mRecyclerView.findViewHolderForAdapterPosition(previousPosition);
             if(holder != null){
                 TabInfo info = mTabInfos.get(mSelectedPosition);
-                previousLeft = (info.mTabWidth - info.mSelectedIndicatorWidth) / 2;
+                previousLeft = (info.mTabWidth - info.paddingLeft - info.paddingRight - info.mSelectedIndicatorWidth) / 2 + info
+                        .paddingLeft;
                 holder.mTab.setSelectedState(false);
                 previousLeft += holder.mTab.getLeft();
             }else {
@@ -591,7 +616,8 @@ public class TabLayout extends FrameLayout {
             layoutParams.width = info.mSelectedIndicatorWidth;
             mSelectedIndicator.setLayoutParams(layoutParams);
 
-            int left = (info.mTabWidth - info.mSelectedIndicatorWidth) / 2;
+            int left = (info.mTabWidth - info.paddingLeft - info.paddingRight - info.mSelectedIndicatorWidth) / 2 +
+                    info.paddingLeft;
             if (holder != null) {
                 left += holder.mTab.getLeft();
             } else {
@@ -710,8 +736,8 @@ public class TabLayout extends FrameLayout {
 
         int x = 0;
         for (int i = 0; i < position; i++) {
-            TabInfo TabInfo = mTabInfos.get(i);
-            x += TabInfo.mTabWidth + mDividerWidth;
+            TabInfo info = mTabInfos.get(i);
+            x += info.mTabWidth + mDividerWidth + info.paddingLeft;
         }
 
         return x;
@@ -724,9 +750,9 @@ public class TabLayout extends FrameLayout {
         public void onBindViewHolder(ViewHolder holder, int position) {
 
             TabInfo info = mTabInfos.get(position);
-            Tab Tab = holder.mTab;
-            Tab.setInfo(info);
-            Tab.setSelectedState(mSelectedPosition == position);
+            Tab tab = holder.mTab;
+            tab.setInfo(info);
+            tab.setSelectedState(mSelectedPosition == position);
         }
 
         @Override
@@ -791,6 +817,9 @@ public class TabLayout extends FrameLayout {
         ///选中下划线宽度
         int mSelectedIndicatorWidth;
 
+        int paddingLeft;
+        int paddingRight;
+
         Drawable mDrawable;
 
         //图片是否当初模板渲染
@@ -843,8 +872,6 @@ public class TabLayout extends FrameLayout {
 
             mTextView = new TextView(context);
             mTextView.setLines(1);
-            mTextView.setPadding(SizeUtil.pxFormDip(8, context), SizeUtil.pxFormDip(2, context), SizeUtil.pxFormDip
-                    (8, context), SizeUtil.pxFormDip(2, context));
             mTextView.setEllipsize(TextUtils.TruncateAt.END);
             addView(mTextView);
 
@@ -871,7 +898,11 @@ public class TabLayout extends FrameLayout {
             RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) getLayoutParams();
             layoutParams.width = info.mTabWidth;
             layoutParams.height = mContentHeight;
+            mTextView.setPadding(mTabPadding / 2, SizeUtil.pxFormDip(2, getContext()), mTabPadding / 2, SizeUtil
+                    .pxFormDip(2, getContext()));
             setLayoutParams(layoutParams);
+
+            setPadding(info.paddingLeft, 0, info.paddingRight, 0);
         }
 
 
@@ -888,7 +919,7 @@ public class TabLayout extends FrameLayout {
 
             if(mSelectedBackgroundColor != 0 || mNormalBackgroundColor != 0){
                 if(mCornerBorderDrawable == null){
-                   mCornerBorderDrawable = new CornerBorderDrawable();
+                    mCornerBorderDrawable = new CornerBorderDrawable();
                 }
                 mCornerBorderDrawable.setCornerRadius(mBackgroundRadius);
                 mCornerBorderDrawable.setBackgroundColor(selected ? mSelectedBackgroundColor : mNormalBackgroundColor);
@@ -948,7 +979,8 @@ public class TabLayout extends FrameLayout {
 
                         TabInfo info = mTabInfos.get(position);
 
-                        int left = (info.mTabWidth - info.mSelectedIndicatorWidth) / 2 + child.getLeft();
+                        int left = (info.mTabWidth - info.paddingLeft - info.paddingRight - info.mSelectedIndicatorWidth) / 2 +
+                                child.getLeft() + info.paddingLeft;
                         mSelectedIndicatorDrawable.setColor(mSelectedIndicatorColor);
                         mSelectedIndicatorDrawable.setBounds(left, child.getBottom() - mSelectedIndicator.getHeight(), left + info
                                 .mSelectedIndicatorWidth, child.getBottom());
@@ -994,9 +1026,9 @@ public class TabLayout extends FrameLayout {
     public interface TabLayoutDataSet{
 
         //按钮数量
-        int numberOfTabs();
+        int numberOfTabs(TabLayout tabLayout);
 
         //配置按钮信息
-        void configureTabInfo(TabInfo tab, int position);
+        void configureTabInfo(TabLayout tabLayout, TabInfo tab, int position);
     }
 }
