@@ -197,7 +197,7 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
                 View view = iterator.next();
                 int position = (int)view.getTag(R.id.view_pager_position_tag_key);
                 if(position < count){
-                    instantiateItemForRealPosition(view, position, getViewType(position));
+                    instantiateItemForRealPosition(view, getRealPosition(position), getViewType(position));
                 }
             }
         }
