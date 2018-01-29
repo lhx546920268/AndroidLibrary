@@ -1,9 +1,12 @@
 package com.lhx.library.widget;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.StateListDrawable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
@@ -13,8 +16,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 
 import com.lhx.library.R;
+import com.lhx.library.drawable.BaseDrawable;
 import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.util.ViewUtil;
@@ -43,6 +49,9 @@ public class SegmentedControl extends LinearLayout{
     //圆角 px
     private int mCornerRadius;
 
+    //边框
+    private int mBorderWidth;
+
     //items
     private ArrayList<SegmentedItem> mItems;
 
@@ -54,6 +63,12 @@ public class SegmentedControl extends LinearLayout{
 
     //当前选中的
     private int mSelectedPosition;
+
+    //item的 padding
+    private int mItemPaddingLeft;
+    private int mItemPaddingTop;
+    private int mItemPaddingRight;
+    private int mItemPaddingBottom;
 
     public int getSelectedPosition(){
 
@@ -78,9 +93,14 @@ public class SegmentedControl extends LinearLayout{
 
         mTextSize = 14;
         mCornerRadius = SizeUtil.pxFormDip(5, context);
+        mItemPaddingLeft = SizeUtil.pxFormDip(10, context);
+        mItemPaddingTop = SizeUtil.pxFormDip(5, context);
+        mItemPaddingRight = SizeUtil.pxFormDip(10, context);
+        mItemPaddingBottom = SizeUtil.pxFormDip(5, context);
 
+        mBorderWidth = SizeUtil.pxFormDip(1, context);
         mBackgroundDrawable = new CornerBorderDrawable();
-        mBackgroundDrawable.setBorderWidth(SizeUtil.pxFormDip(1, context));
+        mBackgroundDrawable.setBorderWidth(mBorderWidth);
         mBackgroundDrawable.setCornerRadius(mCornerRadius);
         mBackgroundDrawable.setBorderColor(mTintColor);
         ViewUtil.setBackground(mBackgroundDrawable, this);
@@ -115,6 +135,7 @@ public class SegmentedControl extends LinearLayout{
             if(mItems != null && mItems.size() > 0){
                 for(SegmentedItem item : mItems){
                     item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
+                    item.normalBackgroundDrawable.setColor(mTintColor);
                 }
             }
         }
@@ -147,7 +168,15 @@ public class SegmentedControl extends LinearLayout{
 
     public void setBorderWidth(int borderWidth){
 
-        mBackgroundDrawable.setBorderWidth(borderWidth);
+        if(mBorderWidth != borderWidth){
+            mBorderWidth = borderWidth;
+            mBackgroundDrawable.setBorderWidth(borderWidth);
+            if(mItems != null && mItems.size() > 0){
+                for(SegmentedItem item : mItems){
+                    item.normalBackgroundDrawable.setLineWidth(mBorderWidth);
+                }
+            }
+        }
     }
 
     public void setCornerRadius(int cornerRadius){
@@ -168,6 +197,14 @@ public class SegmentedControl extends LinearLayout{
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener){
         mOnItemClickListener = onItemClickListener;
+    }
+
+    //设置item 的padding
+    public void setItemPadding(int left, int top, int right, int bottom, int itemIndex){
+        if(mItems != null && itemIndex < mItems.size() && itemIndex >= 0){
+            SegmentedItem item = mItems.get(itemIndex);
+            item.setPadding(left, top, right, bottom);
+        }
     }
 
     /**
@@ -229,7 +266,8 @@ public class SegmentedControl extends LinearLayout{
         Context context = getContext();
         mItems = new ArrayList<>(mButtonTitles.length);
 
-        for(int i = 0;i < mButtonTitles.length;i ++){
+        int count = mButtonTitles.length;
+        for(int i = 0;i < count;i ++){
             SegmentedItem item = new SegmentedItem(context);
             item.position = i;
             item.setText(mButtonTitles[i]);
@@ -237,6 +275,13 @@ public class SegmentedControl extends LinearLayout{
             item.selectedBackgroundDrawable.setBackgroundColor(mTintColor);
             setItemCornerRadius(item, i);
             item.setSelected(i == mSelectedPosition);
+            item.normalBackgroundDrawable.setLineWidth(mBorderWidth);
+            item.normalBackgroundDrawable.setColor(mTintColor);
+            item.setPadding(mItemPaddingLeft, mItemPaddingTop, mItemPaddingRight, mItemPaddingBottom);
+
+            if(count > 2){
+                item.normalBackgroundDrawable.setExist(i < count - 1);
+            }
 
             item.setTextColor(item.isSelected() ? mSelectedTextColor : mTextColor);
 
@@ -261,7 +306,7 @@ public class SegmentedControl extends LinearLayout{
 
 
         //正常drawable
-        CornerBorderDrawable normalBackgroundDrawable;
+        NormalBackgroundDrawable normalBackgroundDrawable;
 
         //选中
         CornerBorderDrawable selectedBackgroundDrawable;
@@ -274,9 +319,6 @@ public class SegmentedControl extends LinearLayout{
             super(context);
 
             setGravity(Gravity.CENTER);
-            int paddingLeft = SizeUtil.pxFormDip(10, context);
-            int paddingTop = SizeUtil.pxFormDip(5, context);
-            setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
             initialization();
         }
 
@@ -290,10 +332,75 @@ public class SegmentedControl extends LinearLayout{
 
             //state_selected 和 state_pressed一起会冲突
             stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedBackgroundDrawable);
-            normalBackgroundDrawable = new CornerBorderDrawable();
+            normalBackgroundDrawable = new NormalBackgroundDrawable();
             stateListDrawable.addState(new int[]{}, normalBackgroundDrawable);
 
             ViewUtil.setBackground(stateListDrawable, this);
+        }
+    }
+
+    //正常背景
+    private static class NormalBackgroundDrawable extends BaseDrawable{
+
+        //是否存在右边线条
+        boolean mExist;
+
+        //颜色
+        int mColor;
+
+        //线条宽度
+        int mLineWidth;
+
+        public int getColor() {
+            return mColor;
+        }
+
+        public void setColor(int color) {
+            if(mColor != color){
+                mColor = color;
+                invalidateSelf();
+            }
+        }
+
+        public boolean isExist() {
+            return mExist;
+        }
+
+        public void setExist(boolean exist) {
+            if(mExist != exist){
+                mExist = exist;
+                invalidateSelf();
+            }
+        }
+
+        public int getLineWidth() {
+            return mLineWidth;
+        }
+
+        public void setLineWidth(int lineWidth) {
+            if(mLineWidth != lineWidth){
+                mLineWidth = lineWidth;
+            }
+        }
+
+        @Override
+        public BaseDrawable copy() {
+            NormalBackgroundDrawable drawable = new NormalBackgroundDrawable();
+            drawable.mExist = mExist;
+            return drawable;
+        }
+
+        @Override
+        public void draw(@NonNull Canvas canvas) {
+
+            if(mExist){
+                mPaint.setColor(mColor);
+                mPaint.setStyle(Paint.Style.STROKE);
+                mPaint.setStrokeWidth(mLineWidth);
+
+                float right = mRectF.right - mLineWidth / 2;
+                canvas.drawLine(right, 0, right, mRectF.bottom, mPaint);
+            }
         }
     }
 
