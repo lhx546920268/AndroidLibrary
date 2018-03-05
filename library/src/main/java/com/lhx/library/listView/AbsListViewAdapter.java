@@ -395,7 +395,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             }
 
             int height = getEmptyViewHeight();
-            if(height < 0){
+            if(height <= 0){
                 height = parent.getHeight();
             }
             params.height = height;
