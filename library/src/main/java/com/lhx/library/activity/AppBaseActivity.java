@@ -11,7 +11,6 @@ import android.support.annotation.AnimRes;
 import android.support.annotation.CallSuper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -51,7 +50,7 @@ public class AppBaseActivity extends AppCompatActivity {
     private AppBaseFragment fragment;
 
     //是否可见
-    private boolean mVisiable;
+    private boolean mVisible;
 
     public String getName() {
         return mName;
@@ -61,8 +60,8 @@ public class AppBaseActivity extends AppCompatActivity {
         mName = name;
     }
 
-    public boolean isVisiable() {
-        return mVisiable;
+    public boolean isVisible() {
+        return mVisible;
     }
 
     //    @Override
@@ -81,13 +80,13 @@ public class AppBaseActivity extends AppCompatActivity {
     protected void onResume() {
 //        Log.d("AppBaseActivity", "onResume");
         super.onResume();
-        mVisiable = true;
+        mVisible = true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mVisiable = false;
+        mVisible = false;
     }
 
     //
@@ -128,11 +127,9 @@ public class AppBaseActivity extends AppCompatActivity {
         }
 
         //java.net.SocketException: sendto failed: ECONNRESET (Connection reset by peer)
-        if (Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         ///生成fragment实例
         String className = getIntent().getStringExtra(FRAGMENT_STRING);

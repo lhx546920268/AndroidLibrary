@@ -39,8 +39,8 @@ public class ActivityStack {
      * 关闭多个activity
      * @param toName 在这个activity名称之后的都关闭，不包括这个
      */
-    public static void finishActivies(@NonNull String toName){
-        finishActivies(toName, Integer.MAX_VALUE);
+    public static void finishActivities(@NonNull String toName){
+        finishActivities(toName, Integer.MAX_VALUE);
     }
 
     /**
@@ -48,7 +48,7 @@ public class ActivityStack {
      * @param toName 在这个activity名称之后的都关闭，不包括这个
      * @param resultCode {@link android.app.Activity#setResult(int)}
      */
-    public static void finishActivies(@NonNull String toName, int resultCode){
+    public static void finishActivities(@NonNull String toName, int resultCode){
         int index = -1;
         for(int i = activities.size() - 1;i >= 0;i --){
             AppBaseActivity activity = activities.get(i);

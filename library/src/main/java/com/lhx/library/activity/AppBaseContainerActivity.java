@@ -1,21 +1,10 @@
 package com.lhx.library.activity;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +13,6 @@ import android.widget.RelativeLayout;
 import com.lhx.library.bar.NavigationBar;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.util.DialogUtil;
-import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.AppBaseContainer;
 
 
@@ -135,7 +123,7 @@ public abstract class AppBaseContainerActivity extends AppBaseActivity implement
      * @param resultCode {@link android.app.Activity#setResult(int)}
      */
     public void backTo(@NonNull String toName, int resultCode){
-        ActivityStack.finishActivies(toName, resultCode);
+        ActivityStack.finishActivities(toName, resultCode);
     }
 
     public NavigationBar getNavigationBar() {

@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.lhx.library.R;
 import com.lhx.library.activity.ActivityStack;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
@@ -192,7 +191,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
      * @param resultCode {@link android.app.Activity#setResult(int)}
      */
     public void backTo(@NonNull String toName, int resultCode){
-        ActivityStack.finishActivies(toName, resultCode);
+        ActivityStack.finishActivities(toName, resultCode);
     }
 
     public NavigationBar getNavigationBar() {

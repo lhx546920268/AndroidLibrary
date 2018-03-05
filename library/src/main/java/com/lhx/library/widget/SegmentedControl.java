@@ -28,7 +28,7 @@ import com.lhx.library.util.ViewUtil;
 import java.util.ArrayList;
 
 /**
- * 分段选择器 类似IOS的 SegmentedControl
+ * 分段选择器 类似IOS的 UISegmentedControl
  */
 
 public class SegmentedControl extends LinearLayout{
