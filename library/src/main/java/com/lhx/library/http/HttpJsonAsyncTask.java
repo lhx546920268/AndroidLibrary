@@ -19,6 +19,10 @@ import java.util.Map;
 
 public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
 
+    //请求方法
+    public static final String POST = "POST";
+    public static final String GET = "GET";
+
     //请求api错误
     private boolean mApiError;
 
@@ -93,6 +97,7 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
             }
         };
 
+        mTask.setHttpMethod(getHttpMethod());
         mTask.setName(getClass().getName());
         mTask.addHttpRequestHandler(this);
         return mTask;
@@ -129,6 +134,11 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
     @Override
     public final void onComplete(HttpAsyncTask task) {
         onComplete(this);
+    }
+
+    //获取请求方法 暂时只支持 GET 和 POST
+    public String getHttpMethod(){
+        return null;
     }
 
     //获取参数

@@ -232,6 +232,28 @@ public class ImageLoaderUtil implements ImageLoadingListener{
                 true);
     }
 
+    //显示部分圆角图片 px
+    public static void displayPartialRoundImage(ImageView imageView, String url, PartialRound partialRound){
+
+        displayPartialRoundImage(imageView, url, partialRound, App.ImagePlaceHolder);
+    }
+
+    public static void displayPartialRoundImage(ImageView imageView, String url, PartialRound partialRound, int
+            placeholderImageRes){
+        displayPartialRoundImage(imageView, url, partialRound, placeholderImageRes, ImageScaleType.EXACTLY);
+    }
+
+    public static void displayPartialRoundImage(ImageView imageView, String url, PartialRound partialRound, ImageScaleType imageScaleType){
+        displayPartialRoundImage(imageView, url, partialRound, App.ImagePlaceHolder, imageScaleType);
+    }
+
+    public static void displayPartialRoundImage(ImageView imageView, String url, PartialRound partialRound, int
+            placeholderImageRes, ImageScaleType imageScaleType){
+
+        displayImage(imageView, url, getPartialRoundDisplayImageOptions(placeholderImageRes, imageScaleType,
+                partialRound, url), false);
+    }
+
     //普通图片选项
 
     public static DisplayImageOptions getDisplayImageOptions(String url){
@@ -292,6 +314,27 @@ public class ImageLoaderUtil implements ImageLoadingListener{
         return getDisplayImageOptions(placeholderImageRes, type, new CircleBitmapDisplayer(), url);
     }
 
+    //部分圆角图片选项
+
+    public static DisplayImageOptions getPartialRoundDisplayImageOptions(PartialRound partialRound, String url) {
+        return getPartialRoundDisplayImageOptions(App.ImagePlaceHolder, partialRound, url);
+    }
+
+    public static DisplayImageOptions getPartialRoundDisplayImageOptions(ImageScaleType
+            type, PartialRound partialRound, String url) {
+        return getPartialRoundDisplayImageOptions(App.ImagePlaceHolder, type, partialRound, url);
+    }
+
+    public static DisplayImageOptions getPartialRoundDisplayImageOptions(int placeholderImageRes, PartialRound partialRound, String url) {
+        return getPartialRoundDisplayImageOptions(placeholderImageRes, ImageScaleType.EXACTLY, partialRound, url);
+    }
+
+    public static DisplayImageOptions getPartialRoundDisplayImageOptions(int placeholderImageRes, ImageScaleType
+            type, PartialRound partialRound, String url) {
+
+        return getDisplayImageOptions(placeholderImageRes, type, new PartialRoundBitmapDisplayer(partialRound), url);
+    }
+
     //获取默认的图片显示选项
     public static DisplayImageOptions getDisplayImageOptions(int placeholderImageRes, ImageScaleType type,
                                                              BitmapDisplayer displayer, String url){
@@ -327,6 +370,65 @@ public class ImageLoaderUtil implements ImageLoadingListener{
 
             CornerBorderDrawable drawable = new CornerBorderDrawable(bitmap);
             drawable.setShouldAbsoluteCircle(true);
+            imageAware.setImageDrawable(drawable);
+        }
+    }
+
+    //圆角
+    public static class PartialRound{
+
+        //圆角
+        private int mLeftTopRadius;
+        private int mRightTopRadius;
+        private int mLeftBottomRadius;
+        private int mRightBottomRadius;
+
+        public PartialRound(int leftTopRadius, int rightTopRadius, int leftBottomRadius, int rightBottomRadius) {
+            mLeftTopRadius = leftTopRadius;
+            mRightTopRadius = rightTopRadius;
+            mLeftBottomRadius = leftBottomRadius;
+            mRightBottomRadius = rightBottomRadius;
+        }
+
+        public int getLeftTopRadius() {
+            return mLeftTopRadius;
+        }
+
+        public int getRightTopRadius() {
+            return mRightTopRadius;
+        }
+
+        public int getLeftBottomRadius() {
+            return mLeftBottomRadius;
+        }
+
+        public int getRightBottomRadius() {
+            return mRightBottomRadius;
+        }
+    }
+
+    //部分圆角显示器
+    public static class PartialRoundBitmapDisplayer implements BitmapDisplayer {
+
+        //部分圆角
+        private PartialRound mPartialRound;
+
+        public PartialRoundBitmapDisplayer(PartialRound partialRound) {
+            mPartialRound = partialRound;
+        }
+
+        @Override
+        public void display(Bitmap bitmap, ImageAware imageAware, LoadedFrom loadedFrom) {
+            if (!(imageAware instanceof ImageViewAware)) {
+                throw new IllegalArgumentException("ImageAware should wrap ImageView. ImageViewAware is expected.");
+            }
+
+            CornerBorderDrawable drawable = new CornerBorderDrawable(bitmap);
+            drawable.setLeftTopCornerRadius(mPartialRound.getLeftTopRadius());
+            drawable.setRightTopCornerRadius(mPartialRound.getRightTopRadius());
+            drawable.setLeftBottomCornerRadius(mPartialRound.getLeftBottomRadius());
+            drawable.setRightBottomCornerRadius(mPartialRound.getRightBottomRadius());
+
             imageAware.setImageDrawable(drawable);
         }
     }

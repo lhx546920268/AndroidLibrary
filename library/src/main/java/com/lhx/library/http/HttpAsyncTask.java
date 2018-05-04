@@ -40,6 +40,10 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     //编码类型
     protected String mStringEncoding = "utf-8";
 
+    //请求方法 默认是空，当有参数时将自动设为POST
+    private String mHttpMethod;
+
+
     //用来识别是哪个请求
     private String mName;
 
@@ -111,6 +115,10 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         mName = name;
     }
 
+    public void setHttpMethod(String httpMethod) {
+        mHttpMethod = httpMethod;
+    }
+
     //把结果转成string
     public String resultToString(byte[] reulst){
        return StringUtil.stringFromBytes(reulst, mStringEncoding);
@@ -120,6 +128,7 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     protected byte[] doInBackground(Void... params) {
         if(!TextUtils.isEmpty(mURL) && !isCancelled()){
             mHttpRequest = new HttpRequest(mURL);
+            mHttpRequest.setHttpMethod(mHttpMethod);
             onConfigure(mHttpRequest);
 
             if(mHttpRequest.isShowDownloadProgress() || mHttpRequest.isShowUploadProgress()){

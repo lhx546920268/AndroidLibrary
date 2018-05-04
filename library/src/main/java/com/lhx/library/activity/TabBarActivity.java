@@ -1,6 +1,9 @@
 package com.lhx.library.activity;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -8,14 +11,18 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.lhx.library.R;
 import com.lhx.library.drawable.DrawableUtil;
+import com.lhx.library.fragment.AppBaseFragment;
 
 import java.util.List;
 
@@ -37,6 +44,9 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
     //按钮信息
     private List<TabBarItem> mTabBarItems;
 
+    //当前fragment
+    AppBaseFragment mCurrentFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +63,16 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
             button.setText(item.getTitle());
             button.setId(i);
             button.setTextColor(getTextColor(item));
+            button.setGravity(Gravity.CENTER);
             button.setCompoundDrawables(null, getIcon(item), null, null);
             button.setCompoundDrawablePadding(getCompoundDrawablePadding(i));
+            button.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
+            button.setPadding(0, getItemPaddingTop(i), 0, 0);
 
-            mTabBar.addView(button);
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+            params.weight = 1;
+
+            mTabBar.addView(button, params);
         }
 
         mTabBar.check(mCheckedPosition);
@@ -70,10 +86,24 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
     @Override
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
         if(shouldCheck(checkedId)){
-
+            TabBarItem item = mTabBarItems.get(checkedId);
+            if(item.getFragment() != null){
+                switchFragment(item.getFragment());
+                mCheckedPosition = checkedId;
+            }else {
+                checkWithoutListener(mCheckedPosition);
+            }
+            onCheck(checkedId);
         }else {
-            group.check(mCheckedPosition);
+            checkWithoutListener(mCheckedPosition);
         }
+    }
+
+    //选择某个
+    private void checkWithoutListener(int position){
+        mTabBar.setOnCheckedChangeListener(null);
+        mTabBar.check(position);
+        mTabBar.setOnCheckedChangeListener(this);
     }
 
     //设置选中
@@ -84,11 +114,43 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
         }
     }
 
+    //显示某个fragment
+    private void switchFragment(AppBaseFragment fragment){
+
+        if(fragment != null && !fragment.isAdded() && fragment != mCurrentFragment){
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            if(mCurrentFragment != null){
+                transaction.detach(mCurrentFragment);
+            }
+
+            if(fragment.isDetached()){
+                transaction.attach(fragment);
+            }else {
+                transaction.add(R.id.fragment_container, fragment);
+            }
+            transaction.commitAllowingStateLoss();
+            mCurrentFragment = fragment;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(mCurrentFragment != null && mCurrentFragment.onKeyDown(keyCode, event)){
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     //获取图标
     private Drawable getIcon(TabBarItem item){
         StateListDrawable stateListDrawable = new StateListDrawable();
 
         Drawable drawable = ContextCompat.getDrawable(this, item.getIcon());
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
 
         Drawable checkDrawable = drawable;
         if(item.getCheckedIcon() != 0){
@@ -100,7 +162,7 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
             }
         }
 
-        checkDrawable.setBounds(0, 0, checkDrawable.getIntrinsicWidth(), checkDrawable.getIntrinsicHeight());
+        checkDrawable.setBounds(0, 0, width, height);
         stateListDrawable.addState(new int[]{android.R.attr.state_checked}, checkDrawable);
 
         int color = getNormalTintColor();
@@ -108,8 +170,10 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
             drawable = DrawableUtil.getTintDrawable(drawable, color);
         }
 
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+
+        drawable.setBounds(0, 0, width, height);
         stateListDrawable.addState(new int[]{}, drawable);
+        stateListDrawable.setBounds(0, 0, width, height);
 
         return stateListDrawable;
     }
@@ -131,11 +195,20 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
         return pxFromDip(2);
     }
 
-    //按钮正常着色 0时 不着色
-    public abstract @ColorInt int getNormalTintColor();
+    //按钮顶部间隔
+    public int getItemPaddingTop(int position){
+        return pxFromDip(2);
+    }
 
-    //按钮正常颜色 0时 不着色
-    public abstract @ColorInt int getCheckedTintColor();
+    //按钮正常着色 0时 不着色
+    public @ColorInt int getNormalTintColor(){
+        return 0;
+    }
+
+    //按钮选中颜色 0时 不着色
+    public @ColorInt int getCheckedTintColor(){
+        return 0;
+    }
 
     //按钮标题颜色
     public abstract @ColorInt int getNormalTitleColor();
@@ -145,6 +218,11 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
 
     //按钮信息
     public abstract @NonNull List<TabBarItem> getTabBarItems();
+
+    //选择某个tab
+    public void onCheck(int position){
+
+    }
 
     //某个标签是否可以点击
     public boolean shouldCheck(int position){
@@ -164,17 +242,17 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
         private @DrawableRes int mCheckedIcon;
 
         //关联的fragment 当为空不会有选中效果
-        private Fragment mFragment;
+        private AppBaseFragment mFragment;
 
         public TabBarItem(@NonNull String title, @DrawableRes int icon) {
             this(title, icon, null);
         }
 
-        public TabBarItem(@NonNull String title, @DrawableRes int icon, Fragment fragment) {
+        public TabBarItem(@NonNull String title, @DrawableRes int icon, AppBaseFragment fragment) {
             this(title, icon, 0, fragment);
         }
 
-        public TabBarItem(@NonNull String title, @DrawableRes int icon, @DrawableRes int checkedIcon, Fragment fragment) {
+        public TabBarItem(@NonNull String title, @DrawableRes int icon, @DrawableRes int checkedIcon, AppBaseFragment fragment) {
             mTitle = title;
             mIcon = icon;
             mCheckedIcon = checkedIcon;
@@ -196,7 +274,7 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
             return mCheckedIcon;
         }
 
-        public Fragment getFragment() {
+        public AppBaseFragment getFragment() {
             return mFragment;
         }
     }

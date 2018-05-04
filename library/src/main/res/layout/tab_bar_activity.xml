@@ -9,6 +9,7 @@
         android:layout_height="49dp"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
+        android:orientation="horizontal"
         android:id="@+id/tabBar">
 
     </RadioGroup>

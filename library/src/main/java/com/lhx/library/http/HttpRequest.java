@@ -104,6 +104,9 @@ public class HttpRequest {
     //编码类型
     protected String mStringEncoding = "utf-8";
 
+    //请求方法 默认是空，当有参数时将自动设为POST
+    private String mHttpMethod;
+
     //超时 毫秒
     protected int mTimeoutInterval = 15000;
 
@@ -212,6 +215,10 @@ public class HttpRequest {
 
     public void setTimeoutInterval(int timeoutInterval) {
         mTimeoutInterval = timeoutInterval;
+    }
+
+    public void setHttpMethod(String httpMethod) {
+        mHttpMethod = httpMethod;
     }
 
     public byte[] getResponseData(){
@@ -373,6 +380,10 @@ public class HttpRequest {
                 CookieHandler.setDefault(cookieManager);
             }
 
+            if("GET".equals(mHttpMethod)){
+                buildGetParams();
+            }
+
             URL url = new URL(mURL);
             mConn = (HttpURLConnection) url.openConnection();
             mConn.setReadTimeout(mTimeoutInterval);
@@ -381,11 +392,15 @@ public class HttpRequest {
             mConn.setConnectTimeout(mTimeoutInterval);
             mConn.setRequestProperty("Connection", "Keep-Alive");
 
-            if (mParams.size() > 0) {
-                mConn.setRequestMethod("POST");
-                buildPostBody();
-            } else {
-                mConn.setRequestMethod("GET");
+            if(StringUtil.isEmpty(mHttpMethod)){
+                if (mParams.size() > 0) {
+                    mConn.setRequestMethod("POST");
+                    buildPostBody();
+                } else {
+                    mConn.setRequestMethod("GET");
+                }
+            }else{
+                mConn.setRequestMethod(mHttpMethod);
             }
 
             mHttpResponseCode = mConn.getResponseCode();
@@ -597,6 +612,26 @@ public class HttpRequest {
                 buildMultiPartFormDataPostBody();
                 break;
             }
+        }
+    }
+
+    //构建get参数
+    private void buildGetParams(){
+        if(mURL != null && mParams.size() > 0){
+            StringBuilder builder = new StringBuilder(mURL);
+            builder.append("?");
+            int i = 0;
+            for (Param param : mParams) {
+                builder.append(param.key);
+                builder.append("=");
+                builder.append(param.getEncodedValue(mStringEncoding));
+                if (i != mParams.size() - 1) {
+                    builder.append("&");
+                }
+                i++;
+            }
+
+            mURL = builder.toString();
         }
     }
 
