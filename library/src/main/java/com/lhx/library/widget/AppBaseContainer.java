@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,13 +24,10 @@ import com.lhx.library.util.SizeUtil;
  */
 
 @SuppressWarnings("unchecked")
-public class AppBaseContainer extends LinearLayout {
+public class AppBaseContainer extends RelativeLayout {
 
     ///内容视图
     private View mContentView;
-
-    ///内容容器
-    private RelativeLayout mContentContainer;
 
     ///导航栏
     private NavigationBar mNavigationBar;
@@ -77,13 +73,8 @@ public class AppBaseContainer extends LinearLayout {
     //初始化
     private void initialize(){
 
-        setOrientation(LinearLayout.VERTICAL);
         setBackgroundColor(Color.WHITE);
 
-        mContentContainer = new RelativeLayout(mContext);
-        mContentContainer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        addView(mContentContainer);
     }
 
     public OnEventHandler getOnEventHandler() {
@@ -100,9 +91,11 @@ public class AppBaseContainer extends LinearLayout {
             ///创建导航栏
             if(mNavigationBar == null){
                 mNavigationBar = new NavigationBar(mContext);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
+                LayoutParams layoutParams = new LayoutParams(LayoutParams
                         .MATCH_PARENT, mContext.getResources().getDimensionPixelOffset(R.dimen.navigation_bar_height));
+                mNavigationBar.setId(R.id.app_base_fragment_navigation_bar_id);
                 addView(mNavigationBar, 0, layoutParams);
+                layoutChildren();
             }
 
             mNavigationBar.setVisibility(VISIBLE);
@@ -129,20 +122,17 @@ public class AppBaseContainer extends LinearLayout {
         mContentView = contentView;
 
         mContentView.setId(R.id.app_base_fragment_content_id);
-        if(!(mContentView.getLayoutParams() instanceof RelativeLayout.LayoutParams)){
+        LayoutParams layoutParams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        layoutParams.alignWithParent = true;
+        layoutParams.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
 
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT);
-            mContentView.setLayoutParams(layoutParams);
-        }
-
-        mContentContainer.addView(mContentView, 0);
-
-        layoutChildViews();
+        addView(mContentView, 0, layoutParams);
+        layoutChildren();
     }
 
     public void setContentView(@LayoutRes int layoutResId){
-        setContentView(LayoutInflater.from(mContext).inflate(layoutResId, mContentContainer, false));
+        setContentView(LayoutInflater.from(mContext).inflate(layoutResId, null, false));
     }
 
     ///获取子视图
@@ -162,31 +152,30 @@ public class AppBaseContainer extends LinearLayout {
     //设置topView 浮动
     public void setTopViewFloat(boolean flag){
         if(mContentView != null && mTopView != null){
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
+            LayoutParams params = (LayoutParams)mContentView.getLayoutParams();
             if(flag){
-                params.addRule(RelativeLayout.BELOW, 0);
+                params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             }else {
-                params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
+                params.addRule(BELOW, R.id.app_base_fragment_top_id);
             }
-            mContentView.setLayoutParams(params);
         }
     }
 
     //重新布局子视图
-    private void layoutChildViews(){
+    private void layoutChildren(){
 
         if(mContentView != null){
 
+            LayoutParams params = (LayoutParams)mContentView.getLayoutParams();
             if(mTopView != null){
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
-                params.addRule(RelativeLayout.BELOW, R.id.app_base_fragment_top_id);
-                mContentView.setLayoutParams(params);
+                params.addRule(BELOW, 0);
+                params.addRule(BELOW, R.id.app_base_fragment_top_id);
+            }else {
+                params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             }
 
             if(mBottomView != null){
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mContentView.getLayoutParams();
-                params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
-                mContentView.setLayoutParams(params);
+                params.addRule(ABOVE, R.id.app_base_fragment_bottom_id);
             }
         }
     }
@@ -228,10 +217,6 @@ public class AppBaseContainer extends LinearLayout {
         return mNavigationBar;
     }
 
-    public RelativeLayout getContentContainer(){
-        return mContentContainer;
-    }
-
     public void setPageLoading(boolean pageLoading){
         setPageLoading(pageLoading, pageLoading ? "正在载入..." : null);
     }
@@ -250,21 +235,23 @@ public class AppBaseContainer extends LinearLayout {
             }
             if(mPageLoading){
                 mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,
-                        mContentContainer, false);
+                        this, false);
                 TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
 
                 if(textView != null){
                     textView.setText(loadingText);
                 }
 
+                LayoutParams params = (LayoutParams)mPageLoadingView.getLayoutParams();
+                params.alignWithParent = true;
+                params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
                 if(mOnEventHandler != null){
-                    mOnEventHandler.onPageLoadingShow(mPageLoadingView, (RelativeLayout.LayoutParams)
-                            mPageLoadingView.getLayoutParams());
+                    mOnEventHandler.onPageLoadingShow(mPageLoadingView, params);
                 }
 
-                mContentContainer.addView(mPageLoadingView);
+                addView(mPageLoadingView);
             }else if(mPageLoadingView != null){
-                mContentContainer.removeView(mPageLoadingView);
+                removeView(mPageLoadingView);
                 mPageLoadingView = null;
             }
         }
@@ -291,7 +278,7 @@ public class AppBaseContainer extends LinearLayout {
 
             if (mPageLoadFail) {
                 mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail,
-                        mContentContainer, false);
+                        this, false);
                 mPageLoadFailView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
@@ -318,15 +305,19 @@ public class AppBaseContainer extends LinearLayout {
                     textView.setText(subtitle);
                 }
 
+                LayoutParams params = (LayoutParams)
+                        mPageLoadFailView.getLayoutParams();
+                params.alignWithParent = true;
+                params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
+
                 if(mOnEventHandler != null){
-                    mOnEventHandler.onPageLoadFailShow(mPageLoadFailView, (RelativeLayout.LayoutParams)
-                            mPageLoadFailView.getLayoutParams());
+                    mOnEventHandler.onPageLoadFailShow(mPageLoadFailView, params);
                 }
 
-                mContentContainer.addView(mPageLoadFailView);
+                addView(mPageLoadFailView);
 
             } else if (mPageLoadFailView != null) {
-                mContentContainer.removeView(mPageLoadFailView);
+                removeView(mPageLoadFailView);
                 mPageLoadFailView = null;
             }
         }
@@ -345,7 +336,7 @@ public class AppBaseContainer extends LinearLayout {
 
         if(show){
             if(mEmptyView == null){
-                mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, mContentContainer, false);
+                mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, this, false);
             }
 
             if(!TextUtils.isEmpty(text)){
@@ -370,14 +361,18 @@ public class AppBaseContainer extends LinearLayout {
                 setPageLoadFail(false);
             }
 
+            LayoutParams params = (LayoutParams)
+                    mPageLoadFailView.getLayoutParams();
+            params.alignWithParent = true;
+            params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             if(mOnEventHandler != null){
-                mOnEventHandler.onShowEmptyView(mEmptyView, (RelativeLayout.LayoutParams)mEmptyView.getLayoutParams());
+                mOnEventHandler.onShowEmptyView(mEmptyView, params);
             }
 
-            mContentContainer.addView(mEmptyView);
+            addView(mEmptyView);
         }else {
             if(mEmptyView != null){
-                mContentContainer.removeView(mEmptyView);
+                removeView(mEmptyView);
                 mEmptyView = null;
             }
         }
@@ -391,7 +386,7 @@ public class AppBaseContainer extends LinearLayout {
     public void setBottomView(View bottomView, int height){
         if(mBottomView != bottomView){
             if(mBottomView != null){
-                mContentContainer.removeView(mBottomView);
+                removeView(mBottomView);
             }
 
             mBottomView = bottomView;
@@ -399,12 +394,12 @@ public class AppBaseContainer extends LinearLayout {
             if(mBottomView == null)
                 return;
 
-            RelativeLayout.LayoutParams params;
-            if(mBottomView.getLayoutParams() != null && mBottomView.getLayoutParams() instanceof RelativeLayout
-                    .LayoutParams){
-                params = (RelativeLayout.LayoutParams)mBottomView.getLayoutParams();
+            LayoutParams params;
+            if(mBottomView.getLayoutParams() != null && mBottomView.getLayoutParams() instanceof
+                    LayoutParams){
+                params = (LayoutParams)mBottomView.getLayoutParams();
             }else {
-                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                params = new LayoutParams(LayoutParams.MATCH_PARENT,
                         height);
             }
 
@@ -412,22 +407,22 @@ public class AppBaseContainer extends LinearLayout {
             mBottomView.setLayoutParams(params);
             mBottomView.setId(R.id.app_base_fragment_bottom_id);
 
-            if(mBottomView.getParent() != mContentContainer){
+            if(mBottomView.getParent() != this){
                 if(mBottomView.getParent() != null){
                     ViewGroup parent = (ViewGroup)mBottomView.getParent();
                     parent.removeView(mBottomView);
                 }
 
-                mContentContainer.addView(mBottomView);
+                addView(mBottomView);
             }
 
-            layoutChildViews();
+            layoutChildren();
         }
     }
 
     public void setBottomView(@LayoutRes int res){
         if(res != 0){
-            setBottomView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false));
+            setBottomView(LayoutInflater.from(mContext).inflate(res, this, false));
         }
     }
 
@@ -443,7 +438,7 @@ public class AppBaseContainer extends LinearLayout {
     public void setTopView(View topView, int height){
         if(mTopView != topView){
             if(mTopView != null){
-                mContentContainer.removeView(mTopView);
+                removeView(mTopView);
             }
 
             mTopView = topView;
@@ -451,34 +446,33 @@ public class AppBaseContainer extends LinearLayout {
             if(mTopView == null)
                 return;
 
-            RelativeLayout.LayoutParams params;
-            if(mTopView.getLayoutParams() != null && mTopView.getLayoutParams() instanceof RelativeLayout
-                    .LayoutParams){
-                params = (RelativeLayout.LayoutParams)mTopView.getLayoutParams();
+            LayoutParams params;
+            if(mTopView.getLayoutParams() != null && mTopView.getLayoutParams() instanceof LayoutParams){
+                params = (LayoutParams)mTopView.getLayoutParams();
             }else {
-                params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
+                params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, height);
             }
 
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             mTopView.setLayoutParams(params);
             mTopView.setId(R.id.app_base_fragment_top_id);
 
-            if(mTopView.getParent() != mContentContainer){
+            if(mTopView.getParent() != this){
                 if(mTopView.getParent() != null){
                     ViewGroup parent = (ViewGroup)mTopView.getParent();
                     parent.removeView(mTopView);
                 }
 
-                mContentContainer.addView(mTopView);
+                addView(mTopView);
             }
 
-            layoutChildViews();
+            layoutChildren();
         }
     }
 
     public void setTopView(@LayoutRes int res){
         if(res != 0){
-            setTopView(LayoutInflater.from(mContext).inflate(res, mContentContainer, false), ViewGroup.LayoutParams.WRAP_CONTENT);
+            setTopView(LayoutInflater.from(mContext).inflate(res, this, false), ViewGroup.LayoutParams.WRAP_CONTENT);
         }
     }
 

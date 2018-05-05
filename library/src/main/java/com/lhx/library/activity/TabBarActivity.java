@@ -19,10 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 
+import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.drawable.DrawableUtil;
 import com.lhx.library.fragment.AppBaseFragment;
+import com.lhx.library.widget.AppBaseContainer;
 
 import java.util.List;
 
@@ -30,7 +33,7 @@ import java.util.List;
  * 标签栏 activity
  */
 
-public abstract class TabBarActivity extends AppBaseActivity implements RadioGroup.OnCheckedChangeListener{
+public abstract class TabBarActivity extends AppBaseActivity implements RadioGroup.OnCheckedChangeListener, AppBaseContainer.OnEventHandler{
 
     //标签栏
     protected RadioGroup mTabBar;
@@ -47,6 +50,9 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
     //当前fragment
     AppBaseFragment mCurrentFragment;
 
+    //容器
+    protected AppBaseContainer mContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,28 +60,37 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
         mTabBar = (RadioGroup)findViewById(R.id.tabBar);
         mDivider = findViewById(R.id.divider);
         mTabBar.setOnCheckedChangeListener(this);
+        mContainer = (AppBaseContainer)findViewById(android.R.id.content);
+        mContainer.setOnEventHandler(this);
 
+        initTabBar();
+    }
+
+    //加载tab
+    protected void initTabBar(){
         //初始化标签
         mTabBarItems = getTabBarItems();
-        for(int i = 0;i < mTabBarItems.size();i ++){
-            TabBarItem item = mTabBarItems.get(i);
-            RadioButton button = new RadioButton(this);
-            button.setText(item.getTitle());
-            button.setId(i);
-            button.setTextColor(getTextColor(item));
-            button.setGravity(Gravity.CENTER);
-            button.setCompoundDrawables(null, getIcon(item), null, null);
-            button.setCompoundDrawablePadding(getCompoundDrawablePadding(i));
-            button.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
-            button.setPadding(0, getItemPaddingTop(i), 0, 0);
+        if(mTabBarItems != null && mTabBarItems.size() > 0){
+            for(int i = 0;i < mTabBarItems.size();i ++){
+                TabBarItem item = mTabBarItems.get(i);
+                RadioButton button = new RadioButton(this);
+                button.setText(item.getTitle());
+                button.setId(i);
+                button.setTextColor(getTextColor(item));
+                button.setGravity(Gravity.CENTER);
+                button.setCompoundDrawables(null, getIcon(item), null, null);
+                button.setCompoundDrawablePadding(getCompoundDrawablePadding(i));
+                button.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
+                button.setPadding(0, getItemPaddingTop(i), 0, 0);
 
-            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-            params.weight = 1;
+                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+                params.weight = 1;
 
-            mTabBar.addView(button, params);
+                mTabBar.addView(button, params);
+            }
+
+            mTabBar.check(mCheckedPosition);
         }
-
-        mTabBar.check(mCheckedPosition);
     }
 
     @Override
@@ -217,10 +232,35 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
     public abstract @ColorInt int getCheckedTitleColor();
 
     //按钮信息
-    public abstract @NonNull List<TabBarItem> getTabBarItems();
+    public abstract List<TabBarItem> getTabBarItems();
 
     //选择某个tab
     public void onCheck(int position){
+
+    }
+
+    @Override
+    public void onClickPageLoadFai() {
+
+    }
+
+    @Override
+    public void onBack() {
+
+    }
+
+    @Override
+    public void onPageLoadingShow(View pageLoadingView, RelativeLayout.LayoutParams params) {
+
+    }
+
+    @Override
+    public void onPageLoadFailShow(View pageLoadFailView, RelativeLayout.LayoutParams params) {
+
+    }
+
+    @Override
+    public void onShowEmptyView(View emptyView, RelativeLayout.LayoutParams params) {
 
     }
 

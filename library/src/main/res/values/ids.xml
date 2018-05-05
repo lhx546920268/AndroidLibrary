@@ -4,6 +4,7 @@
     <item name="right_navigation_item" type="id"/>
 
     <!--AppBaseFragment 顶部 内容 底部视图-->
+    <item name="app_base_fragment_navigation_bar_id" type="id"/>
     <item name="app_base_fragment_content_id" type="id"/>
     <item name="app_base_fragment_bottom_id" type="id"/>
     <item name="app_base_fragment_top_id" type="id"/>

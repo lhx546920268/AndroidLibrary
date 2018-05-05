@@ -56,6 +56,9 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = getActivity();
+        if(!mActivity.isTaskRoot()){
+            setShowBackButton(true);
+        }
 //        Log.d("AppBaseFragment", "onActivityCreated");
     }
 
