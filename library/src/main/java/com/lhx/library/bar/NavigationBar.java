@@ -270,6 +270,14 @@ public class NavigationBar extends RelativeLayout {
     }
 
 
+    public TextView setNavigationLeftItem(String title, Drawable drawable){
+        return setNavigationItem(title, drawable, NAVIGATIONBAR_ITEM_POSITION_LEFT);
+    }
+
+    public TextView setNavigationRightItem(String title, Drawable drawable){
+        return setNavigationItem(title, drawable, NAVIGATIONBAR_ITEM_POSITION_RIGHT);
+    }
+
     /** 设置导航栏按钮
      *
      * @param title 标题

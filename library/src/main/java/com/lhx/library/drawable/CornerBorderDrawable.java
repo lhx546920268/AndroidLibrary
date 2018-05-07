@@ -154,7 +154,7 @@ public class CornerBorderDrawable extends BaseDrawable {
 
         if(mShouldAbsoluteCircle){
             //全圆
-            float radius = Math.max(bounds.width(), bounds.height()) / 2.0f;
+            float radius = Math.min(bounds.width(), bounds.height()) / 2.0f;
             path.addCircle(mRectF.width() / 2.0f, mRectF.height() / 2.0f, radius, Path.Direction.CW);
         }else {
             //从左上角开始 绕一圈

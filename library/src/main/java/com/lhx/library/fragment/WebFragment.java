@@ -51,7 +51,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     @CallSuper
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         setContentView(R.layout.web_fragment);
-
+        
         mShouldUseWebTitle = getExtraBooleanFromBundle(WEB_USE_WEB_TITLE, true);
 
         String url = getExtraStringFromBundle(WEB_URL);

@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -25,7 +26,6 @@ import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.drawable.DrawableUtil;
 import com.lhx.library.fragment.AppBaseFragment;
-import com.lhx.library.widget.AppBaseContainer;
 
 import java.util.List;
 
@@ -33,7 +33,10 @@ import java.util.List;
  * 标签栏 activity
  */
 
-public abstract class TabBarActivity extends AppBaseActivity implements RadioGroup.OnCheckedChangeListener, AppBaseContainer.OnEventHandler{
+public abstract class TabBarActivity extends AppBaseContainerActivity implements RadioGroup.OnCheckedChangeListener{
+
+    //没有位置
+    public static final int NO_POSITION = -1;
 
     //标签栏
     protected RadioGroup mTabBar;
@@ -50,20 +53,19 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
     //当前fragment
     AppBaseFragment mCurrentFragment;
 
-    //容器
-    protected AppBaseContainer mContainer;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected final void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
+        setContentView(R.layout.tab_bar_activity);
         mTabBar = (RadioGroup)findViewById(R.id.tabBar);
         mDivider = findViewById(R.id.divider);
         mTabBar.setOnCheckedChangeListener(this);
-        mContainer = (AppBaseContainer)findViewById(android.R.id.content);
-        mContainer.setOnEventHandler(this);
 
         initTabBar();
+    }
+
+    @Override
+    protected boolean showNavigationBar() {
+        return false;
     }
 
     //加载tab
@@ -91,11 +93,6 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
 
             mTabBar.check(mCheckedPosition);
         }
-    }
-
-    @Override
-    public int getContentViewRes() {
-        return R.layout.tab_bar_activity;
     }
 
     @Override
@@ -127,6 +124,20 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
             mCheckedPosition = checkedPosition;
             mTabBar.check(mCheckedPosition);
         }
+    }
+
+    //获取对应fragment位置 没有则返回
+    public int getPosition(Class<? extends AppBaseFragment> fragmentClass){
+        if(mTabBarItems != null && mTabBarItems.size() > 0){
+            for(int i = 0;i < mTabBarItems.size();i ++){
+                TabBarItem item = mTabBarItems.get(i);
+                if(item.getFragment() != null && item.getFragment().getClass() == fragmentClass){
+                    return i;
+                }
+            }
+        }
+
+        return NO_POSITION;
     }
 
     //显示某个fragment
@@ -236,31 +247,6 @@ public abstract class TabBarActivity extends AppBaseActivity implements RadioGro
 
     //选择某个tab
     public void onCheck(int position){
-
-    }
-
-    @Override
-    public void onClickPageLoadFai() {
-
-    }
-
-    @Override
-    public void onBack() {
-
-    }
-
-    @Override
-    public void onPageLoadingShow(View pageLoadingView, RelativeLayout.LayoutParams params) {
-
-    }
-
-    @Override
-    public void onPageLoadFailShow(View pageLoadFailView, RelativeLayout.LayoutParams params) {
-
-    }
-
-    @Override
-    public void onShowEmptyView(View emptyView, RelativeLayout.LayoutParams params) {
 
     }
 

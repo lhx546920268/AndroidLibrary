@@ -37,16 +37,17 @@ public abstract class AppBaseContainerActivity extends AppBaseActivity implement
             ///创建导航栏
             mContainer.setShowNavigationBar(showNavigationBar());
 
+            setContentView(mContainer);
             //内容视图
             initialize(getLayoutInflater(), mContainer, savedInstanceState);
         }
 
-        setContentView(mContainer);
+
         setName(getClass().getName());
     }
 
     @Override
-    public int getContentViewRes() {
+    public final int getContentViewRes() {
         return 0;
     }
 
@@ -134,12 +135,6 @@ public abstract class AppBaseContainerActivity extends AppBaseActivity implement
 
     public AppBaseContainer getContainer() {
         return mContainer;
-    }
-
-    public RelativeLayout getContentContainer(){
-        if(mContainer == null)
-            return null;
-        return mContainer.getContentContainer();
     }
 
     ///获取子视图

@@ -207,11 +207,6 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         return mContainer;
     }
 
-    public RelativeLayout getContentContainer(){
-        if(mContainer == null)
-            return null;
-        return mContainer.getContentContainer();
-    }
 
     ///获取子视图
     public <T extends View> T findViewById(int resId){

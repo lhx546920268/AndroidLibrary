@@ -191,6 +191,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         return false;
     }
 
+    //当没有数据时是否可以加载更多 默认不行
+    public boolean loadMoreEnableForData(int count){
+        return count > 0;
+    }
+
     @Override
     public final void loadMoreComplete(boolean hasMore) {
         if(!loadMoreEnable())
@@ -214,7 +219,8 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     //是否是加载更多的UI
     private boolean isLoadMoreItem(int position){
-        return mRealCount > 0 && position == mLoadMorePosition && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
+        return loadMoreEnableForData(mRealCount) && position == mLoadMorePosition && loadMoreEnable() && getLoadMoreControl()
+                .shouldDisplay();
     }
 
     //是否正在加载更多
@@ -265,7 +271,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
                 mEmptyViewPosition = NO_POSITION;
             }
 
-            if(mRealCount > 0 && loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
+            if(loadMoreEnableForData(mRealCount) && loadMoreEnable() && getLoadMoreControl().shouldDisplay()){
                 mLoadMorePosition = count;
                 count ++;
             }else {

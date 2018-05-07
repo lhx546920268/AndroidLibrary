@@ -7,12 +7,12 @@ import android.support.annotation.DrawableRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.refresh.DefaultPtrFrameLayout;
 import com.lhx.library.util.SizeUtil;
+import com.lhx.library.widget.AppBaseContainer;
 import com.lhx.library.widget.BackToTopButton;
 
 import in.srain.cube.views.ptr.PtrDefaultHandler;
@@ -108,15 +108,15 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         if(mBackToTopButton == null){
             mBackToTopButton = new BackToTopButton(mContext);
             mBackToTopButton.setImageResource(mScrollToTopIconRes);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            AppBaseContainer.LayoutParams params = new AppBaseContainer.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, SizeUtil.pxFormDip(20, mContext), SizeUtil.pxFormDip(20, mContext));
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            params.addRule(RelativeLayout.ABOVE, R.id.app_base_fragment_bottom_id);
+            params.addRule(AppBaseContainer.ALIGN_PARENT_RIGHT);
+            params.addRule(AppBaseContainer.ABOVE, R.id.app_base_fragment_bottom_id);
             params.alignWithParent = true;
             mBackToTopButton.setVisibility(View.GONE);
             mBackToTopButton.setLayoutParams(params);
-            getContentContainer().addView(mBackToTopButton);
+            getContainer().addView(mBackToTopButton);
         }
 
         return mBackToTopButton;

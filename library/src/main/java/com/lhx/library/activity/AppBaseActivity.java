@@ -213,6 +213,18 @@ public class AppBaseActivity extends AppCompatActivity {
         transaction.commitAllowingStateLoss();
     }
 
+    public void addFragment(AppBaseFragment fragment){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.fragment_container, fragment);
+        transaction.commitAllowingStateLoss();
+    }
+
+    public void removeFragment(AppBaseFragment fragment){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.remove(fragment);
+        transaction.commitAllowingStateLoss();
+    }
+
     public static Intent getIntentWithFragment(Context context, Class<? extends AppBaseFragment> fragmentClass) {
 
         Intent intent = new Intent(context, AppBaseActivity.class);

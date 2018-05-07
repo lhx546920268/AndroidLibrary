@@ -36,6 +36,22 @@ public class ActivityStack {
     }
 
     /**
+     * 获取对应名称的 activity
+     * @param name 名称
+     * @return activity
+     */
+    public static AppBaseActivity getActivity(String name){
+        if(name != null){
+            for(AppBaseActivity activity : activities){
+                if(name.equals(activity.getName())){
+                    return activity;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 关闭多个activity
      * @param toName 在这个activity名称之后的都关闭，不包括这个
      */
