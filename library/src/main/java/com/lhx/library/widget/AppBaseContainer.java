@@ -122,8 +122,13 @@ public class AppBaseContainer extends RelativeLayout {
         mContentView = contentView;
 
         mContentView.setId(R.id.app_base_fragment_content_id);
-        LayoutParams layoutParams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
+        LayoutParams layoutParams;
+        if(mContentView.getLayoutParams() instanceof LayoutParams){
+            layoutParams = (LayoutParams)mContentView.getLayoutParams();
+        }else {
+            layoutParams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT);
+        }
         layoutParams.alignWithParent = true;
         layoutParams.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
 

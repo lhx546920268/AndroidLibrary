@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.RelativeLayout;
 
 import com.lhx.library.R;
 import com.lhx.library.widget.AppBaseContainer;
@@ -39,9 +38,9 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         mContainer = new AppBaseContainer(mContext);
         mContainer.setShowNavigationBar(showNavigationBar());
 
-        View contentView = getContentView();
-        if(!(contentView.getLayoutParams() instanceof RelativeLayout.LayoutParams)){
-            contentView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        View contentView = getContentView(mContainer);
+        if(!(contentView.getLayoutParams() instanceof AppBaseContainer.LayoutParams)){
+            contentView.setLayoutParams(new AppBaseContainer.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
@@ -49,17 +48,12 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         mContainer.setOnEventHandler(this);
 
         setContentView(mContainer);
-    }
-
-    @Override
-    public void show() {
-        super.show();
 
         //设置弹窗大小
         Window window = getWindow();
         if(window != null){
             onConfigure(window);
-            onConfigure(window, (RelativeLayout.LayoutParams)mContainer.getContentView().getLayoutParams());
+            onConfigure(window, (AppBaseContainer.LayoutParams)mContainer.getContentView().getLayoutParams());
 
             setCancelable(true);
             setCanceledOnTouchOutside(true);
@@ -69,6 +63,11 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
                 view.setPadding(0, 0, 0 , 0);
             }
         }
+    }
+
+    @Override
+    public void show() {
+        super.show();
     }
 
     public void setPageLoading(boolean pageLoading){
@@ -128,7 +127,7 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * @param params          页面加载视图布局参数
      */
     @Override
-    public void onPageLoadingShow(View pageLoadingView, RelativeLayout.LayoutParams params) {
+    public void onPageLoadingShow(View pageLoadingView, AppBaseContainer.LayoutParams params) {
 
     }
 
@@ -139,7 +138,7 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * @param params           布局参数
      */
     @Override
-    public void onPageLoadFailShow(View pageLoadFailView, RelativeLayout.LayoutParams params) {
+    public void onPageLoadFailShow(View pageLoadFailView, AppBaseContainer.LayoutParams params) {
 
     }
 
@@ -150,7 +149,7 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * @param params    布局参数
      */
     @Override
-    public void onShowEmptyView(View emptyView, RelativeLayout.LayoutParams params) {
+    public void onShowEmptyView(View emptyView, AppBaseContainer.LayoutParams params) {
 
     }
 
@@ -168,13 +167,13 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * @param window 弹窗
      * @param contentViewLayoutParams 内容视图布局
      */
-    public abstract void onConfigure(Window window, RelativeLayout.LayoutParams contentViewLayoutParams);
+    public abstract void onConfigure(Window window, AppBaseContainer.LayoutParams contentViewLayoutParams);
 
     /**
      * 获取内容视图
      * @return 内容视图
      */
-    public abstract @NonNull View getContentView();
+    public abstract @NonNull View getContentView(AppBaseContainer parent);
 
     /**
      * 是否显示导航栏

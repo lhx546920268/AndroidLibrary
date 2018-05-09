@@ -39,7 +39,7 @@ public class BaseDialogFragment extends AppBaseFragment {
 
                     @NonNull
                     @Override
-                    public View getContentView() {
+                    public View getContentView(AppBaseContainer parent) {
                         View view = View.inflate(mContext, R.layout.base_dialog, null);
                         view.findViewById(R.id.btn).setOnClickListener(new OnSingleClickListener() {
                             @Override
@@ -49,6 +49,7 @@ public class BaseDialogFragment extends AppBaseFragment {
                         });
                         return view;
                     }
+
 
                     @Override
                     public boolean showNavigationBar() {

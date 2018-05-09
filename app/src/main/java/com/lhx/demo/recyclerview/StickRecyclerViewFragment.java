@@ -73,12 +73,12 @@ public class StickRecyclerViewFragment extends AppBaseFragment {
                     TabLayout tabLayout = holder.getView(R.id.tab_layout);
                     tabLayout.setTabLayoutDataSet(new TabLayout.TabLayoutDataSet() {
                         @Override
-                        public int numberOfTabs() {
+                        public int numberOfTabs(TabLayout tabLayout) {
                             return 2;
                         }
 
                         @Override
-                        public void configureTabInfo(TabLayout.TabInfo tab, int position) {
+                        public void configureTabInfo(TabLayout tabLayout, TabLayout.TabInfo tab, int position) {
                             tab.setTitle("按钮" + position);
                         }
                     });

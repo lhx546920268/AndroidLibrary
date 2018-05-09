@@ -164,7 +164,7 @@ public class CacheUtil {
     }
 
     // 获取缓存大小
-    public static void getCacheSize(final Context context, final OnCacheHander onCacheHander) {
+    public static void getCacheSize(final Context context, final OnCacheHandler onCacheHander) {
 
         final String folder = FileUtil.getImageCacheFolder(context);
         new Thread(){
@@ -185,7 +185,7 @@ public class CacheUtil {
         }.start();
     }
 
-    public interface OnCacheHander{
+    public interface OnCacheHandler{
 
         //获取缓存大小
         void onGetCacheSize(String size);

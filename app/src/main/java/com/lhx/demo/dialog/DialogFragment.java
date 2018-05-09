@@ -97,7 +97,7 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
                                 logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mContext, R.mipmap
                                         .checkboxmark) : null, strings);
 
-                        controller.setShouldMesureContentHeight(true);
+                        controller.setShouldMeasureContentHeight(true);
                         controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
                             @Override
                             public void onItemClick(AlertController controller, int index) {
@@ -113,7 +113,7 @@ public class DialogFragment extends AppBaseFragment implements View.OnClickListe
                                 logoCheckedTextView.isChecked() ? ContextCompat.getDrawable(mContext, R.mipmap
                                         .checkboxmark) : null, strings);
 
-                        controller.setShouldMesureContentHeight(true);
+                        controller.setShouldMeasureContentHeight(true);
                         controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
                             @Override
                             public void onItemClick(AlertController controller, int index) {

@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -33,7 +34,16 @@ public class FileUtil {
 
     public static String getAppFolder(Context context) {
         if(appFolder == null){
-            appFolder = context.getExternalCacheDir() + File.separator + AppUtil.getAppPackageName(context) + File.separator;
+
+            String cacheFolder;
+            //当sd卡可用并且不可被移除时 使用sd卡
+            if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()){
+                cacheFolder = context.getExternalCacheDir().getPath();
+            }else {
+                cacheFolder = context.getCacheDir().getPath();
+            }
+
+            appFolder = cacheFolder + File.separator + AppUtil.getAppPackageName(context) + File.separator;
             File file = new File(appFolder);
             if(!file.exists()){
                 file.mkdirs();
@@ -184,7 +194,7 @@ public class FileUtil {
 
         try {
 
-            createDirectoryIfNotEixist(destFile);
+            createDirectoryIfNotExist(destFile);
             return file.renameTo(destFile);
         }catch (SecurityException e){
             e.printStackTrace();
@@ -321,8 +331,8 @@ public class FileUtil {
 
     }
 
-    public static boolean createDirectoryIfNotEixist(@NonNull String filePath){
-        return createDirectoryIfNotEixist(new File(filePath));
+    public static boolean createDirectoryIfNotExist(@NonNull String filePath){
+        return createDirectoryIfNotExist(new File(filePath));
     }
 
     /**
@@ -330,7 +340,7 @@ public class FileUtil {
      * @param file 必须是一个文件路径 而不是文件夹路径
      * @return 是否成功 如果文件夹存在，也返回成功
      */
-    public static boolean createDirectoryIfNotEixist(@NonNull File file){
+    public static boolean createDirectoryIfNotExist(@NonNull File file){
         String parent = file.getParent();
 
         //创建文件夹

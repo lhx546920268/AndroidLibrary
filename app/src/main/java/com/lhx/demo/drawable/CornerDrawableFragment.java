@@ -31,7 +31,7 @@ public class CornerDrawableFragment extends AppBaseFragment {
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         setContentView(inflater.inflate(R.layout.corner_drawable_fragment, null));
 
-        getContentContainer().setBackgroundColor(getColor(R.color.purple));
+        getContentView().setBackgroundColor(getColor(R.color.purple));
         setTitle("CornerBorderDrawable");
         setShowBackButton(true);
 

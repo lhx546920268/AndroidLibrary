@@ -172,7 +172,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private LinearLayout mScrollContainer;
 
     //是否需要计算内容高度 当内容或者按钮数量过多时可设置，防止内容显示不完
-    private boolean mShouldMesureContentHeight = false;
+    private boolean mShouldMeasureContentHeight = false;
 
     //用于延迟操作
     Handler mHandler;
@@ -326,8 +326,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mShouldDismissAfterClickItem = shouldDismissAfterClickItem;
     }
 
-    public void setShouldMesureContentHeight(boolean shouldMesureContentHeight){
-        mShouldMesureContentHeight = shouldMesureContentHeight;
+    public void setShouldMeasureContentHeight(boolean shouldMeasureContentHeight){
+        mShouldMeasureContentHeight = shouldMeasureContentHeight;
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -362,7 +362,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         return mTopContainer;
     }
 
-    public RecyclerView getRecyclertView() {
+    public RecyclerView getRecyclerView() {
         return mRecyclerView;
     }
 
@@ -427,8 +427,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             setBackground(mContentView);
         }
 
-        if(mShouldMesureContentHeight){
-            mesureContentHeight();
+        if(mShouldMeasureContentHeight){
+            measureContentHeight();
         }
 
         int spanCount = (mButtonTitles.length != 2 || mStyle == STYLE_ACTION_SHEET) ? 1 : 2;
@@ -472,7 +472,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     }
 
     //计算内容高度
-    private void mesureContentHeight(){
+    private void measureContentHeight(){
 
         //按钮内容高度
         int buttonContentHeight = 0;
