@@ -418,8 +418,9 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 mContentDivider.setVisibility(View.GONE);
             }
 
-            mScrollContainer.setPadding(0, has ? mContentPadding - mContentVerticalSpace : 0, 0,
-                    has ? mContentPadding : 0);
+            int top = has ? mContentPadding - mContentVerticalSpace : 0;
+            int bottom = has ? mContentPadding : 0;
+            mScrollContainer.setPadding(0, top, 0, bottom);
 
         }else {
             mScrollContainer.setPadding(0, mContentPadding - mContentVerticalSpace, 0, mContentPadding);
