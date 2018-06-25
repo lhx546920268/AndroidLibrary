@@ -104,7 +104,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 //        super.onDetach();
 //        Log.d("AppBaseFragment", "onDetach");
 //    }
-
+    
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
