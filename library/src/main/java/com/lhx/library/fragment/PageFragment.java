@@ -25,6 +25,7 @@ import in.srain.cube.views.ptr.PtrHandler;
 
 public abstract class PageFragment extends AppBaseFragment implements PtrHandler {
 
+
     //当前第几页
     protected int mCurPage;
 

@@ -15,6 +15,7 @@ import com.lhx.library.widget.BackToTopButton;
 
 public class RecyclerViewFragment extends PageFragment{
 
+
     //
     protected StickRecyclerView mRecyclerView;
 
