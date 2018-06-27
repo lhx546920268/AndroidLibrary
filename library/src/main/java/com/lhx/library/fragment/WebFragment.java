@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -102,10 +103,13 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
-                        if(shouldOpenURL(view, url)){
-                            return true;
-                        }
-                        return super.shouldOverrideUrlLoading(view, url);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+
+                        return false;
                     }
                 })
                 .setSecurityType(AgentWeb.SecurityType.strict)

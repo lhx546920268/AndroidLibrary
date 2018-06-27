@@ -112,6 +112,16 @@ public class FileUtil {
     }
 
     /**
+     * 获取储存apk的目录
+     *
+     * @return
+     */
+    public static String getDownLoadDirectory() {
+        return android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "xinjiang" + File.separator;
+    }
+
+
+    /**
      * 通过 mimeType 获取文件扩展名称
      * @param mimeType 文件的mimeType
      * @return 文件拓展名
