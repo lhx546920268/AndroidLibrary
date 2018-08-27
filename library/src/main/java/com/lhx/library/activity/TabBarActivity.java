@@ -26,6 +26,7 @@ import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.drawable.DrawableUtil;
 import com.lhx.library.fragment.AppBaseFragment;
+import com.lhx.library.util.ViewUtil;
 
 import java.util.List;
 
@@ -47,6 +48,9 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     //当前选中的
     private int mCheckedPosition;
 
+    //背景视图
+    private View mBackgroundView;
+
     //按钮信息
     private List<TabBarItem> mTabBarItems;
 
@@ -61,6 +65,24 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
         mTabBar.setOnCheckedChangeListener(this);
 
         initTabBar();
+    }
+
+    //设置tab背景视图
+    protected void setBackgroundView(View backgroundView){
+
+        if(backgroundView != mBackgroundView){
+            if(mBackgroundView != null){
+                ViewUtil.removeFromParent(mBackgroundView);
+            }
+            mBackgroundView = backgroundView;
+            if(mBackgroundView != null){
+                RelativeLayout relativeLayout = (RelativeLayout)getContainer().getContentView();
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams
+                        .MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                relativeLayout.addView(mBackgroundView, relativeLayout.indexOfChild(mTabBar), params);
+            }
+        }
     }
 
     @Override
@@ -78,15 +100,18 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
                 RadioButton button = new RadioButton(this);
                 button.setText(item.getTitle());
                 button.setId(i);
+                button.setTextSize(getItemTextSize(i));
                 button.setTextColor(getTextColor(item));
                 button.setGravity(Gravity.CENTER);
                 button.setCompoundDrawables(null, getIcon(item), null, null);
-                button.setCompoundDrawablePadding(getCompoundDrawablePadding(i));
+                button.setCompoundDrawablePadding(pxFromDip(2));
                 button.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
-                button.setPadding(0, getItemPaddingTop(i), 0, 0);
 
-                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.weight = 1;
+                params.gravity = Gravity.CENTER_VERTICAL;
+
+                onConfigureItem(button, params, i);
 
                 mTabBar.addView(button, params);
             }
@@ -216,14 +241,14 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
         return new ColorStateList(states, colors);
     }
 
-    //按钮和图标的间距
-    public int getCompoundDrawablePadding(int position){
-        return pxFromDip(2);
+    //配置button
+    public void onConfigureItem(RadioButton button, RadioGroup.LayoutParams params, int position){
+
     }
 
-    //按钮顶部间隔
-    public int getItemPaddingTop(int position){
-        return pxFromDip(2);
+    //字体大小
+    public int getItemTextSize(int position){
+        return 11;
     }
 
     //按钮正常着色 0时 不着色

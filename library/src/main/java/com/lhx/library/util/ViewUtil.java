@@ -63,4 +63,14 @@ public class ViewUtil {
     public static int getViewVisiableHeight(View view, int containerHeight){
         return getViewVisibleHeight(view, containerHeight);
     }
+
+
+    public static void removeFromParent(View view){
+        if(view != null){
+            ViewGroup viewGroup = (ViewGroup)view.getParent();
+            if(viewGroup != null){
+                viewGroup.removeView(view);
+            }
+        }
+    }
 }

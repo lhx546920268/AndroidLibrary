@@ -102,26 +102,58 @@ public class AppUtil {
 
         if(StringUtil.isEmpty(phone))
             return;
-        AlertController controller = AlertController.buildAlert(context, "是否拨打 " + phone, "取消", "拨打");
-        controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
-            @Override
-            public void onItemClick(AlertController controller, int index) {
-                if(index == 1){
-                    String nPhone = phone;
-                    if (nPhone.contains("-")) {
-                        nPhone = nPhone.replaceAll("-", "");
-                    }
-                    try{
-                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);
-                    }catch (SecurityException e){
+        makePhoneCall(context, new String[]{phone});
+    }
 
+    //拨打电话
+    public static void makePhoneCall(final Context context, final String[] phones){
+
+        if(phones == null || phones.length == 0)
+            return;
+
+        if(phones.length > 1){
+            AlertController controller = AlertController.buildActionSheet(context, null, phones);
+            controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                @Override
+                public void onItemClick(AlertController controller, int index) {
+                    if(index < phones.length){
+                        String nPhone = phones[index];
+                        if (nPhone.contains("-")) {
+                            nPhone = nPhone.replaceAll("-", "");
+                        }
+                        try{
+                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(intent);
+                        }catch (SecurityException e){
+
+                        }
                     }
                 }
-            }
-        });
-        controller.show();
+            });
+        }else {
+            final String phone = phones[0];
+            AlertController controller = AlertController.buildAlert(context, "是否拨打 " + phone, "取消", "拨打");
+            controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                @Override
+                public void onItemClick(AlertController controller, int index) {
+                    if(index == 1){
+                        String nPhone = phone;
+                        if (nPhone.contains("-")) {
+                            nPhone = nPhone.replaceAll("-", "");
+                        }
+                        try{
+                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(intent);
+                        }catch (SecurityException e){
+
+                        }
+                    }
+                }
+            });
+            controller.show();
+        }
     }
 
     /**
