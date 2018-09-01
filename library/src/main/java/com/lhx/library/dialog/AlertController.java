@@ -165,7 +165,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private OnItemClickListener mOnItemClickListener;
 
     //UI回调
-    private AlertUIHandler mAlertUIHander;
+    private AlertUIHandler mAlertUIHandler;
 
     //防止内容过多无法看完
     private ScrollView mScrollView;
@@ -334,8 +334,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mOnItemClickListener = onItemClickListener;
     }
 
-    public void setAlertUIHander(AlertUIHandler alertUIHander) {
-        mAlertUIHander = alertUIHander;
+    public void setAlertUIHandler(AlertUIHandler alertUIHandler) {
+        mAlertUIHandler = alertUIHandler;
     }
 
     public View getContentView() {
@@ -498,7 +498,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 topContentHeight += mContentVerticalSpace;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)mTitleTextView.getLayoutParams();
                 int maxWidth = contentWidth - params.leftMargin - params.rightMargin;
-                topContentHeight += StringUtil.mesureTextHeight(mTitle, mTitleTextView.getPaint(), maxWidth);
+                topContentHeight += StringUtil.measureTextHeight(mTitle, mTitleTextView.getPaint(), maxWidth);
             }
 
             //副标题高度
@@ -506,7 +506,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 topContentHeight += mContentVerticalSpace;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)mSubtitleTextView.getLayoutParams();
                 int maxWidth = contentWidth - params.leftMargin - params.rightMargin;
-                topContentHeight += StringUtil.mesureTextHeight(mSubtitle, mSubtitleTextView.getPaint(), maxWidth);
+                topContentHeight += StringUtil.measureTextHeight(mSubtitle, mSubtitleTextView.getPaint(), maxWidth);
             }
         }
 
@@ -524,14 +524,14 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
                     for(int i = 0;i < mButtonTitles.length; i ++){
                         String title = mButtonTitles[i];
-                        buttonContentHeight += StringUtil.mesureTextHeight(title, textView.getPaint(),
+                        buttonContentHeight += StringUtil.measureTextHeight(title, textView.getPaint(),
                                 maxWidth) + mButtonTopBottomPadding * 2 + mDividerHeight;
                     }
                     buttonContentHeight -= mDividerHeight;
                 }
 
                 //取消按钮高度
-                cancelButtonHeight += StringUtil.mesureTextHeight(mCancelTextView.getText(), mCancelTextView
+                cancelButtonHeight += StringUtil.measureTextHeight(mCancelTextView.getText(), mCancelTextView
                         .getPaint(), maxWidth) + mButtonTopBottomPadding * 2 + mDialogPadding;
 
                 break;
@@ -542,7 +542,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
                 for(int i = 0;i < mButtonTitles.length; i ++){
                     String title = mButtonTitles[i];
-                    buttonContentHeight += StringUtil.mesureTextHeight(title, textView.getPaint(),
+                    buttonContentHeight += StringUtil.measureTextHeight(title, textView.getPaint(),
                             maxWidth) + mButtonTopBottomPadding * 2 + mDividerHeight;
                     if(mButtonTitles.length <= 2)
                         break;
@@ -606,8 +606,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     @Override
     public void onDismiss(DialogInterface dialog) {
-        if(mAlertUIHander != null){
-            mAlertUIHander.onDismiss(this);
+        if(mAlertUIHandler != null){
+            mAlertUIHandler.onDismiss(this);
         }
     }
 
@@ -727,11 +727,11 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             int color = mButtonTextColor;
             boolean enable = true;
             //刷新UI
-            if(mAlertUIHander != null){
-                if(!mAlertUIHander.shouldEnable(AlertController.this, position)){
+            if(mAlertUIHandler != null){
+                if(!mAlertUIHandler.shouldEnable(AlertController.this, position)){
                     color = mDisableButtonTextColor;
                     enable = false;
-                }else if(mAlertUIHander.shouldDestructive(AlertController.this, position)){
+                }else if(mAlertUIHandler.shouldDestructive(AlertController.this, position)){
                     color = mDestructiveButtonTextColor;
                 }
             }

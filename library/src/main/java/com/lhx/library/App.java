@@ -24,6 +24,9 @@ public class App {
     public static @DrawableRes int ImagePlaceHolder = 0;
     public static @DrawableRes int ImagePlaceHolderCircle = 0;
 
+    //回到顶部
+    public static @DrawableRes int BackToTopIcon = 0;
+
 
     public static void init(Context context){
         ImageLoaderUtil.initialize(context);

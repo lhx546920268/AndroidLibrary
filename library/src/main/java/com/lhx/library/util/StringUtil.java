@@ -181,12 +181,24 @@ public class StringUtil {
         }
     }
 
-    public static int mesureTextHeight(CharSequence text, Context context, int textSize, int maxWidth){
-        return mesureTextHeight(text, context, textSize, null, maxWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f);
+    /**
+     * 获取字体行高
+     * @param textSize 字体大小
+     * @return 行高
+     */
+    public static int getFontHeight(int textSize){
+        Paint paint = new Paint();
+        paint.setTextSize(textSize);
+        Paint.FontMetrics fm = paint.getFontMetrics();
+        return (int) Math.ceil(fm.descent - fm.ascent);
     }
 
-    public static int mesureTextHeight(CharSequence text, TextPaint paint, int maxWidth){
-        return mesureTextHeight(text, null, 0, paint, maxWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f);
+    public static int measureTextHeight(CharSequence text, Context context, int textSize, int maxWidth){
+        return measureTextHeight(text, context, textSize, null, maxWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f);
+    }
+
+    public static int measureTextHeight(CharSequence text, TextPaint paint, int maxWidth){
+        return measureTextHeight(text, null, 0, paint, maxWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f);
     }
 
     /**
@@ -201,7 +213,7 @@ public class StringUtil {
      * @param lineSpacingExtra 行距额外高度 {@link TextView#getLineSpacingExtra()} default is 0.0f
      * @return 文字高度
      */
-    public static int mesureTextHeight(CharSequence text, Context context, int textSize, TextPaint paint, int maxWidth,
+    public static int measureTextHeight(CharSequence text, Context context, int textSize, TextPaint paint, int maxWidth,
                                        Layout.Alignment alignment, float lineSpacingMultiplier, float lineSpacingExtra){
         if(TextUtils.isEmpty(text))
             return 0;

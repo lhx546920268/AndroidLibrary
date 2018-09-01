@@ -46,11 +46,17 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     //加载更多控制器
     LoadMoreControl mLoadMoreControl;
 
+    //是否可以加载更多
+    private boolean mLoadMoreEnable = false;
+
     //空视图
     private View mEmptyView;
 
     ///上下文
     private Context mContext;
+
+    ///是否显示空视图
+    private boolean mShouldDisplayEmptyView = true;
 
     static final int LOAD_MORE_VIEW_TYPE = 9999; //加载更多视图类型
     static final int EMPTY_VIEW_TYPE = 9998; //空视图类型
@@ -100,14 +106,23 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         }
     }
 
+    public void setShouldDisplayEmptyView(boolean shouldDisplayEmptyView) {
+        mShouldDisplayEmptyView = shouldDisplayEmptyView;
+    }
+
     //当没有数据的时候是否显示空视图
     protected boolean shouldDisplayEmptyView(){
-        return true;
+        return mShouldDisplayEmptyView;
     }
 
     //空视图高度 默认和listView一样高
     protected int getEmptyViewHeight(){
         return -1;
+    }
+
+    //空视图已显示
+    protected void onEmptyViewDisplay(View emptyView){
+
     }
 
     @Override
@@ -118,13 +133,12 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public final void loadMoreComplete(boolean hasMore) {
-        if(!loadMoreEnable())
-            return;
-
-        if(hasMore){
-            getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_HAS_MORE);
-        }else {
-            getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_NO_MORE_DATA);
+        if(loadMoreEnable()){
+            if(hasMore){
+                getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_HAS_MORE);
+            }else {
+                getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_NO_MORE_DATA);
+            }
         }
 
         notifyDataSetChanged();
@@ -142,9 +156,13 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     }
 
+    public void setLoadMoreEnable(boolean loadMoreEnable) {
+        mLoadMoreEnable = loadMoreEnable;
+    }
+
     @Override
     public boolean loadMoreEnable() {
-        return false;
+        return mLoadMoreEnable;
     }
 
     //是否是加载更多的UI
@@ -312,7 +330,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
 
     @Override
-    public final void onBindViewHolder(RecyclerViewHolder holder, int position) {
+    public final void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
 
         //触发加载更多
         if(loadMoreEnable() && getLoadMoreControl().loadMoreEnable()){
@@ -351,6 +369,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 params.height = height;
 
                 holder.itemView.setLayoutParams(params);
+                onEmptyViewDisplay(holder.itemView);
 
                 break;
             case HEADER_VIEW_TYPE : {
@@ -448,6 +467,9 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public final int getItemViewType(int position) {
+
+        if(itemCount == 0 || mSections == null || mSections.size() == 0)
+            return 0;
 
         if(isHeader(position)){
             return HEADER_VIEW_TYPE;

@@ -46,7 +46,7 @@ public class TextBoundsFragment extends AppBaseFragment implements View.OnClickL
             case R.id.text:
                 Log.d("TextBoundsFragment", "height = " + textView.getHeight());
 
-                Log.d("TextBoundsFragment", "mesure height = " + StringUtil.mesureTextHeight(textView.getText(),
+                Log.d("TextBoundsFragment", "mesure height = " + StringUtil.measureTextHeight(textView.getText(),
                         textView.getPaint(), textView.getWidth()));
                 break;
         }

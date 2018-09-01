@@ -18,6 +18,10 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends View> T getItemView(){
+        return (T)this.itemView;
+    }
 
     /**
      * 通过id 获取view

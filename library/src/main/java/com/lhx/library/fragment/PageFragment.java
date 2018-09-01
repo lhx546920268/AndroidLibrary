@@ -63,6 +63,7 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     @CallSuper
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         mCurPage = App.HttpFirstPage;
+        mScrollToTopIconRes = App.BackToTopIcon;
     }
 
     //停止下拉刷新

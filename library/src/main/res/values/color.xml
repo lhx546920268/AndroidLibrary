@@ -60,4 +60,8 @@
     <!--图片加载时的背景颜色-->
     <color name="image_placeholder_color">#f0f0f0</color>
 
+
+    <!--AlertController 样式-->
+
+
 </resources>

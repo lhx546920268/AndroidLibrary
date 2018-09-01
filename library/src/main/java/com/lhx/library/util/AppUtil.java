@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.provider.Settings;
 import android.support.annotation.DrawableRes;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -242,6 +243,13 @@ public class AppUtil {
         }
 
         return packageInfo != null;
+    }
+
+    //打开app设置详情
+    public static void openAppSettings(Context context){
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", context.getPackageName(), null));
+        context.startActivity(intent);
     }
 
 }
