@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--清除按钮-->
     <declare-styleable name="SeaEditText">
         <attr name="clear_icon" format="reference"/>
+    </declare-styleable>
+
+    <!--角标填充也是-->
+    <declare-styleable name="BadgeValueTextView">
+        <attr name="fill_color" format="color"/>
     </declare-styleable>
 </resources>

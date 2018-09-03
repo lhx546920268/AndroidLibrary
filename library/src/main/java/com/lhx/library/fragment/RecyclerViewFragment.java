@@ -35,8 +35,8 @@ public class RecyclerViewFragment extends PageFragment{
         setRefreshView(mRecyclerView);
 
         BackToTopButton backToTopButton = getBackToTopButton();
-//        if(backToTopButton != null){
-//            backToTopButton.setRecyclerView(mRecyclerView);
-//        }
+        if(backToTopButton != null){
+            backToTopButton.setRecyclerView(mRecyclerView);
+        }
     }
 }

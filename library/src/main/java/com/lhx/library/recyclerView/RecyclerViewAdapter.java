@@ -38,7 +38,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     protected boolean mShouldReloadData = true;
 
     ///item数量
-    protected int itemCount;
+    protected int mItemCount;
 
     ///数据源item的数量
     protected int mRealCount = 0;
@@ -457,7 +457,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     public final int getItemCount() {
 
         getData();
-        return itemCount;
+        return mItemCount;
     }
 
     @Override
@@ -468,7 +468,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     @Override
     public final int getItemViewType(int position) {
 
-        if(itemCount == 0 || mSections == null || mSections.size() == 0)
+        if(mItemCount == 0)
             return 0;
 
         if(isHeader(position)){
@@ -558,7 +558,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 count ++;
             }
 
-            itemCount = count;
+            mItemCount = count;
         }
     }
 

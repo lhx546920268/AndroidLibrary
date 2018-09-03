@@ -68,7 +68,7 @@ public class LoadMoreControl {
         mContentView.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                if(mLoadMoreControlHandler != null){
+                if(mLoadMoreControlHandler != null && mLoadingStatus == LOAD_MORE_STATUS_HAS_MORE){
                     mLoadMoreControlHandler.onClickLoadMore();
                 }
             }

@@ -99,7 +99,8 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-
+                if(mItemCount == 0)
+                    return mDifferentColumnProduct;
                 int type = getItemViewType(position);
                 if(type == LOAD_MORE_VIEW_TYPE || type == EMPTY_VIEW_TYPE ||
                         type == HEADER_VIEW_TYPE || type == FOOTER_VIEW_TYPE){
@@ -299,7 +300,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                 count ++;
             }
 
-            itemCount = count;
+            mItemCount = count;
         }
     }
 
@@ -478,7 +479,7 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         @Override
         public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-            if(!mShouldDrawDivider)
+            if(!mShouldDrawDivider || mSections == null || mSections.size() == 0)
                 return;
 
             ///绘制分割线
@@ -567,15 +568,16 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
 
-            GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams)view.getLayoutParams();
+            if(mSections != null && mSections.size() > 0){
+                GridLayoutManager.LayoutParams layoutParams = (GridLayoutManager.LayoutParams)view.getLayoutParams();
 
-            int position = layoutParams.getViewLayoutPosition();
-
-            LayoutInfo info = getLayoutInfoAtPosition(position);
-            if(mOrientation == HORIZONTAL_LIST){
-                outRect.set(info.top, info.left, info.bottom, info.right);
-            }else {
-                outRect.set(info.left, info.top, info.right, info.bottom);
+                int position = layoutParams.getViewLayoutPosition();
+                LayoutInfo info = getLayoutInfoAtPosition(position);
+                if(mOrientation == HORIZONTAL_LIST){
+                    outRect.set(info.top, info.left, info.bottom, info.right);
+                }else {
+                    outRect.set(info.left, info.top, info.right, info.bottom);
+                }
             }
         }
     }

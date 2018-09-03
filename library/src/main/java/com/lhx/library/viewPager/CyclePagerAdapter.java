@@ -48,6 +48,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
                 stopAutoPlayTimer();
             }
         });
+
         setScroller();
     }
 

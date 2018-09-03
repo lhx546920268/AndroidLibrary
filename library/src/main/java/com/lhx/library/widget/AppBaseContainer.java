@@ -18,7 +18,10 @@ import android.widget.TextView;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.bar.NavigationBar;
+import com.lhx.library.loading.PageLoadingView;
 import com.lhx.library.util.SizeUtil;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 基础视图容器
@@ -255,15 +258,27 @@ public class AppBaseContainer extends RelativeLayout {
                 setPageLoadFail(false);
             }
             if(mPageLoading){
-                mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,
-                        this, false);
-                TextView textView = (TextView)mPageLoadingView.findViewById(R.id.text_view);
+                if(App.pageLoadingViewClass != null){
+                    try {
+                        mPageLoadingView = App.pageLoadingViewClass.getConstructor(Context.class).newInstance(mContext);
+                    }catch (Exception e){
+                        throw new IllegalStateException("pageLoadingViewClass 无法通过context实例化");
+                    }
 
-                if(textView != null){
-                    textView.setText(loadingText);
+                }else {
+                    mPageLoadingView = LayoutInflater.from(mContext).inflate(R.layout.common_page_loading,
+                            this, false);
+                }
+
+                if(mPageLoadingView instanceof PageLoadingView){
+                    ((PageLoadingView) mPageLoadingView).getTextView().setText(loadingText);
                 }
 
                 LayoutParams params = (LayoutParams)mPageLoadingView.getLayoutParams();
+                if(params == null){
+                    params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    mPageLoadingView.setLayoutParams(params);
+                }
                 params.alignWithParent = true;
 
                 if(mTopView == null || (mOverlayArea & OVERLAY_AREA_PAGE_LOADING_TOP) == OVERLAY_AREA_PAGE_LOADING_TOP){

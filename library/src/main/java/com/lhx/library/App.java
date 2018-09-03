@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.view.View;
 
 import com.lhx.library.image.ImageLoaderUtil;
 
@@ -26,6 +27,10 @@ public class App {
 
     //回到顶部
     public static @DrawableRes int BackToTopIcon = 0;
+
+    //自定义的loading视图
+    public static Class<? extends View> pageLoadingViewClass = null;
+    public static Class<? extends View> loadViewClass = null;
 
 
     public static void init(Context context){

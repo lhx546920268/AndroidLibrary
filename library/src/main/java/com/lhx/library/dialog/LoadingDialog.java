@@ -2,7 +2,6 @@ package com.lhx.library.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
@@ -11,8 +10,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.lhx.library.App;
 import com.lhx.library.R;
-import com.lhx.library.drawable.CornerBorderDrawable;
 
 /**
  * 加载中弹窗
@@ -22,24 +21,33 @@ public class LoadingDialog extends Dialog {
 
     public LoadingDialog(@NonNull Context context) {
         super(context, R.style.Theme_dialog_loading);
-        initlization();
+        initialization();
     }
 
     public LoadingDialog(@NonNull Context context, @StyleRes int themeResId) {
         super(context, themeResId);
-        initlization();
+        initialization();
     }
 
     public LoadingDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
-        initlization();
+        initialization();
     }
 
     //初始化
-    private void initlization(){
+    private void initialization(){
 
-        View contentView = View.inflate(getContext(), R.layout.loading_dialog, null);
-        CornerBorderDrawable.setDrawable(contentView, 15, Color.parseColor("#4c4c4c"));
+        View contentView;
+        if(App.loadViewClass != null){
+            try {
+                contentView = App.loadViewClass.getConstructor(Context.class).newInstance(getContext());
+            }catch (Exception e){
+                throw new IllegalStateException("pageLoadingViewClass 无法通过context实例化");
+            }
+        }else {
+            contentView = View.inflate(getContext(), R.layout.loading_view, null);
+        }
+
 
         setContentView(contentView);
 
@@ -47,10 +55,12 @@ public class LoadingDialog extends Dialog {
         setCanceledOnTouchOutside(false);
 
         Window window = getWindow();
-        WindowManager.LayoutParams layoutParams = window.getAttributes();
-        layoutParams.gravity = Gravity.CENTER;
-        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(layoutParams);
+        if(window != null){
+            WindowManager.LayoutParams layoutParams = window.getAttributes();
+            layoutParams.gravity = Gravity.CENTER;
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(layoutParams);
+        }
     }
 }
