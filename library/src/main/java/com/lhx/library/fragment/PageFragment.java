@@ -63,7 +63,14 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     @CallSuper
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         mCurPage = App.HttpFirstPage;
-        mScrollToTopIconRes = App.BackToTopIcon;
+        if(shouldDisplayBackToTop()){
+            mScrollToTopIconRes = App.BackToTopIcon;
+        }
+    }
+
+    //是否需要显示回到顶部按钮
+    public boolean shouldDisplayBackToTop(){
+        return true;
     }
 
     //停止下拉刷新

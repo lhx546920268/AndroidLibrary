@@ -368,6 +368,14 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         mContainer.setShowEmptyView(show, text, iconRes);
     }
 
+    //显示空视图
+    public void setShowEmptyView(boolean show, @LayoutRes int layoutRes){
+        mContainer.setShowEmptyView(show, layoutRes);
+    }
+
+    public void setShowEmptyView(boolean show, View emptyView){
+        mContainer.setShowEmptyView(show, emptyView);
+    }
 
     //设置底部视图
     public void setBottomView(View bottomView){

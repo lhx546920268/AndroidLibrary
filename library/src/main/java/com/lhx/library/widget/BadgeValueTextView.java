@@ -33,11 +33,11 @@ public class BadgeValueTextView extends AppCompatTextView {
     }
 
     public BadgeValueTextView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public BadgeValueTextView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public BadgeValueTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -56,8 +56,20 @@ public class BadgeValueTextView extends AppCompatTextView {
     }
 
     @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        hideIfNeeded();
+    }
+
+    @Override
     public void setText(CharSequence text, BufferType type) {
         super.setText(text, type);
+        hideIfNeeded();
+    }
+
+    //判断是否需要隐藏
+    private void hideIfNeeded(){
+        CharSequence text = getText();
         if(TextUtils.isDigitsOnly(text)){
             int value = StringUtil.parseInt(text);
             setVisibility(value > 0 ? VISIBLE : INVISIBLE);

@@ -395,24 +395,41 @@ public class AppBaseContainer extends RelativeLayout {
      */
     public void setShowEmptyView(boolean show, String text, @DrawableRes int iconRes){
 
+        View view = null;
         if(show){
-            if(mEmptyView == null){
-                mEmptyView = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, this, false);
-            }
+            view = LayoutInflater.from(mContext).inflate(R.layout.common_empty_view, this, false);
 
             if(!TextUtils.isEmpty(text)){
-                TextView textView = (TextView)mEmptyView.findViewById(R.id.text);
+                TextView textView = view.findViewById(R.id.text);
                 if(textView != null){
                     textView.setText(text);
                 }
             }
 
             if(iconRes != 0){
-                ImageView imageView = (ImageView)mEmptyView.findViewById(R.id.icon);
+                ImageView imageView = view.findViewById(R.id.icon);
                 if(imageView != null){
                     imageView.setImageResource(iconRes);
                 }
             }
+        }
+        setShowEmptyView(show, view);
+    }
+
+    //显示空视图
+    public void setShowEmptyView(boolean show, @LayoutRes int layoutRes){
+        View view = null;
+        if(show && layoutRes != 0.0){
+            view = LayoutInflater.from(mContext).inflate(layoutRes, this, false);
+        }
+        setShowEmptyView(show, view);
+    }
+
+    //显示空视图
+    public void setShowEmptyView(boolean show, View emptyView){
+
+        if(show && emptyView != null){
+            mEmptyView = emptyView;
 
             if(isPageLoading()){
                 setPageLoading(false);
@@ -423,7 +440,11 @@ public class AppBaseContainer extends RelativeLayout {
             }
 
             LayoutParams params = (LayoutParams)
-                    mPageLoadFailView.getLayoutParams();
+                    mEmptyView.getLayoutParams();
+            if(params == null){
+                params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                mEmptyView.setLayoutParams(params);
+            }
             params.alignWithParent = true;
 
             if(mTopView == null || (mOverlayArea & OVERLAY_AREA_EMPTY_TOP) == OVERLAY_AREA_EMPTY_TOP){

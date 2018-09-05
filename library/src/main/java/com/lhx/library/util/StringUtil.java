@@ -53,7 +53,8 @@ public class StringUtil {
             try {
                 value = Integer.parseInt((String)object);
             }catch (NumberFormatException e){
-                e.printStackTrace();
+//                e.printStackTrace();
+                return 0;
             }
         }else if(object instanceof Integer){
             return (int)object;
@@ -76,7 +77,7 @@ public class StringUtil {
             try {
                 value = Long.parseLong((String)object);
             }catch (NumberFormatException e){
-                e.printStackTrace();
+                return 0;
             }
         }else if(object instanceof Integer || object instanceof Long){
             return (long)object;
@@ -97,7 +98,7 @@ public class StringUtil {
             try {
                 value = Float.parseFloat((String)object);
             }catch (NumberFormatException e){
-                e.printStackTrace();
+                return 0;
             }
         }else if(object instanceof Integer){
             return ((Integer) object).floatValue();
@@ -120,7 +121,7 @@ public class StringUtil {
             try {
                 value = Double.parseDouble((String)object);
             }catch (NumberFormatException e){
-                e.printStackTrace();
+                return 0;
             }
         }else if(object instanceof Integer){
             return ((Integer) object).doubleValue();

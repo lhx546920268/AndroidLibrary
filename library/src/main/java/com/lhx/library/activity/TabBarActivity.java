@@ -165,6 +165,10 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
         return NO_POSITION;
     }
 
+    public int getCheckedPosition() {
+        return mCheckedPosition;
+    }
+
     //显示某个fragment
     private void switchFragment(AppBaseFragment fragment){
 
