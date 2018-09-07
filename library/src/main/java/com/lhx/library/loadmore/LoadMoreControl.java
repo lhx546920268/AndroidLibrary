@@ -126,18 +126,19 @@ public class LoadMoreControl {
                 }
                 case LOAD_MORE_STATUS_HAS_MORE :
                 case LOAD_MORE_STATUS_LOADING : {
-                    mTextView.setText("正在载入...");
+                    mTextView.setText("加载中...");
                     mProgressBar.setVisibility(View.VISIBLE);
                     mContentView.setEnabled(false);
                     break;
                 }
                 case LOAD_MORE_STATUS_FAIL : {
                     mContentView.setEnabled(true);
-                    mTextView.setText("重新加载");
+                    mTextView.setText("加载失败，点击重新加载");
                     mProgressBar.setVisibility(View.GONE);
                     break;
                 }
                 case LOAD_MORE_STATUS_NO_MORE_DATA : {
+
                     break;
                 }
             }
@@ -152,6 +153,11 @@ public class LoadMoreControl {
     ///是否显示加载更多视图
     public boolean shouldDisplay(){
         return mLoadingStatus != LOAD_MORE_STATUS_NORMAL;
+    }
+
+    ///是否是没有数据的视图
+    public boolean isNoData(){
+        return mLoadingStatus == LOAD_MORE_STATUS_NO_MORE_DATA;
     }
 
     ///是否可以显示空视图

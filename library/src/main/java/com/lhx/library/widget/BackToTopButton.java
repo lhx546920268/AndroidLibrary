@@ -23,7 +23,7 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
     private AbsListView mListView;
 
     //显示第几个时显示回到顶部按钮
-    private int mBackToTopPosition = 20;
+    private int mBackToTopPosition = 30;
 
     private BackToTopHandler mBackToTopHandler;
 

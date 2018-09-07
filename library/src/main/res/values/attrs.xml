@@ -10,4 +10,17 @@
     <declare-styleable name="BadgeValueTextView">
         <attr name="fill_color" format="color"/>
     </declare-styleable>
+
+    <!--可换行的线性布局-->
+    <declare-styleable name="WrapLinearLayout">
+        <attr name="gravity" format="enum">
+            <enum name="right" value="0"/>
+            <enum name="left" value="1"/>
+            <enum name="center" value="2"/>
+        </attr>
+        <attr name="horizontal_Space" format="dimension"/>
+        <attr name="vertical_Space" format="dimension"/>
+        <attr name="isFull" format="boolean"/>
+    </declare-styleable>
+
 </resources>

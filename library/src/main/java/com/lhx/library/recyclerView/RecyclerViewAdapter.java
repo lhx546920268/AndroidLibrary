@@ -59,9 +59,10 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     private boolean mShouldDisplayEmptyView = true;
 
     static final int LOAD_MORE_VIEW_TYPE = 9999; //加载更多视图类型
-    static final int EMPTY_VIEW_TYPE = 9998; //空视图类型
-    static final int HEADER_VIEW_TYPE = 9997; //头部视图类型
-    static final int FOOTER_VIEW_TYPE = 9996; //底部视图类型
+    static final int LOAD_MORE_VIEW_NO_DATA_TYPE = 9998; //加载更多视图没有数据了
+    static final int EMPTY_VIEW_TYPE = 9997; //空视图类型
+    static final int HEADER_VIEW_TYPE = 9996; //头部视图类型
+    static final int FOOTER_VIEW_TYPE = 9995; //底部视图类型
 
     ///构造方法
     public RecyclerViewAdapter(@NonNull RecyclerView recyclerView) {
@@ -343,6 +344,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         int viewType = holder.getItemViewType();
         switch (viewType){
             case LOAD_MORE_VIEW_TYPE :
+            case LOAD_MORE_VIEW_NO_DATA_TYPE :
 
                 if(holder.itemView.getLayoutParams() instanceof RecyclerView.LayoutParams){
 
@@ -409,9 +411,11 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     public final RecyclerViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
         switch (viewType){
-            case LOAD_MORE_VIEW_TYPE : {
+            case LOAD_MORE_VIEW_TYPE :
+            case LOAD_MORE_VIEW_NO_DATA_TYPE: {
 
-                return new RecyclerViewHolder(getLoadMoreControl().getContentView());
+                RecyclerViewHolder holder = new RecyclerViewHolder(getLoadMoreControl().getContentView());
+                return holder;
             }
             case EMPTY_VIEW_TYPE : {
 
@@ -484,7 +488,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         }
 
         if(isLoadMoreItem(position)){
-            return LOAD_MORE_VIEW_TYPE;
+            return getLoadMoreControl().isNoData() ? LOAD_MORE_VIEW_NO_DATA_TYPE : LOAD_MORE_VIEW_TYPE;
         }
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
