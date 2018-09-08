@@ -51,8 +51,11 @@
     <!--导航栏阴影颜色-->
     <color name="navigation_bar_shadow_color">#c8c8c8</color>
 
-    <!--导航栏 tint color 也就是 标题、按钮颜色-->
+    <!--导航栏 tint color 也就是 按钮颜色-->
     <color name="navigation_bar_tint_color">#000000</color>
+
+    <!--导航栏 标题颜色-->
+    <color name="navigation_bar_title_color">#000000</color>
 
     <!--web进度条颜色-->
     <color name="web_progress_color">#007aff</color>

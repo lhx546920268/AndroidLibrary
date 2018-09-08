@@ -4,6 +4,7 @@ package com.lhx.library.fragment;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,5 +130,10 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         }
 
         return mBackToTopButton;
+    }
+
+    //返回自定义的 layout res
+    public @LayoutRes int getContentRes(){
+        return 0;
     }
 }

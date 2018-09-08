@@ -62,17 +62,6 @@ public class LoadMoreControl {
 
     public LoadMoreControl(@NonNull Context context) {
         mContext = context;
-        mContentView = View.inflate(mContext, R.layout.common_load_more, null);
-        mProgressBar = (ProgressBar)mContentView.findViewById(R.id.progress_bar);
-        mTextView = (TextView)mContentView.findViewById(R.id.text_view);
-        mContentView.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                if(mLoadMoreControlHandler != null && mLoadingStatus == LOAD_MORE_STATUS_HAS_MORE){
-                    mLoadMoreControlHandler.onClickLoadMore();
-                }
-            }
-        });
     }
 
     //设置标题
@@ -80,13 +69,32 @@ public class LoadMoreControl {
         mTextView.setText(title);
     }
 
-    public View getContentView(){
+    public View getContentView(View reusedView){
 
         if(mLoadingStatus == LOAD_MORE_STATUS_NO_MORE_DATA){
-            if(mNoMoreDataView == null){
+            if(reusedView == null){
                 mNoMoreDataView = View.inflate(mContext, R.layout.common_load_more_no_data, null);
+            }else {
+                mNoMoreDataView = reusedView;
             }
             return mNoMoreDataView;
+        }else {
+            if(reusedView == null){
+                mContentView = View.inflate(mContext, R.layout.common_load_more, null);
+                mProgressBar = (ProgressBar)mContentView.findViewById(R.id.progress_bar);
+                mTextView = (TextView)mContentView.findViewById(R.id.text_view);
+                mContentView.setOnClickListener(new OnSingleClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        if(mLoadMoreControlHandler != null && mLoadingStatus == LOAD_MORE_STATUS_HAS_MORE){
+                            mLoadMoreControlHandler.onClickLoadMore();
+                        }
+                    }
+                });
+            }else {
+                mContentView = reusedView;
+            }
+            refreshUI();
         }
         return mContentView;
     }
@@ -119,28 +127,45 @@ public class LoadMoreControl {
                 status = LOAD_MORE_STATUS_NORMAL;
             }
             mLoadingStatus = status;
-            switch (mLoadingStatus){
-                case LOAD_MORE_STATUS_NORMAL : {
+            refreshUI();
+        }
+    }
 
-                    break;
-                }
-                case LOAD_MORE_STATUS_HAS_MORE :
-                case LOAD_MORE_STATUS_LOADING : {
-                    mTextView.setText("加载中...");
-                    mProgressBar.setVisibility(View.VISIBLE);
+    //刷新UI
+    private void refreshUI(){
+        switch (mLoadingStatus){
+            case LOAD_MORE_STATUS_NORMAL : {
+
+                break;
+            }
+            case LOAD_MORE_STATUS_HAS_MORE :
+            case LOAD_MORE_STATUS_LOADING : {
+                if(mContentView != null){
                     mContentView.setEnabled(false);
-                    break;
                 }
-                case LOAD_MORE_STATUS_FAIL : {
+                if(mProgressBar != null){
+                    mProgressBar.setVisibility(View.VISIBLE);
+                }
+                if(mTextView != null){
+                    mTextView.setText("加载中...");
+                }
+                break;
+            }
+            case LOAD_MORE_STATUS_FAIL : {
+                if(mContentView != null){
                     mContentView.setEnabled(true);
-                    mTextView.setText("加载失败，点击重新加载");
+                }
+                if(mProgressBar != null){
                     mProgressBar.setVisibility(View.GONE);
-                    break;
                 }
-                case LOAD_MORE_STATUS_NO_MORE_DATA : {
+                if(mTextView != null){
+                    mTextView.setText("加载失败，点击重新加载");
+                }
+                break;
+            }
+            case LOAD_MORE_STATUS_NO_MORE_DATA : {
 
-                    break;
-                }
+                break;
             }
         }
     }

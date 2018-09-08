@@ -52,6 +52,13 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         // Required empty public constructor
     }
 
+    //是否已初始化
+    private boolean mInit;
+
+    public boolean isInit() {
+        return mInit;
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -121,6 +128,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
             //内容视图
             initialize(inflater, mContainer, savedInstanceState);
+            mInit = true;
         }
 
         return mContainer;
@@ -195,6 +203,13 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
      */
     public void backTo(@NonNull String toName, int resultCode){
         ActivityStack.finishActivities(toName, resultCode);
+    }
+
+    /**
+     * 返回到底部
+     */
+    public void backToRoot(){
+        ActivityStack.finishActivitiesToRoot();
     }
 
     public NavigationBar getNavigationBar() {

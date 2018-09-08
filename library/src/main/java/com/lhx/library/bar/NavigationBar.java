@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
+import com.lhx.library.drawable.DrawableUtil;
 import com.lhx.library.util.SizeUtil;
 
 import java.lang.annotation.Retention;
@@ -84,7 +85,7 @@ public class NavigationBar extends RelativeLayout {
             title_textView = new TextView(context);
             title_textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen
                     .navigation_bar_title_text_size));
-            title_textView.setTextColor(ContextCompat.getColor(context, R.color.navigation_bar_tint_color));
+            title_textView.setTextColor(ContextCompat.getColor(context, R.color.navigation_bar_title_color));
             title_textView.setLines(1);
             title_textView.setEllipsize(TextUtils.TruncateAt.END);
             title_textView.setBackgroundColor(Color.TRANSPARENT);
@@ -249,6 +250,8 @@ public class NavigationBar extends RelativeLayout {
             String title = null;
             if (icon != 0) {
                 drawable = ContextCompat.getDrawable(getContext(), icon);
+                drawable = DrawableUtil.getTintDrawable(drawable, ContextCompat.getColor(getContext(), R.color
+                        .navigation_bar_tint_color));
             }
             if (drawable == null) {
                 title = getContext().getString(R.string.navigation_bar_back_title);

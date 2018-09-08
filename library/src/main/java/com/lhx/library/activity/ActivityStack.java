@@ -52,6 +52,27 @@ public class ActivityStack {
     }
 
     /**
+     * 关闭所有activity到 root
+     */
+    public static void finishActivitiesToRoot(){
+        //要关闭的activity
+        Set<AppBaseActivity> closeActivities = new HashSet<>();
+
+        for(int i = 0;i < activities.size();i ++){
+            AppBaseActivity activity = activities.get(i);
+            if(!activity.isTaskRoot()){
+                closeActivities.add(activities.get(i));
+            }
+        }
+
+        Iterator<AppBaseActivity> iterator = closeActivities.iterator();
+        while (iterator.hasNext()){
+            AppBaseActivity activity = iterator.next();
+            activity.finish();
+        }
+    }
+
+    /**
      * 关闭多个activity
      * @param toName 在这个activity名称之后的都关闭，不包括这个
      */
