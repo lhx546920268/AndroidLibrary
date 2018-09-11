@@ -25,7 +25,7 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
     private Drawable mClearDrawable;
 
     ///是否聚焦
-    private boolean mHasFoucs;
+    private boolean mHasFocus;
 
     public SeaEditText(Context context) {
         super(context);
@@ -68,7 +68,7 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
 
     //显示删除按钮
     private void showClearBtn() {
-        if(length() > 0 && mHasFoucs)
+        if(length() > 0 && mHasFocus)
             setCompoundDrawablesWithIntrinsicBounds(null, null, mClearDrawable, null);
         else
             setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
@@ -90,9 +90,15 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
         showClearBtn();
     }
 
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
     // 处理删除事件
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (mClearDrawable != null) {
                 int x = (int)event.getX();
@@ -106,7 +112,11 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
 
                 if (isInnerWidth && isInnerHeight) {
                     this.setText("");
+                }else {
+                    performClick();
                 }
+            }else {
+                performClick();
             }
         }
         return super.onTouchEvent(event);
@@ -125,7 +135,7 @@ public class SeaEditText extends AppCompatEditText implements TextWatcher, View.
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
 
-        mHasFoucs = hasFocus;
+        mHasFocus = hasFocus;
         showClearBtn();
     }
 }

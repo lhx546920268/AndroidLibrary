@@ -334,6 +334,14 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         return mContainer.isPageLoading();
     }
 
+    public void setLoading(boolean loading){
+        mContainer.setLoading(loading, "加载中...");
+    }
+
+    public void setLoading(boolean loading, String text){
+        mContainer.setLoading(loading, text);
+    }
+
     public void setPageLoadFail(boolean pageLoadFail){
         mContainer.setPageLoadFail(pageLoadFail);
     }
@@ -351,19 +359,6 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     public boolean isPageLoadFail(){
         return mContainer.isPageLoadFail();
-    }
-
-    //显示加载菊花
-    public boolean isLoading() {
-        return DialogUtil.isShowing();
-    }
-
-    public void setLoading(boolean loading) {
-        if(loading){
-            DialogUtil.showLoadingDialog(mContext, false, null);
-        }else {
-            DialogUtil.dismissLoadingDialog();
-        }
     }
 
     public void setShowEmptyView(String text){

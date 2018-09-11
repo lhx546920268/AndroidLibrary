@@ -21,6 +21,7 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
 
     //关联的listView gridView
     private AbsListView mListView;
+    private AbsListView.OnScrollListener mOnScrollListener;
 
     //显示第几个时显示回到顶部按钮
     private int mBackToTopPosition = 30;
@@ -93,6 +94,10 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
         }
     }
 
+    public void setOnScrollListener(AbsListView.OnScrollListener onScrollListener) {
+        mOnScrollListener = onScrollListener;
+    }
+
     public void setBackToTopHandler(BackToTopHandler backToTopHandler) {
         mBackToTopHandler = backToTopHandler;
     }
@@ -107,14 +112,18 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
                 setVisibility(GONE);
             }
         }
+
+        if(mOnScrollListener != null){
+            mOnScrollListener.onScrollStateChanged(view, scrollState);
+        }
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
+        if(mOnScrollListener != null){
+            mOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+        }
     }
-
-
 
 
     class BackToTopListener extends RecyclerView.OnScrollListener{

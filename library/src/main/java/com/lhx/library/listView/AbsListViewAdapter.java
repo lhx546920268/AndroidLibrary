@@ -31,16 +31,16 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     //没有位置
     private static final int NO_POSITION = -1;
 
-    ///section信息数组
+    //section信息数组
     private ArrayList<SectionInfo> mSections = new ArrayList<>();
 
-    ///是否需要刷新数据
+    //是否需要刷新数据
     private boolean mShouldReloadData = true;
 
-    ///item数量
+    //item数量
     private int mCount = 0;
 
-    ///数据源item的数量
+    //数据源item的数量
     private int mRealCount = 0;
 
     //加载更多控制器
@@ -48,12 +48,18 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     private int mLoadMoreType;
     private int mLoadMorePosition = NO_POSITION;
 
+    //是否可以加载更多
+    private boolean mLoadMoreEnable = false;
+
     //空视图
     private View mEmptyView;
     private int mEmptyViewType;
     private int mEmptyViewPosition = NO_POSITION;
 
-    ///上下文
+    //是否显示空视图
+    private boolean mShouldDisplayEmptyView = true;
+
+    //上下文
     private Context mContext;
 
     public AbsListViewAdapter(@NonNull Context context) {
@@ -102,7 +108,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     //当没有数据的时候是否显示空视图
     protected boolean shouldDisplayEmptyView() {
-        return true;
+        return mShouldDisplayEmptyView;
+    }
+
+    public void setShouldDisplayEmptyView(boolean shouldDisplayEmptyView) {
+        mShouldDisplayEmptyView = shouldDisplayEmptyView;
     }
 
     //空视图高度 默认和listView一样高
@@ -190,7 +200,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     @Override
     public boolean loadMoreEnable() {
-        return false;
+        return mLoadMoreEnable;
+    }
+
+    public void setLoadMoreEnable(boolean loadMoreEnable) {
+        mLoadMoreEnable = loadMoreEnable;
     }
 
     //当没有数据时是否可以加载更多 默认不行
@@ -200,8 +214,6 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
     @Override
     public final void loadMoreComplete(boolean hasMore) {
-        if (!loadMoreEnable())
-            return;
 
         if (hasMore) {
             getLoadMoreControl().setLoadingStatus(LoadMoreControl.LOAD_MORE_STATUS_HAS_MORE);
@@ -343,15 +355,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
     public final int getViewTypeCount() {
 
         int count = numberOfItemViewTypes();
-        if (loadMoreEnable()) {
-            mLoadMoreType = count;
-            count++;
-        }
+        mLoadMoreType = count;
+        count++;
 
-        if (shouldDisplayEmptyView()) {
-            mEmptyViewType = count;
-            count++;
-        }
+        mEmptyViewType = count;
+        count++;
 
         return count;
     }
@@ -428,8 +436,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             }
         }
 
-        if (isLoadMoreItem(position))
-            return getLoadMoreControl().getContentView(convertView);
+        if (isLoadMoreItem(position)){
+            convertView = getLoadMoreControl().getContentView(convertView);
+            convertView.setTag(R.id.list_view_type_tag_key, type);
+            return convertView;
+        }
 
         SectionInfo sectionInfo = sectionInfoForPosition(position);
 

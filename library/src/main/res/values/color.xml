@@ -65,6 +65,32 @@
 
 
     <!--AlertController 样式-->
+    
+    <!--弹窗背景颜色-->
+    <color name="alert_dialog_background_color">@color/white</color>
 
+    <!--按钮点击背景颜色-->
+    <color name="alert_high_lighted_background_color">#e6e6e6</color>
+
+    <!--标题字体颜色-->
+    <color name="alert_title_color">@color/black</color>
+
+    <!--副标题字体颜色-->
+    <color name="alert_subtitle_color">@color/gray</color>
+
+    <!--按钮字体颜色-->
+    <color name="alert_button_text_color">@color/light_blue</color>
+
+    <!--警示按钮字体颜色 如删除-->
+    <color name="alert_destructive_button_text_color">@color/red</color>
+
+    <!--警示按钮背景颜色-->
+    <color name="alert_destructive_button_background_color">@color/white</color>
+
+    <!--警示按钮高亮背景颜色-->
+    <color name="alert_destructive_button_high_lighted_background_color">@color/white</color>
+
+    <!--无法点击的按钮字体颜色-->
+    <color name="alert_disable_button_text_color">@color/gray</color>
 
 </resources>

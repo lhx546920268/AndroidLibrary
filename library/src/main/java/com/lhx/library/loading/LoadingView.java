@@ -46,4 +46,8 @@ public class LoadingView extends FrameLayout {
 
         CornerBorderDrawable.setDrawable(mContainer, 15, Color.parseColor("#4c4c4c"));
     }
+
+    public TextView getTextView() {
+        return mTextView;
+    }
 }

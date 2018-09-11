@@ -153,11 +153,19 @@ public class StringUtil {
 
     /**
      * 判断字符串是否为空
-     * @param string 要判断的字符串
+     * @param text 要判断的字符串
      * @return 是否为空
      */
-    public static boolean isEmpty(String string){
-        return string == null || string.length() == 0 || "null".equals(string);
+    public static boolean isEmpty(CharSequence text){
+        if(text == null || text.length() == 0){
+            return true;
+        }
+
+        if(text instanceof String){
+            return "null".equals(text);
+        }
+
+        return false;
     }
 
     public static String stringFromBytes(byte[] bytes){

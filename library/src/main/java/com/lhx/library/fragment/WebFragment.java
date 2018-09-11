@@ -1,5 +1,6 @@
 package com.lhx.library.fragment;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.text.TextUtils;
@@ -7,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -20,6 +22,8 @@ import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.util.StringUtil;
 
+import java.util.Locale;
+
 /**
  * 浏览器
  */
@@ -31,6 +35,8 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     public static final String WEB_HTML_STRING = "com.lhx.WEB_HTML_STRING";//要加载的html
     public static final String WEB_TITLE = "com.lhx.WEB_TITLE";//默认显示的标题
     public static final String WEB_USE_WEB_TITLE = "com.lhx.WEB_USE_WEB_TITLE";//是否使用web标题
+    public static final String WEB_DISPLAY_PROGRESS = "com.lhx.WEB_DISPLAY_PROGRESS";//是否显示进度条 默认显示
+    public static final String WEB_DISPLAY_INDICATOR = "com.lhx.WEB_DISPLAY_INDICATOR";//是否显示菊花，默认不显示
 
     //浏览器
     AgentWeb mAgentWeb;
@@ -50,6 +56,12 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     //原始标题
     protected String mOriginTitle;
 
+    //是否显示加载进度条
+    protected boolean mShouldDisplayProgress = true;
+
+    //是否显示菊花 与进度条互斥
+    protected boolean mShouldDisplayIndicator = false;
+
     public AgentWeb getAgentWeb() {
         return mAgentWeb;
     }
@@ -60,6 +72,11 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         setContentView(R.layout.web_fragment);
 
         mShouldUseWebTitle = getExtraBooleanFromBundle(WEB_USE_WEB_TITLE, true);
+        mShouldDisplayProgress = getExtraBooleanFromBundle(WEB_DISPLAY_PROGRESS, true);
+        mShouldDisplayIndicator = getExtraBooleanFromBundle(WEB_DISPLAY_INDICATOR, false);
+        if(mShouldDisplayIndicator){
+            mShouldDisplayProgress = false;
+        }
 
         String url = getExtraStringFromBundle(WEB_URL);
         if(StringUtil.isEmpty(url)){
@@ -94,8 +111,8 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         mAgentWeb = AgentWeb.with(this)//
                 .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
-                .setIndicatorColorWithHeight(getColor(R.color.web_progress_color), getInteger(R.integer
-                        .web_progress_height_dp))//
+                .setIndicatorColorWithHeight(getColor(R.color.web_progress_color), mShouldDisplayProgress ? getInteger(R.integer
+                        .web_progress_height_dp) : 0)// 进度条
                 .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
                 .setReceivedTitleCallback(this)
                 .setWebViewClient(new WebViewClient(){
@@ -111,13 +128,37 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
                         return false;
                     }
+
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        if(mShouldDisplayIndicator){
+                            setPageLoading(false);
+                            mShouldDisplayIndicator = false;
+                        }
+                    }
+
+                    @Override
+                    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                        if(mShouldDisplayIndicator){
+                            setPageLoading(true);
+                        }
+                    }
                 })
                 .setSecurityType(AgentWeb.SecurityType.strict)
                 .createAgentWeb()//
                 .ready()//
                 .go(null);
 
+        WebSettings settings = mAgentWeb.getAgentWebSettings().getWebSettings();
+        String userAgent = getCustomUserAgent();
+        if(!StringUtil.isEmpty(userAgent)){
+            settings.setUserAgentString(String.format(Locale.getDefault(), "%s %s", settings.getUserAgentString(), userAgent));
+        }
         loadWebContent();
+    }
+
+    public void setShouldDisplayProgress(boolean shouldDisplayProgress) {
+        mShouldDisplayProgress = shouldDisplayProgress;
     }
 
     //加载
@@ -210,13 +251,18 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         return "";
     }
 
-    ///当前url是否可以打开
+    //当前url是否可以打开
     public boolean shouldOpenURL(WebView view, String url){
         return true;
     }
 
-    ///是否需要销毁 tabBar 需要返回 false
+    //是否需要销毁 tabBar 需要返回 false
     public boolean shouldOnDestroy(){
         return true;
+    }
+
+    //返回需要设置的自定义 userAgent 会拼在系统的userAgent后面
+    public String getCustomUserAgent(){
+        return null;
     }
 }

@@ -89,29 +89,41 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     //弹窗边距
     private int mDialogPadding;
 
+    //提示框内容（除了按钮）最低高度
+    private int mContentMinHeight;
+
     //标题字体颜色
-    private @ColorInt int mTitleColor = Color.BLACK;
+    private @ColorInt int mTitleColor;
 
     //标题字体大小
-    private @ColorInt int mTitleSize = 17;
+    private @ColorInt float mTitleSize;
 
     //副标题字体颜色
-    private @ColorInt int mSubtitleColor = Color.GRAY;
+    private @ColorInt int mSubtitleColor;
 
     //副标题字体大小
-    private int mSubtitleSize = 12;
+    private float mSubtitleSize;
 
-    //按钮字体大小
-    private int mButtonTextSize = 15;
+    //按钮字体大小 sp
+    private float mButtonTextSize;
 
     //按钮字体颜色
     private @ColorInt int mButtonTextColor;
 
     //警示按钮字体颜色 如删除
-    private @ColorInt int mDestructiveButtonTextColor = Color.RED;
+    private @ColorInt int mDestructiveButtonTextColor;
+
+    //警示按钮背景颜色
+    private @ColorInt int mDestructiveButtonBackgroundColor;
+
+    //警示按钮高亮背景颜色
+    private @ColorInt int mDestructiveHighlightedButtonBackgroundColor;
 
     //无法点击的按钮字体颜色
-    private @ColorInt int mDisableButtonTextColor = Color.GRAY;
+    private @ColorInt int mDisableButtonTextColor;
+
+    //警示下标
+    private int mDestructivePosition = -1;
 
     //内容视图
     private View mContentView;
@@ -129,7 +141,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private TextView mCancelTextView;
 
     //actionSheet的 顶部透明视图，用来点击取消
-    private View mTopTranparentView;
+    private View mTopTransparentView;
 
     //actionSheet 顶部容器
     private LinearLayout mTopContainer;
@@ -212,14 +224,36 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             mButtonTitles = new String[]{};
         }
 
+        mDialogBackgroundColor = ContextCompat.getColor(context, R.color.alert_dialog_background_color);
+        mHighlightBackgroundColor = ContextCompat.getColor(context, R.color.alert_high_lighted_background_color);
+        mTitleColor = ContextCompat.getColor(context, R.color.alert_title_color);
+        mSubtitleColor = ContextCompat.getColor(context, R.color.alert_subtitle_color);
+        mButtonTextColor = ContextCompat.getColor(context, R.color.alert_button_text_color);
+        mDestructiveButtonTextColor = ContextCompat.getColor(context, R.color.alert_destructive_button_text_color);
+        mDestructiveButtonBackgroundColor = ContextCompat.getColor(context, R.color.alert_destructive_button_background_color);
+        mDestructiveHighlightedButtonBackgroundColor = ContextCompat.getColor(context, R.color.alert_destructive_button_high_lighted_background_color);
+        mDisableButtonTextColor = ContextCompat.getColor(context, R.color.alert_disable_button_text_color);
+
         mDividerHeight = SizeUtil.pxFormDip(0.5f, mContext);
-        mButtonTextColor = ContextCompat.getColor(mContext, R.color.light_blue);
-        mHighlightBackgroundColor = ColorUtil.whitePercentColor(0.80f, 1.0f);
-        mButtonTopBottomPadding = SizeUtil.pxFormDip(13, mContext);
-        mButtonLeftRightPadding = SizeUtil.pxFormDip(10, mContext);
-        mContentVerticalSpace = SizeUtil.pxFormDip(5, mContext);
-        mContentPadding = SizeUtil.pxFormDip(15, mContext);
-        mDialogPadding = SizeUtil.pxFormDip(10, context);
+
+        mCornerRadius = context.getResources().getDimensionPixelSize(R.dimen.alert_corner_radius);
+        mButtonTopBottomPadding = context.getResources().getDimensionPixelSize(R.dimen.alert_button_top_bottom_padding);
+        mButtonLeftRightPadding = context.getResources().getDimensionPixelSize(R.dimen.alert_button_left_right_padding);
+        mContentVerticalSpace = context.getResources().getDimensionPixelSize(R.dimen.alert_content_vertical_space);
+        mContentPadding = context.getResources().getDimensionPixelSize(R.dimen.alert_content_padding);
+        mDialogPadding = context.getResources().getDimensionPixelSize(R.dimen.alert_dialog_padding);
+        mContentMinHeight = context.getResources().getDimensionPixelSize(R.dimen.alert_content_min_height);
+
+
+        mTitleSize = SizeUtil.spFromPx(context.getResources().getDimensionPixelSize(R.dimen.alert_title_text_size),
+                context);
+        mSubtitleSize = SizeUtil.spFromPx(context.getResources().getDimensionPixelSize(R.dimen
+                .alert_subtitle_text_size), context);
+
+        mButtonTextSize = SizeUtil.spFromPx(context.getResources().getDimensionPixelSize(R.dimen
+                .alert_button_text_size), context);
+
+
 
         mContentView = View.inflate(mContext, mStyle == STYLE_ALERT ? R.layout.alert_dialog : R.layout
                 .action_sheet_dialog, null);
@@ -274,7 +308,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mTitleColor = titleColor;
     }
 
-    public void setTitleSize(int titleSize) {
+    public void setTitleSize(float titleSize) {
         mTitleSize = titleSize;
     }
 
@@ -282,11 +316,11 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         mSubtitleColor = subtitleColor;
     }
 
-    public void setSubtitleSize(int subtitleSize) {
+    public void setSubtitleSize(float subtitleSize) {
         mSubtitleSize = subtitleSize;
     }
 
-    public void setButtonTextSize(int buttonTextSize) {
+    public void setButtonTextSize(float buttonTextSize) {
         mButtonTextSize = buttonTextSize;
     }
 
@@ -304,6 +338,22 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     public void setDividerHeight(int dividerHeight) {
         mDividerHeight = dividerHeight;
+    }
+
+    public void setContentMinHeight(int contentMinHeight) {
+        mContentMinHeight = contentMinHeight;
+    }
+
+    public void setDestructiveButtonBackgroundColor(int destructiveButtonBackgroundColor) {
+        mDestructiveButtonBackgroundColor = destructiveButtonBackgroundColor;
+    }
+
+    public void setDestructiveHighlightedButtonBackgroundColor(int destructiveHighlightedButtonBackgroundColor) {
+        mDestructiveHighlightedButtonBackgroundColor = destructiveHighlightedButtonBackgroundColor;
+    }
+
+    public void setDestructivePosition(int destructivePosition) {
+        mDestructivePosition = destructivePosition;
     }
 
     public void setTitle(String title) {
@@ -409,8 +459,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             setBackground(mTopContainer);
             setBackgroundSelector(mCancelTextView);
 
-            mTopTranparentView = mContentView.findViewById(R.id.top_tranparent_view);
-            mTopTranparentView.setOnClickListener(this);
+            mTopTransparentView = mContentView.findViewById(R.id.top_tranparent_view);
+            mTopTransparentView.setOnClickListener(this);
 
             boolean has = hasTopContent();
             //隐藏顶部分割线 没有按钮也隐藏
@@ -428,7 +478,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
             setBackground(mContentView);
         }
 
-        if(mShouldMeasureContentHeight){
+        if(mShouldMeasureContentHeight || mContentMinHeight > 0){
             measureContentHeight();
         }
 
@@ -507,6 +557,16 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)mSubtitleTextView.getLayoutParams();
                 int maxWidth = contentWidth - params.leftMargin - params.rightMargin;
                 topContentHeight += StringUtil.measureTextHeight(mSubtitle, mSubtitleTextView.getPaint(), maxWidth);
+            }
+        }
+
+        //内容高度不够
+        if(mIcon != null || mTitle != null || mSubtitle != null){
+            if(topContentHeight < mContentMinHeight) {
+                int res = mContentMinHeight - topContentHeight;
+                int top = mContentPadding - mContentVerticalSpace + res / 2;
+                int bottom = mContentPadding + res / 2;
+                mScrollContainer.setPadding(0, top, 0, bottom);
             }
         }
 
@@ -613,7 +673,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
     @Override
     public void onClick(View v) {
-        if(v == mCancelTextView || v == mTopTranparentView){
+        if(v == mCancelTextView || v == mTopTransparentView){
             dismiss();
         }
     }
@@ -640,7 +700,7 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         CornerBorderDrawable drawable = new CornerBorderDrawable();
         drawable.setCornerRadius(mCornerRadius);
         drawable.setBackgroundColor(mDialogBackgroundColor);
-        drawable.attatchView(view, false);
+        drawable.attachView(view, false);
     }
 
     //设置点击效果
@@ -689,7 +749,8 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
     private class Adapter extends RecyclerView.Adapter<ViewHolder>{
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        @NonNull
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             final ViewHolder holder = new ViewHolder(View.inflate(mContext, R.layout.alert_button_item, null));
             holder.itemView.setOnClickListener(new OnSingleClickListener() {
                                                    @Override
@@ -720,11 +781,13 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
             holder.textView.setText(mButtonTitles[position]);
 
             int color = mButtonTextColor;
+            int backgroundColor = mDialogBackgroundColor;
+            int pressedBackgroundColor = mHighlightBackgroundColor;
             boolean enable = true;
             //刷新UI
             if(mAlertUIHandler != null){
@@ -733,10 +796,18 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
                     enable = false;
                 }else if(mAlertUIHandler.shouldDestructive(AlertController.this, position)){
                     color = mDestructiveButtonTextColor;
+                    backgroundColor = mDestructiveButtonBackgroundColor;
+                    pressedBackgroundColor = mDestructiveHighlightedButtonBackgroundColor;
                 }
+            }else if(position == mDestructivePosition){
+                color = mDestructiveButtonTextColor;
+                backgroundColor = mDestructiveButtonBackgroundColor;
+                pressedBackgroundColor = mDestructiveHighlightedButtonBackgroundColor;
             }
             holder.itemView.setEnabled(enable);
             holder.textView.setTextColor(color);
+            holder.drawable.setBackgroundColor(backgroundColor);
+            holder.drawablePressed.setBackgroundColor(pressedBackgroundColor);
 
             //设置点击效果
             if(mStyle == STYLE_ACTION_SHEET || mButtonTitles.length != 2){
@@ -788,10 +859,10 @@ public class AlertController implements DialogInterface.OnDismissListener, View.
 
             textView = (TextView)itemView;
             CornerBorderDrawable[] drawables = setBackgroundSelector(itemView);
-            drawable = drawables[0];
-            drawable.setCornerRadius(0);
-            drawablePressed = drawables[1];
+            drawablePressed = drawables[0];
             drawablePressed.setCornerRadius(0);
+            drawable = drawables[1];
+            drawable.setCornerRadius(0);
         }
     }
 

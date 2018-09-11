@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.bar.NavigationBar;
+import com.lhx.library.loading.LoadingView;
 import com.lhx.library.loading.PageLoadingView;
 import com.lhx.library.util.SizeUtil;
 
@@ -38,20 +39,24 @@ public class AppBaseContainer extends RelativeLayout {
     public static final int OVERLAY_AREA_EMPTY_TOP = 1 << 2; //空视图将遮住header
     public static final int OVERLAY_AREA_EMPTY_BOTTOM = 1 << 3; //空视图将遮住footer
 
-    ///内容视图
+    //内容视图
     private View mContentView;
 
-    ///导航栏
+    //导航栏
     private NavigationBar mNavigationBar;
 
-    ///关联的context
+    //关联的context
     protected Context mContext;
 
-    ///页面是否正在载入
+    //页面是否正在载入
     private boolean mPageLoading = false;
     private View mPageLoadingView;
 
-    ///页面是否载入失败
+    //显示菊花
+    private boolean mLoading = false;
+    private View mLoadingView;
+
+    //页面是否载入失败
     private boolean mPageLoadFail = false;
     private View mPageLoadFailView;
 
@@ -100,10 +105,10 @@ public class AppBaseContainer extends RelativeLayout {
         mOnEventHandler = onEventHandler;
     }
 
-    ///设置是否需要显示导航栏
+    //设置是否需要显示导航栏
     public void setShowNavigationBar(boolean show){
         if(show){
-            ///创建导航栏
+            //创建导航栏
             if(mNavigationBar == null){
                 mNavigationBar = new NavigationBar(mContext);
                 LayoutParams layoutParams = new LayoutParams(LayoutParams
@@ -125,7 +130,7 @@ public class AppBaseContainer extends RelativeLayout {
         return mNavigationBar != null && mNavigationBar.getVisibility() == VISIBLE;
     }
 
-    ///获取内容视图
+    //获取内容视图
     public View getContentView(){
         return  mContentView;
     }
@@ -155,7 +160,7 @@ public class AppBaseContainer extends RelativeLayout {
         setContentView(LayoutInflater.from(mContext).inflate(layoutResId, null, false));
     }
 
-    ///获取子视图
+    //获取子视图
     public <T extends View> T sea_findViewById(int resId){
         T view = (T)mContentView.findViewById(resId);
         if(view == null && mBottomView != null){
@@ -386,6 +391,49 @@ public class AppBaseContainer extends RelativeLayout {
 
     public boolean isPageLoadFail(){
         return mPageLoadFail;
+    }
+
+    //显示菊花
+    public void setLoading(boolean loading, String text){
+        if(mLoading != loading){
+            mLoading = loading;
+
+            if(mLoading){
+                if(App.loadViewClass != null){
+                    try {
+                        mLoadingView = App.loadViewClass.getConstructor(Context.class).newInstance(mContext);
+                    }catch (Exception e){
+                        throw new IllegalStateException("loadViewClass 无法通过context实例化");
+                    }
+
+                }else {
+                    mLoadingView = LayoutInflater.from(mContext).inflate(R.layout.loading_view,
+                            this, false);
+                }
+
+                if(mLoadingView instanceof LoadingView){
+                    ((LoadingView) mLoadingView).getTextView().setText(text);
+                }
+
+                LayoutParams params = (LayoutParams)mLoadingView.getLayoutParams();
+                if(params == null){
+                    params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    mLoadingView.setLayoutParams(params);
+                }
+                params.alignWithParent = true;
+                params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
+                params.addRule(ALIGN_PARENT_BOTTOM);
+
+                addView(mLoadingView);
+            }else if(mPageLoadingView != null){
+                removeView(mLoadingView);
+                mLoadingView = null;
+            }
+        }
+    }
+
+    public boolean isLoading(){
+        return mLoading;
     }
 
     /**

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -77,6 +78,9 @@ public class ImageLoaderUtil implements ImageLoadingListener{
     public static void initialize(Context context){
 
         mPlaceholderColor = ContextCompat.getColor(context, R.color.image_placeholder_color);
+        if(Color.alpha(mPlaceholderColor) == 0){
+            mPlaceholderColor = 0;
+        }
 
         ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);
         config.threadPriority(Thread.NORM_PRIORITY - 1);
@@ -115,11 +119,13 @@ public class ImageLoaderUtil implements ImageLoadingListener{
                 imageView.setScaleType(type);
             }
 
-            tag = imageView.getTag(R.id.tag_background);
-            if(tag == null){
-                ViewUtil.setBackground(null, imageView);
-            }else if(tag instanceof Drawable){
-                ViewUtil.setBackground((Drawable)tag, imageView);
+            if(mPlaceholderColor != 0){
+                tag = imageView.getTag(R.id.tag_background);
+                if(tag == null){
+                    ViewUtil.setBackground(null, imageView);
+                }else if(tag instanceof Drawable){
+                    ViewUtil.setBackground((Drawable)tag, imageView);
+                }
             }
         }
     }
@@ -143,7 +149,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
             imageView.setTag(R.id.tag_background, imageView.getBackground());
         }
 
-        if(!round){
+        if(!round && mPlaceholderColor != 0){
             imageView.setBackgroundColor(mPlaceholderColor);
         }
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
