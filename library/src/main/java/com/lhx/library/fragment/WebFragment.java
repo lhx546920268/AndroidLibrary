@@ -78,25 +78,30 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
             mShouldDisplayProgress = false;
         }
 
-        String url = getExtraStringFromBundle(WEB_URL);
-        if(StringUtil.isEmpty(url)){
-            url = getURL();
-        }
+        if(StringUtil.isEmpty(mURL)){
+            String url = getExtraStringFromBundle(WEB_URL);
+            if(StringUtil.isEmpty(url)){
+                url = getURL();
+            }
 
-        //没有http头的加上
-        if(!TextUtils.isEmpty(url)){
-            int index = url.indexOf("http://");
-            if(index != 0){
-                index = url.indexOf("https://");
+            //没有http头的加上
+            if(!TextUtils.isEmpty(url)){
+                int index = url.indexOf("http://");
                 if(index != 0){
-                    url = "http://" + url;
+                    index = url.indexOf("https://");
+                    if(index != 0){
+                        url = "http://" + url;
+                    }
                 }
             }
+            mURL = url;
         }
-        mURL = url;
-        mHtmlString = getExtraStringFromBundle(WEB_HTML_STRING);
+
         if(StringUtil.isEmpty(mHtmlString)){
-            mHtmlString = getHtmlString();
+            mHtmlString = getExtraStringFromBundle(WEB_HTML_STRING);
+            if(StringUtil.isEmpty(mHtmlString)){
+                mHtmlString = getHtmlString();
+            }
         }
 
         String title = getExtraStringFromBundle(WEB_TITLE);
@@ -108,7 +113,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
         setShowBackButton(true);
 
-        mAgentWeb = AgentWeb.with(this)//
+        AgentWeb.CommonBuilderForFragment builder = AgentWeb.with(this)//
                 .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
                 .setIndicatorColorWithHeight(getColor(R.color.web_progress_color), mShouldDisplayProgress ? getInteger(R.integer
@@ -144,8 +149,13 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
                         }
                     }
                 })
-                .setSecurityType(AgentWeb.SecurityType.strict)
-                .createAgentWeb()//
+                .setSecurityType(AgentWeb.SecurityType.strict);
+
+        WebView webView = getWebView();
+        if(webView != null){
+            builder.setWebView(webView);
+        }
+        mAgentWeb = builder.createAgentWeb()//
                 .ready()//
                 .go(null);
 
@@ -159,6 +169,22 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     public void setShouldDisplayProgress(boolean shouldDisplayProgress) {
         mShouldDisplayProgress = shouldDisplayProgress;
+    }
+
+    public void setShouldUseWebTitle(boolean shouldUseWebTitle) {
+        mShouldUseWebTitle = shouldUseWebTitle;
+    }
+
+    public void setShouldDisplayIndicator(boolean shouldDisplayIndicator) {
+        mShouldDisplayIndicator = shouldDisplayIndicator;
+    }
+
+    public void setHtmlString(String htmlString) {
+        mHtmlString = htmlString;
+    }
+
+    public void setURL(String URL) {
+        mURL = URL;
     }
 
     //加载
@@ -263,6 +289,11 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     //返回需要设置的自定义 userAgent 会拼在系统的userAgent后面
     public String getCustomUserAgent(){
+        return null;
+    }
+
+    //获取自定义的webView
+    public WebView getWebView(){
         return null;
     }
 }

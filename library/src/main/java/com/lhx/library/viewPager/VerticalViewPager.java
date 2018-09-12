@@ -41,6 +41,18 @@ public class VerticalViewPager extends ViewGroup {
     //是否正在动画中
     private boolean mAnimating = false;
 
+    //是否需要重用
+    private boolean mShouldReuse = true;
+
+    //是否需要自动轮播
+    private boolean mShouldAutoPlay = true;
+
+    //当前位置
+    private int mPosition = NO_POSITION;
+
+    //相反方向
+    private boolean mReverse = false;
+
     //当前显示出来的view
     private SparseArray<HashSet<View>> mVisibleViews = new SparseArray<>();
 
@@ -49,6 +61,14 @@ public class VerticalViewPager extends ViewGroup {
 
     public void setMillisInterval(long millisInterval) {
         mMillisInterval = millisInterval;
+    }
+
+    public void setShouldAutoPlay(boolean shouldAutoPlay) {
+
+        mShouldAutoPlay = shouldAutoPlay;
+        if(!mShouldAutoPlay){
+            stopTimer();
+        }
     }
 
     public void setAnimateDuration(long animateDuration) {
@@ -69,9 +89,13 @@ public class VerticalViewPager extends ViewGroup {
         initialization();
     }
 
+    public void setShouldReuse(boolean shouldReuse) {
+        mShouldReuse = shouldReuse;
+    }
+
     //初始化
     private void initialization(){
-
+        setClipChildren(true);
     }
 
     //开始计时器
@@ -89,8 +113,8 @@ public class VerticalViewPager extends ViewGroup {
 
                 @Override
                 public void onTick(long millisLeft) {
-                    animateDidEnd();
-                    int position = getCurrentPosition() + 1;
+
+                    int position = mPosition + 1;
                     if(position >= mItemCount){
                         position = 0;
                     }
@@ -126,7 +150,9 @@ public class VerticalViewPager extends ViewGroup {
         if(mAdapter != null){
             mItemCount = mAdapter.getCount();
             scrollTo(0, false);
-            startTimer();
+            if(mShouldAutoPlay){
+                startTimer();
+            }
         }
     }
 
@@ -137,114 +163,121 @@ public class VerticalViewPager extends ViewGroup {
             return;
 
         View currentView = getCurrentView();
-        int currentPosition = getCurrentPosition();
 
-        if(currentView != null && currentPosition == position)
+        if(currentView != null && mPosition == position)
             return;
 
+        final int currentPosition = mPosition;
         int type = mAdapter.getViewType(position);
+
+        View convertView = null;
 
         //获取可重用的view
         HashSet<View> views = mReusedViews.get(type);
-        View convertView = null;
-        if(views != null && views.size() > 0){
-            Iterator<View> iterator = views.iterator();
-            convertView = iterator.next();
-            views.remove(convertView);
+        if(mShouldReuse){
+            if(views != null && views.size() > 0){
+                Iterator<View> iterator = views.iterator();
+                convertView = iterator.next();
+                views.remove(convertView);
+            }
         }
 
         convertView = mAdapter.getView(convertView, position, type);
+        convertView.setTag(R.id.view_pager_position_tag_key, position);
 
         //加入可见队列
-        views = mVisibleViews.get(type);
-        if(views == null){
-            views = new HashSet<>();
-            mVisibleViews.put(type, views);
+        if(mShouldReuse){
+            views = mVisibleViews.get(type);
+            if(views == null){
+                views = new HashSet<>();
+                mVisibleViews.put(type, views);
+            }
+            views.add(convertView);
         }
 
-        convertView.setTag(R.id.view_pager_position_tag_key, position);
-        views.add(convertView);
-
+        mPosition = position;
         if(currentView == null){
             //刚开始显示
-            currentView = convertView;
             addView(convertView);
-            currentPosition = position;
+            mAdapter.onAttachToParent(convertView, position, type);
         }else {
-            addView(convertView);
+            if(currentPosition > position){
+                addView(convertView, 0);
+            }else {
+                addView(convertView);
+            }
 
-            final View view = convertView;
-            mAnimating = true;
-            TranslateAnimation animation = new TranslateAnimation(0, 0, 0, -getMeasuredHeight());
-            animation.setDuration(mAnimateDuration);
-            animation.setFillAfter(true);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+            mAdapter.onAttachToParent(convertView, position, type);
 
-                }
+            if(animate){
+                final View view1 = convertView;
+                final View view2 = currentView;
+                mReverse = currentPosition > position;
+                int translate = currentPosition > position ? getMeasuredHeight() : -getMeasuredHeight();
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    animateDidEnd();
-                }
+                mAnimating = true;
+                TranslateAnimation animation = new TranslateAnimation(0, 0, 0, translate);
+                animation.setDuration(mAnimateDuration);
+                animation.setFillAfter(true);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
+                    }
 
-                }
-            });
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mReverse = false;
+                        view1.clearAnimation();
+                    }
 
-            currentView.startAnimation(animation);
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-            animation = new TranslateAnimation(0, 0, 0, -getMeasuredHeight());
-            animation.setDuration(mAnimateDuration);
-            animation.setFillAfter(true);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+                    }
+                });
 
-                }
+                view1.startAnimation(animation);
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    view.clearAnimation();
-                }
+                animation = new TranslateAnimation(0, 0, 0, translate);
+                animation.setDuration(mAnimateDuration);
+                animation.setFillAfter(true);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
+                    }
 
-                }
-            });
-            view.startAnimation(animation);
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mReverse = false;
+                        view2.clearAnimation();
+                        addToReuse(currentPosition, view2);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                view2.startAnimation(animation);
+            }else {
+                addToReuse(currentPosition, currentView);
+            }
         }
     }
 
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
-        if(visibility == VISIBLE){
-            startTimer();
-        }else {
-            stopTimer();
+        if(mShouldAutoPlay){
+            if(visibility == VISIBLE){
+                startTimer();
+            }else {
+                stopTimer();
+            }
         }
     }
-
-    //动画结束处理
-    private void animateDidEnd(){
-
-        if(!mAnimating)
-            return;
-        mAnimating = false;
-        if(getChildCount() > 1){
-            View view = getChildAt(0);
-            view.clearAnimation();
-            View view1 = getChildAt(1);
-            view1.clearAnimation();
-            addToReuse(getCurrentPosition(), view);
-        }
-    }
-
 
     //获取当前视图
     public View getCurrentView() {
@@ -262,31 +295,25 @@ public class VerticalViewPager extends ViewGroup {
         return view;
     }
 
-    //获取当前位置
-    public int getCurrentPosition(){
-        View view = getCurrentView();
-        if(view != null){
-            return (int)view.getTag(R.id.view_pager_position_tag_key);
-        }
-        return NO_POSITION;
-    }
-
     //加入重用队列
     private void addToReuse(int position, View view){
-        int type = mAdapter.getViewType(position);
+        if(mShouldReuse){
+            int type = mAdapter.getViewType(position);
 
-        //移出可见队列
-        HashSet<View> views = mVisibleViews.get(type);
-        views.remove(view);
+            //移出可见队列
+            HashSet<View> views = mVisibleViews.get(type);
+            views.remove(view);
 
-        //加入重用队列
-        views = mReusedViews.get(type);
-        if(views == null){
-            views = new HashSet<>();
-            mReusedViews.put(type, views);
+            //加入重用队列
+            views = mReusedViews.get(type);
+            if(views == null){
+                views = new HashSet<>();
+                mReusedViews.put(type, views);
+            }
+            views.add(view);
         }
-        views.add(view);
         removeView(view);
+        mAdapter.onDetachToParent(view, position, mAdapter.getViewType(position));
     }
 
     //判断position是否有效
@@ -316,6 +343,9 @@ public class VerticalViewPager extends ViewGroup {
                 int left = paddingLeft;
                 int right = left + width;
                 int top = paddingTop + height * i;
+                if(mReverse){
+                    top -= height;
+                }
                 int bottom = top + height;
                 child.layout(left, top, right, bottom);
             }
@@ -350,5 +380,15 @@ public class VerticalViewPager extends ViewGroup {
 
         //获取视图类型
         public abstract int getViewType(int position);
+
+        //添加到父视图
+        public void onAttachToParent(View convertView, int position, int viewType){
+
+        }
+
+        //添加到父视图
+        public void onDetachToParent(View convertView, int position, int viewType){
+
+        }
     }
 }

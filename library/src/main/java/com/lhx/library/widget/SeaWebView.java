@@ -13,6 +13,9 @@ import android.webkit.WebViewClient;
 
 public class SeaWebView extends WebView {
 
+    //滑动回调
+    private OnScrollChangeListener mOnScrollChangeListener;
+
     public SeaWebView(Context context) {
         this(context, null, 0);
     }
@@ -23,17 +26,6 @@ public class SeaWebView extends WebView {
 
     public SeaWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
-        setWebViewClient(new WebViewClient(){
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-            }
-        });
-
-        WebSettings webSettings = getSettings();
-        webSettings.setSupportZoom(false);
     }
 
     public void setHtml(String html){
@@ -44,6 +36,25 @@ public class SeaWebView extends WebView {
             loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
 
         }
+    }
 
+    public void setOnScrollChangeListener(OnScrollChangeListener onScrollChangeListener) {
+        mOnScrollChangeListener = onScrollChangeListener;
+    }
+
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+
+        if(mOnScrollChangeListener != null){
+            mOnScrollChangeListener.onScrollChange(this, getScrollY(), getContentHeight() * getScaleY());
+        }
+    }
+
+    //回调
+    public interface OnScrollChangeListener{
+
+        //
+        void onScrollChange(SeaWebView webView, int y, float contentHeight);
     }
 }
