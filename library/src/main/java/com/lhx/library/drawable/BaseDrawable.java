@@ -22,9 +22,6 @@ public abstract class BaseDrawable extends Drawable {
     //范围
     protected RectF mRectF;
 
-    //绘制路径
-    private Path mPath;
-
     //内在的宽度
     private int mIntrinsicWidth = -1;
 
@@ -38,14 +35,6 @@ public abstract class BaseDrawable extends Drawable {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setAntiAlias(true); //设置抗锯齿
         mRectF = new RectF();
-    }
-
-    public Path getPath() {
-        if(mPath == null){
-            mPath = new Path();
-        }
-        mPath.reset();
-        return mPath;
     }
 
     @Override

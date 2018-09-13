@@ -57,6 +57,9 @@ public abstract class CountDownTimer implements Handler.Callback{
 
     //开始倒计时
     public synchronized void start(){
+        if(mExecuting){
+            mHandler.removeMessages(COUNT_DOWN_MSG_WHAT);
+        }
         mCanceled = false;
         if(mMillisToCountDown <= 0 || mMillisInterval <= 0){
             finish();
