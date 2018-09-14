@@ -90,6 +90,10 @@ public class AppBaseContainer extends RelativeLayout {
         initialize();
     }
 
+    public void setOverlayArea(int overlayArea) {
+        mOverlayArea = overlayArea;
+    }
+
     //初始化
     private void initialize(){
 

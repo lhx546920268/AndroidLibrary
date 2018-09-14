@@ -28,7 +28,7 @@ import java.util.Locale;
  * 浏览器
  */
 
-public class WebFragment extends AppBaseFragment implements ChromeClientCallbackManager.ReceivedTitleCallback{
+public class WebFragment extends AppBaseFragment implements ChromeClientCallbackManager.ReceivedTitleCallback {
 
 
     public static final String WEB_URL = "com.lhx.WEB_URL";//要打开的链接
@@ -74,22 +74,22 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         mShouldUseWebTitle = getExtraBooleanFromBundle(WEB_USE_WEB_TITLE, true);
         mShouldDisplayProgress = getExtraBooleanFromBundle(WEB_DISPLAY_PROGRESS, true);
         mShouldDisplayIndicator = getExtraBooleanFromBundle(WEB_DISPLAY_INDICATOR, false);
-        if(mShouldDisplayIndicator){
+        if (mShouldDisplayIndicator) {
             mShouldDisplayProgress = false;
         }
 
-        if(StringUtil.isEmpty(mURL)){
+        if (StringUtil.isEmpty(mURL)) {
             String url = getExtraStringFromBundle(WEB_URL);
-            if(StringUtil.isEmpty(url)){
+            if (StringUtil.isEmpty(url)) {
                 url = getURL();
             }
 
             //没有http头的加上
-            if(!TextUtils.isEmpty(url)){
+            if (!TextUtils.isEmpty(url)) {
                 int index = url.indexOf("http://");
-                if(index != 0){
+                if (index != 0) {
                     index = url.indexOf("https://");
-                    if(index != 0){
+                    if (index != 0) {
                         url = "http://" + url;
                     }
                 }
@@ -97,30 +97,39 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
             mURL = url;
         }
 
-        if(StringUtil.isEmpty(mHtmlString)){
+        if (StringUtil.isEmpty(mHtmlString)) {
             mHtmlString = getExtraStringFromBundle(WEB_HTML_STRING);
-            if(StringUtil.isEmpty(mHtmlString)){
+            if (StringUtil.isEmpty(mHtmlString)) {
                 mHtmlString = getHtmlString();
             }
         }
 
         String title = getExtraStringFromBundle(WEB_TITLE);
-        if(!TextUtils.isEmpty(title)){
+        if (!TextUtils.isEmpty(title)) {
             getNavigationBar().setTitle(title);
         }
         mOriginURL = mURL;
         mOriginTitle = title;
 
-        setShowBackButton(true);
+        willCreateAgentWeb();
 
-        AgentWeb.CommonBuilderForFragment builder = AgentWeb.with(this)//
+        AgentWeb.IndicatorBuilderForFragment indicatorBuilder = AgentWeb.with(this)//
                 .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))//
-                .setIndicatorColorWithHeight(getColor(R.color.web_progress_color), mShouldDisplayProgress ? getInteger(R.integer
-                        .web_progress_height_dp) : 0)// 进度条
-                .setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
+                        .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        AgentWeb.CommonBuilderForFragment builder;
+        if (mShouldDisplayProgress) {
+            builder = indicatorBuilder.setIndicatorColorWithHeight(getColor(R.color.web_progress_color), getInteger(R
+                    .integer
+                    .web_progress_height_dp));// 进度条
+        } else {
+            builder = indicatorBuilder.closeDefaultIndicator();
+        }
+
+
+        builder.setAgentWebWebSettings(WebDefaultSettingsManager.getInstance())//
                 .setReceivedTitleCallback(this)
-                .setWebViewClient(new WebViewClient(){
+                .setWebViewClient(new WebViewClient() {
 
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -136,7 +145,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
                     @Override
                     public void onPageFinished(WebView view, String url) {
-                        if(mShouldDisplayIndicator){
+                        if (mShouldDisplayIndicator) {
                             setPageLoading(false);
                             mShouldDisplayIndicator = false;
                         }
@@ -144,7 +153,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
                     @Override
                     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                        if(mShouldDisplayIndicator){
+                        if (mShouldDisplayIndicator) {
                             setPageLoading(true);
                         }
                     }
@@ -152,7 +161,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
                 .setSecurityType(AgentWeb.SecurityType.strict);
 
         WebView webView = getWebView();
-        if(webView != null){
+        if (webView != null) {
             builder.setWebView(webView);
         }
         mAgentWeb = builder.createAgentWeb()//
@@ -161,8 +170,9 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
         WebSettings settings = mAgentWeb.getAgentWebSettings().getWebSettings();
         String userAgent = getCustomUserAgent();
-        if(!StringUtil.isEmpty(userAgent)){
-            settings.setUserAgentString(String.format(Locale.getDefault(), "%s %s", settings.getUserAgentString(), userAgent));
+        if (!StringUtil.isEmpty(userAgent)) {
+            settings.setUserAgentString(String.format(Locale.getDefault(), "%s %s", settings.getUserAgentString(),
+                    userAgent));
         }
         loadWebContent();
     }
@@ -188,15 +198,15 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     }
 
     //加载
-    public void loadWebContent(){
-        if(!StringUtil.isEmpty(mURL) || !StringUtil.isEmpty(mHtmlString)){
+    public void loadWebContent() {
+        if (!StringUtil.isEmpty(mURL) || !StringUtil.isEmpty(mHtmlString)) {
 
-            if(!StringUtil.isEmpty(mURL)){
+            if (!StringUtil.isEmpty(mURL)) {
                 mAgentWeb.getLoader().loadUrl(mURL);
-            }else {
+            } else {
                 String html = mHtmlString;
-                if(shouldAddMobileMeta()){
-                    html =  "<style>img {width:100%;}</style><meta name='viewport' " +
+                if (shouldAddMobileMeta()) {
+                    html = "<style>img {width:100%;}</style><meta name='viewport' " +
                             "content='width=device-width, initial-scale=1'/>" + mHtmlString;
                 }
                 mAgentWeb.getLoader().loadDataWithBaseURL(null, html, "text/html", "utf8", null);
@@ -205,7 +215,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     }
 
     //是否添加移动设备头部
-    public boolean shouldAddMobileMeta(){
+    public boolean shouldAddMobileMeta() {
         return true;
     }
 
@@ -216,8 +226,8 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     @Override
     public void onReceivedTitle(WebView view, String title) {
-        if(mShouldUseWebTitle){
-            if(showNavigationBar()){
+        if (mShouldUseWebTitle) {
+            if (showNavigationBar()) {
                 setTitle(title);
             }
         }
@@ -225,9 +235,9 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     @Override
     public void onResume() {
-        if(mAgentWeb != null){
+        if (mAgentWeb != null) {
             WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
-            if(lifeCycle != null){
+            if (lifeCycle != null) {
                 lifeCycle.onResume();
             }
         }
@@ -236,9 +246,9 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     @Override
     public void onPause() {
-        if(mAgentWeb != null){
+        if (mAgentWeb != null) {
             WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
-            if(lifeCycle != null){
+            if (lifeCycle != null) {
                 lifeCycle.onPause();
             }
         }
@@ -247,19 +257,19 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(mAgentWeb != null){
+        if (mAgentWeb != null) {
             return super.onKeyDown(keyCode, event) && mAgentWeb.handleKeyEvent(keyCode, event);
-        }else {
+        } else {
             return super.onKeyDown(keyCode, event);
         }
     }
 
     @Override
     public void onDestroy() {
-        if(shouldOnDestroy()){
-            if(mAgentWeb != null){
+        if (shouldOnDestroy()) {
+            if (mAgentWeb != null) {
                 WebLifeCycle lifeCycle = mAgentWeb.getWebLifeCycle();
-                if(lifeCycle != null){
+                if (lifeCycle != null) {
                     lifeCycle.onDestroy();
                 }
             }
@@ -268,32 +278,37 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         super.onDestroy();
     }
 
+    //将要设置agent可以在这里设置对应参数
+    public void willCreateAgentWeb() {
+
+    }
+
     //获取要打开的链接
-    public String getURL(){
+    public String getURL() {
         return "";
     }
 
-    public String getHtmlString(){
+    public String getHtmlString() {
         return "";
     }
 
     //当前url是否可以打开
-    public boolean shouldOpenURL(WebView view, String url){
+    public boolean shouldOpenURL(WebView view, String url) {
         return true;
     }
 
     //是否需要销毁 tabBar 需要返回 false
-    public boolean shouldOnDestroy(){
+    public boolean shouldOnDestroy() {
         return true;
     }
 
     //返回需要设置的自定义 userAgent 会拼在系统的userAgent后面
-    public String getCustomUserAgent(){
+    public String getCustomUserAgent() {
         return null;
     }
 
     //获取自定义的webView
-    public WebView getWebView(){
+    public WebView getWebView() {
         return null;
     }
 }
