@@ -70,4 +70,18 @@ public class SizeUtil{
     public static int getWindowHeight(Context context){
         return context.getResources().getDisplayMetrics().heightPixels;
     }
+
+    public static int getStatusBarHeight(Context context){
+        int height = 0;
+        int resId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) {
+            height = context.getResources().getDimensionPixelSize(resId);
+        }
+
+        if(height == 0){
+            height = SizeUtil.pxFormDip(20, context);
+        }
+
+        return height;
+    }
 }

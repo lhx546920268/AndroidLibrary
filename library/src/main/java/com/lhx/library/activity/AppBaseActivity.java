@@ -23,6 +23,7 @@ import android.view.Window;
 import com.lhx.library.R;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.inter.LoginHandler;
+import com.lhx.library.util.AppUtil;
 import com.lhx.library.util.SizeUtil;
 
 import java.io.Serializable;
@@ -120,6 +121,9 @@ public class AppBaseActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 //        Log.d("AppBaseActivity", "onCreate");
         super.onCreate(savedInstanceState);
+
+        AppUtil.setStatusBarStyle(this, ContextCompat.getColor(this, R.color.status_bar_background_color),
+                getResources().getBoolean(R.bool.status_bar_is_light));
 
         int layoutRes = getContentViewRes();
         if(layoutRes != 0){

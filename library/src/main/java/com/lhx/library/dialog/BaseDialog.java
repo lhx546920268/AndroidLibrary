@@ -28,6 +28,7 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
 
     public BaseDialog(@NonNull Context context) {
         super(context, R.style.Theme_dialog_noTitle_noBackground);
+
         mContext = context;
         initialize();
     }
