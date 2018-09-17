@@ -32,7 +32,7 @@
     <integer name="web_progress_height_dp">2</integer>
 
     <!--状态栏内容颜色 true浅色，false深色-->
-    <bool name="status_bar_is_light">true</bool>
+    <bool name="status_bar_is_light">false</bool>
 
     <!--AlertController 样式-->
 

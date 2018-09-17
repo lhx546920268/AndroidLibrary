@@ -28,6 +28,7 @@ import com.lhx.demo.toast.ToastFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.media.fragment.MediaFragment;
+import com.lhx.library.scan.fragment.ScanFragment;
 import com.lhx.library.viewHoler.ViewHolder;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("Base Dialog");
         infos.add("Media");
         infos.add("State");
+        infos.add("扫一扫");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -148,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 15 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, StateFragment.class));
+                        break;
+                    case 16 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, ScanFragment.class));
                         break;
                 }
 

@@ -428,9 +428,11 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     //点击物理键
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Activity activity = getActivity();
-        if(keyCode == KeyEvent.KEYCODE_BACK && !activity.isTaskRoot()){
-            back();
-            return true;
+        if(activity != null){
+            if(keyCode == KeyEvent.KEYCODE_BACK && !activity.isTaskRoot()){
+                back();
+                return true;
+            }
         }
         return false;
     }

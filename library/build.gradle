@@ -35,5 +35,14 @@ dependencies {
     api 'com.android.support:support-v4:27.1.1'
     api 'com.android.support:recyclerview-v7:27.1.1'
     api 'com.android.support.constraint:constraint-layout:2.0.0-alpha2'
+
+    //权限
+    api 'pub.devrel:easypermissions:1.3.0'
+    //通知
+    api 'org.greenrobot:eventbus:3.1.1'
+    //键盘事件
+    api 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
+    //Zxing核心包
+    api 'com.google.zxing:core:3.3.0'
 }
 
