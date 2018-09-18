@@ -3,7 +3,9 @@ package com.lhx.library.loadmore;
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -69,18 +71,18 @@ public class LoadMoreControl {
         mTextView.setText(title);
     }
 
-    public View getContentView(View reusedView){
+    public View getContentView(View reusedView, ViewGroup parent){
 
         if(mLoadingStatus == LOAD_MORE_STATUS_NO_MORE_DATA){
             if(reusedView == null){
-                mNoMoreDataView = View.inflate(mContext, R.layout.common_load_more_no_data, null);
+                mNoMoreDataView = LayoutInflater.from(mContext).inflate(R.layout.common_load_more_no_data, parent, false);
             }else {
                 mNoMoreDataView = reusedView;
             }
             return mNoMoreDataView;
         }else {
             if(reusedView == null){
-                mContentView = View.inflate(mContext, R.layout.common_load_more, null);
+                mContentView = LayoutInflater.from(mContext).inflate(R.layout.common_load_more, parent, false);
                 mProgressBar = (ProgressBar)mContentView.findViewById(R.id.progress_bar);
                 mTextView = (TextView)mContentView.findViewById(R.id.text_view);
                 mContentView.setOnClickListener(new OnSingleClickListener() {

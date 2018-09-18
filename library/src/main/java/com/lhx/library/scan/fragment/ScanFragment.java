@@ -90,8 +90,6 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mCameraManager.setPreviewSize(width, height);
-
-        mCameraManager.setScanRect(getScanRect(width, height));
         mCameraManager.openCamera(surface);
     }
 
@@ -116,10 +114,6 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
     public boolean onPermissionsDenied(@NonNull List<String> permissions) {
         return false;
     }
-
-    //获取扫码框位置
-    public abstract @NonNull
-    Rect getScanRect(int width, int height);
 
     //获取内容视图
     public abstract @NonNull

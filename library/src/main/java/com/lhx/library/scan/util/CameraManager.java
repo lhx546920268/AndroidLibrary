@@ -71,11 +71,17 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
     }
 
     public Rect getScanRect() {
+        if(mScanRect == null){
+            mScanRect = mCameraManagerHandler.getScanRect(mSurfaceWidth, mSurfaceHeight);
+            Camera.Size size = mCamera.getParameters().getPreviewSize();
+            float widthScale = (float)size.height / (float)mSurfaceWidth;
+            float heightScale = (float)size.width / (float)mSurfaceHeight;
+            mScanRect.left = (int)(mScanRect.left * widthScale);
+            mScanRect.right = (int)(mScanRect.right * widthScale);
+            mScanRect.top = (int)(mScanRect.top * heightScale);
+            mScanRect.bottom = (int)(mScanRect.bottom * heightScale);
+        }
         return mScanRect;
-    }
-
-    public void setScanRect(Rect scanRect) {
-        mScanRect = scanRect;
     }
 
     //设置预览大小
@@ -294,13 +300,6 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
             if(optimalSize != null){
                 parameters.setPreviewSize(optimalSize.width, optimalSize.height);
                 mCamera.setParameters(parameters);
-
-                float widthScale = (float)optimalSize.height / (float)mSurfaceWidth;
-                float heightScale = (float)optimalSize.width / (float)mSurfaceHeight;
-                mScanRect.left = (int)(mScanRect.left * widthScale);
-                mScanRect.right = (int)(mScanRect.right * widthScale);
-                mScanRect.top = (int)(mScanRect.top * heightScale);
-                mScanRect.bottom = (int)(mScanRect.bottom * heightScale);
             }
         }
     }
@@ -326,7 +325,10 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
         //没有权限 返回true 说明自己提示权限信息
         boolean onPermissionsDenied(@NonNull List<String> permissions);
 
+        //获取扫描框位置 width、height预览surface的宽高
+        @NonNull Rect getScanRect(int width, int height);
+
         //解码成功
-        void onScanSuccess(Result result);
+        void onScanSuccess(@NonNull Result result);
     }
 }

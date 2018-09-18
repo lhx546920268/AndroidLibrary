@@ -414,7 +414,7 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             case LOAD_MORE_VIEW_TYPE :
             case LOAD_MORE_VIEW_NO_DATA_TYPE: {
 
-                RecyclerViewHolder holder = new RecyclerViewHolder(getLoadMoreControl().getContentView(null));
+                RecyclerViewHolder holder = new RecyclerViewHolder(getLoadMoreControl().getContentView(null, parent));
                 return holder;
             }
             case EMPTY_VIEW_TYPE : {

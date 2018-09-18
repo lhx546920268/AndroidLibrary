@@ -437,7 +437,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         }
 
         if (isLoadMoreItem(position)){
-            convertView = getLoadMoreControl().getContentView(convertView);
+            convertView = getLoadMoreControl().getContentView(convertView, parent);
             convertView.setTag(R.id.list_view_type_tag_key, type);
             return convertView;
         }

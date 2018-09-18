@@ -102,8 +102,11 @@ public abstract class RecyclerViewGridAdapter extends RecyclerViewAdapter{
                 if(mItemCount == 0)
                     return mDifferentColumnProduct;
                 int type = getItemViewType(position);
-                if(type == LOAD_MORE_VIEW_TYPE || type == EMPTY_VIEW_TYPE ||
-                        type == HEADER_VIEW_TYPE || type == FOOTER_VIEW_TYPE){
+                if(type == LOAD_MORE_VIEW_TYPE ||
+                        type == EMPTY_VIEW_TYPE ||
+                        type == HEADER_VIEW_TYPE ||
+                        type == FOOTER_VIEW_TYPE ||
+                        type == LOAD_MORE_VIEW_NO_DATA_TYPE){
                     return mDifferentColumnProduct;
                 }else {
                     return RecyclerViewGridAdapter.this.spanCountForPosition(position);

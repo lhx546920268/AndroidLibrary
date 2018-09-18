@@ -157,7 +157,7 @@ public class CornerBorderDrawable extends BaseDrawable {
             float radius = Math.min(bounds.width(), bounds.height()) / 2.0f;
             path.addCircle(mRectF.width() / 2.0f, mRectF.height() / 2.0f, radius, Path.Direction.CW);
         }else {
-            //从左上角开始 绕一圈
+            //从左下角开始 绕一圈
             path.moveTo(bounds.left, bounds.top + mLeftTopCornerRadius);
             path.lineTo(bounds.left, bounds.bottom - mLeftBottomCornerRadius);
             if(mLeftBottomCornerRadius > 0){
