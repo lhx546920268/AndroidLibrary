@@ -63,7 +63,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = getActivity();
-        if(!mActivity.isTaskRoot()){
+        if(showBackItem()){
             setShowBackButton(true);
         }
 //        Log.d("AppBaseFragment", "onActivityCreated");
@@ -140,6 +140,11 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     ///是否需要显示导航栏
     protected boolean showNavigationBar(){
         return true;
+    }
+
+    ///是否需要显示返回按钮
+    protected boolean showBackItem(){
+        return mActivity != null && mActivity.isTaskRoot();
     }
 
     ///获取内容视图

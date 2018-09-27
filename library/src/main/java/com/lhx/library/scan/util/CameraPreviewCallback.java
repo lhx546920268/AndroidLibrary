@@ -47,7 +47,7 @@ public class CameraPreviewCallback implements Camera.PreviewCallback {
             mCameraManager.autoFocus();
         }
 
-        if(!mDecoding){
+        if(!mDecoding && mDecoder != null){
             mDecoding = true;
             mDecoder.decode(data);
         }

@@ -12,17 +12,12 @@
         android:layout_height="wrap_content">
 
         <!--菊花-->
-        <ProgressBar
+        <ImageView
             android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateDrawable="@drawable/loading_progress_bar"
-            android:minWidth="@dimen/loading_progress_bar_size"
-            android:minHeight="@dimen/loading_progress_bar_size"
-            android:maxHeight="@dimen/loading_progress_bar_size"
-            android:maxWidth="@dimen/loading_progress_bar_size"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginRight="5dp"
-            android:id="@+id/progress_bar"/>
+            android:id="@+id/loading"/>
 
         <!--文字-->
         <TextView

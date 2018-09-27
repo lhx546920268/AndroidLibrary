@@ -15,9 +15,11 @@ import android.widget.TextView;
 
 import com.lhx.demo.R;
 import com.lhx.library.drawable.CornerBorderDrawable;
+import com.lhx.library.drawable.LoadingDrawable;
 import com.lhx.library.drawable.TriangleDrawable;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.image.ImageLoaderUtil;
+import com.lhx.library.util.SizeUtil;
 
 import org.xml.sax.XMLReader;
 
@@ -85,7 +87,12 @@ public class CornerDrawableFragment extends AppBaseFragment {
 //        drawable.setBackgroundColor(Color.CYAN);
 //        drawable.attatchView(textView);
 //
-//        ImageView imageView = findViewById(R.id.img_square);
+        ImageView imageView = findViewById(R.id.img_square);
+        LoadingDrawable loadingDrawable = new LoadingDrawable(mContext);
+//        loadingDrawable.setIntrinsicWidth(pxFromDip(37));
+//        loadingDrawable.setIntrinsicHeight(pxFromDip(37));
+        imageView.setImageDrawable(loadingDrawable);
+        loadingDrawable.start();
 //        CornerBorderDrawable borderDrawable = new CornerBorderDrawable(BitmapFactory.decodeResource(getResources(), R.drawable
 //                .square));
 //        borderDrawable.setShouldAbsoluteCircle(true);

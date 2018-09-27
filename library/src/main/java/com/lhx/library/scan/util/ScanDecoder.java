@@ -36,6 +36,9 @@ public class ScanDecoder extends Thread{
     //是否已停止
     private boolean mStop;
 
+    ///
+    private Looper mLooper;
+
     public ScanDecoder(Handler handler, CameraManager cameraManager) {
 
         mCameraManager = cameraManager;
@@ -67,16 +70,20 @@ public class ScanDecoder extends Thread{
 
     @Override
     public void run() {
+
         Looper.prepare();
 
-
+        mLooper = Looper.myLooper();
         Looper.loop();
     }
 
     //停止解码
     public void stopDecode(){
         mStop = true;
-        Looper.myLooper().quit();
+        if(mLooper != null){
+            mLooper.quit();
+            mLooper = null;
+        }
     }
 
     //获取解码所需的

@@ -1,15 +1,18 @@
 package com.lhx.library.loadmore;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lhx.library.R;
+import com.lhx.library.drawable.LoadingDrawable;
 import com.lhx.library.widget.OnSingleClickListener;
 
 import java.lang.annotation.Retention;
@@ -55,7 +58,8 @@ public class LoadMoreControl {
     private Context mContext;
 
     ///菊花
-    ProgressBar mProgressBar;
+    ImageView mImageView;
+    LoadingDrawable mLoadingDrawable;
 
     //文本
     TextView mTextView;
@@ -83,12 +87,16 @@ public class LoadMoreControl {
         }else {
             if(reusedView == null){
                 mContentView = LayoutInflater.from(mContext).inflate(R.layout.common_load_more, parent, false);
-                mProgressBar = (ProgressBar)mContentView.findViewById(R.id.progress_bar);
-                mTextView = (TextView)mContentView.findViewById(R.id.text_view);
+                mImageView = mContentView.findViewById(R.id.loading);
+                mLoadingDrawable = new LoadingDrawable(mContext);
+                mLoadingDrawable.setColor(Color.GRAY);
+                mImageView.setImageDrawable(mLoadingDrawable);
+
+                mTextView = mContentView.findViewById(R.id.text_view);
                 mContentView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if(mLoadMoreControlHandler != null && mLoadingStatus == LOAD_MORE_STATUS_HAS_MORE){
+                        if(mLoadMoreControlHandler != null && mLoadingStatus == LOAD_MORE_STATUS_FAIL){
                             mLoadMoreControlHandler.onClickLoadMore();
                         }
                     }
@@ -145,8 +153,9 @@ public class LoadMoreControl {
                 if(mContentView != null){
                     mContentView.setEnabled(false);
                 }
-                if(mProgressBar != null){
-                    mProgressBar.setVisibility(View.VISIBLE);
+                if(mImageView != null){
+                    mImageView.setVisibility(View.VISIBLE);
+                    mLoadingDrawable.start();
                 }
                 if(mTextView != null){
                     mTextView.setText("加载中...");
@@ -157,8 +166,9 @@ public class LoadMoreControl {
                 if(mContentView != null){
                     mContentView.setEnabled(true);
                 }
-                if(mProgressBar != null){
-                    mProgressBar.setVisibility(View.GONE);
+                if(mImageView != null){
+                    mImageView.setVisibility(View.GONE);
+                    mLoadingDrawable.stop();
                 }
                 if(mTextView != null){
                     mTextView.setText("加载失败，点击重新加载");

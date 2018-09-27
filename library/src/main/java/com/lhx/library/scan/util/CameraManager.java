@@ -262,7 +262,7 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
 
         if(mCamera != null){
             Camera.Parameters parameters = mCamera.getParameters();
-            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
 
             int landScapeWidth = width;
             int landScapeHeight = height;

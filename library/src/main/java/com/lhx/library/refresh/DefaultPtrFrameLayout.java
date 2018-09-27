@@ -1,13 +1,16 @@
 package com.lhx.library.refresh;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lhx.library.R;
+import com.lhx.library.drawable.LoadingDrawable;
 
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrUIHandler;
@@ -23,7 +26,8 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
     private View mHeader;
 
     //菊花
-    private ProgressBar mProgressBar;
+    private ImageView mImageView;
+    private LoadingDrawable mLoadingDrawable;
 
     //文本
     private TextView mTextView;
@@ -46,9 +50,13 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
         super(context, attrs, defStyle);
 
         mHeader = LayoutInflater.from(context).inflate(R.layout.refresh_control_header, this, false);
-        mProgressBar = (ProgressBar)mHeader.findViewById(R.id.progress_bar);
-        mTextView = (TextView)mHeader.findViewById(R.id.text_view);
-        mProgressBar.setVisibility(View.GONE);
+        mImageView = mHeader.findViewById(R.id.loading);
+        mLoadingDrawable = new LoadingDrawable(context);
+        mLoadingDrawable.setColor(Color.GRAY);
+        mImageView.setImageDrawable(mLoadingDrawable);
+        mImageView.setVisibility(GONE);
+
+        mTextView = mHeader.findViewById(R.id.text_view);
 
         setHeaderView(mHeader);
         addPtrUIHandler(this);
@@ -57,7 +65,8 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
 
     @Override
     public void onUIReset(PtrFrameLayout frame) {
-        mProgressBar.setVisibility(View.GONE);
+        mImageView.setVisibility(View.GONE);
+        mLoadingDrawable.stop();
         mTextView.setText("下拉刷新");
     }
 
@@ -68,13 +77,15 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
 
     @Override
     public void onUIRefreshBegin(PtrFrameLayout frame) {
-        mProgressBar.setVisibility(View.VISIBLE);
+        mImageView.setVisibility(View.VISIBLE);
+        mLoadingDrawable.start();
         mTextView.setText("加载中...");
     }
 
     @Override
     public void onUIRefreshComplete(PtrFrameLayout frame) {
-        mProgressBar.setVisibility(View.GONE);
+        mImageView.setVisibility(View.GONE);
+        mLoadingDrawable.stop();
         mTextView.setText("刷新成功");
     }
 

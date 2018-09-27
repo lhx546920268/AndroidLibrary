@@ -57,6 +57,7 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
         }
 
         mCameraManager = new CameraManager(mContext, this);
+        mCameraManager.setCameraManagerHandler(this);
 
         mTextureView = findViewById(R.id.texture);
         mTextureView.setSurfaceTextureListener(this);

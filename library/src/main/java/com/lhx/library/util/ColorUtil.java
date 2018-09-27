@@ -2,6 +2,7 @@ package com.lhx.library.util;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 
 /**
@@ -22,6 +23,18 @@ public class ColorUtil {
         int a = (int)(0xff * alpha);
 
         return (a << 24) | (v << 16) | (v << 8) | v;
+    }
+
+    /**
+     * 生成带透明度的颜色
+     * @param color 颜色
+     * @param alpha 透明度 0-1.0
+     * @return 颜色值
+     */
+    public static int colorWithAlpha(@ColorInt int color, float alpha){
+
+        int alphaHex = (int)(alpha * 255);
+        return (color & 0x00ffffff) | (alphaHex << 24);
     }
 
     /**
