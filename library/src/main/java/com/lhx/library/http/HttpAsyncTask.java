@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * http 异步任务
  */
-public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> implements HttpProgressHandler<HttpRequest> {
+public class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> implements HttpProgressHandler<HttpRequest> {
 
     ///请求URL
     protected String mURL;
@@ -54,6 +54,9 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
     private static final float PROGRESS_UPLOAD = 0.0f;
     private static final float PROGRESS_DOWNLOAD = 1.0f;
 
+    //回调
+    private HttpAsyncTaskHandler mHttpAsyncTaskHandler;
+
 
     public HttpAsyncTask(String URL, ContentValues params, Map<String, File> files) {
         mURL = URL;
@@ -71,6 +74,10 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     public void setErrorCode(int errorCode){
         mErrorCode = errorCode;
+    }
+
+    public void setHttpAsyncTaskHandler(HttpAsyncTaskHandler httpAsyncTaskHandler) {
+        mHttpAsyncTaskHandler = httpAsyncTaskHandler;
     }
 
     @Deprecated
@@ -129,7 +136,9 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
         if(!TextUtils.isEmpty(mURL) && !isCancelled()){
             mHttpRequest = new HttpRequest(mURL);
             mHttpRequest.setHttpMethod(mHttpMethod);
-            onConfigure(mHttpRequest);
+            if(mHttpAsyncTaskHandler != null){
+                mHttpAsyncTaskHandler.onConfigure(mHttpRequest);
+            }
 
             if(mHttpRequest.isShowDownloadProgress() || mHttpRequest.isShowUploadProgress()){
                 mHttpRequest.setHttpProgressHandler(this);
@@ -163,9 +172,6 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
         return null;
     }
-
-    //配置 http 不要在该方法上做任何与主线程有关的东西
-    public abstract void onConfigure(HttpRequest request);
 
     @Override
     protected void onPostExecute(byte[] bytes) {
@@ -240,5 +246,12 @@ public abstract class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> imple
 
     public HttpAsyncTask startConcurrently(){
         return (HttpAsyncTask)executeOnExecutor(THREAD_POOL_EXECUTOR);
+    }
+
+    //回调
+    public interface HttpAsyncTaskHandler{
+
+        //配置 http 不要在该方法上做任何与主线程有关的东西
+        void onConfigure(HttpRequest request);
     }
 }

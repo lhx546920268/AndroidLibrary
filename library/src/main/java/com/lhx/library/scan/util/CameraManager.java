@@ -2,6 +2,8 @@ package com.lhx.library.scan.util;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.FeatureInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
@@ -62,6 +64,9 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
     //扫码框
     private Rect mScanRect;
 
+    //相机是否已创建
+    private boolean mCameraInit;
+
     public CameraManager(@NonNull Context context, @NonNull Fragment fragment) {
         mContext = context;
         mFragment = fragment;
@@ -72,7 +77,7 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
 
     public Rect getScanRect() {
         if(mScanRect == null){
-            mScanRect = mCameraManagerHandler.getScanRect(mSurfaceWidth, mSurfaceHeight);
+            mScanRect = new Rect(mCameraManagerHandler.getScanRect(mSurfaceWidth, mSurfaceHeight));
             Camera.Size size = mCamera.getParameters().getPreviewSize();
             float widthScale = (float)size.height / (float)mSurfaceWidth;
             float heightScale = (float)size.width / (float)mSurfaceHeight;
@@ -88,6 +93,11 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
     public void setPreviewSize(int width, int height){
         mSurfaceWidth = width;
         mSurfaceHeight = height;
+    }
+
+    //设置预览视图
+    public void setSurfaceTexture(@NonNull SurfaceTexture surfaceTexture) {
+        mSurfaceTexture = surfaceTexture;
     }
 
     //获取当前预览大小
@@ -128,9 +138,13 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
         mCameraManagerHandler = cameraManagerHandler;
     }
 
+    public boolean isCameraInit() {
+        return mCameraInit;
+    }
+
     //打开相机
-    public void openCamera(@NonNull SurfaceTexture surfaceTexture){
-        mSurfaceTexture = surfaceTexture;
+    public void openCamera(){
+
         String[] permissions = neededPermissions();
         if(EasyPermissions.hasPermissions(mContext, permissions)){
             if(mCamera == null){
@@ -140,13 +154,17 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
                 AlertController.buildActionSheet(mContext, "摄像头不可用", "确定").show();
             }else {
                 try {
-                    mCamera.setPreviewTexture(surfaceTexture);
+                    mCamera.setPreviewTexture(mSurfaceTexture);
                     setOptimalPreviewSize(mSurfaceWidth, mSurfaceHeight);
                     mCamera.setDisplayOrientation(90);
                     mCamera.setPreviewCallback(mPreviewCallback);
                     mCamera.startPreview();
                     mPreviewing = true;
                     startDecode();
+                    if(mCameraManagerHandler != null){
+                        mCameraManagerHandler.onCameraStart();
+                    }
+                    mCameraInit = true;
                 }catch (IOException e){
                     e.printStackTrace();
                     Log.d("ScanFragment", "相机预览失败");
@@ -187,7 +205,11 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
     public void onResume(){
         if(mPausing && mCamera != null && !mPreviewing){
             mCamera.startPreview();
+            mPreviewing = true;
             startDecode();
+            if(mCameraManagerHandler != null){
+                mCameraManagerHandler.onCameraStart();
+            }
         }
     }
 
@@ -219,6 +241,33 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
         mPreviewCallback.stopDecode();
     }
 
+    //设置开灯状态
+    public String setOpenLamp(boolean open){
+        if(isCameraInit()){
+
+            //判断设备是否支持闪光灯
+            boolean support = false;
+            FeatureInfo[] featureInfos = mContext.getPackageManager().getSystemAvailableFeatures();
+            for(FeatureInfo info : featureInfos){
+                if (PackageManager.FEATURE_CAMERA_FLASH.equals(info.name)){
+                    support = true;
+                    break;
+                }
+            }
+
+            if(support){
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setFlashMode(open ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_AUTO);
+                mCamera.setParameters(parameters);
+                return null;
+            }
+
+            return "该设备不支持开灯";
+        }
+
+        return "相机正在初始化";
+    }
+
     //所需权限
     private String[] neededPermissions(){
         return new String[]{Manifest.permission.CAMERA};
@@ -226,7 +275,7 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        openCamera(mSurfaceTexture);
+        openCamera();
     }
 
     @Override
@@ -309,6 +358,7 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
         if(mCameraManagerHandler != null){
             onPause();
             mCameraManagerHandler.onScanSuccess(result);
+            mCameraManagerHandler.onCameraStop();
         }
     }
 
@@ -330,5 +380,11 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
 
         //解码成功
         void onScanSuccess(@NonNull Result result);
+
+        //开始
+        void onCameraStart();
+
+        //停止
+        void onCameraStop();
     }
 }

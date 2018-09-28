@@ -7,6 +7,7 @@ import android.support.annotation.DrawableRes;
 import android.view.View;
 
 import com.lhx.library.image.ImageLoaderUtil;
+import com.lhx.library.loading.LoadingView;
 
 /**
  * app信息
@@ -29,7 +30,7 @@ public class App {
     public static @DrawableRes int BackToTopIcon = 0;
 
     //自定义的loading视图
-    public static Class<? extends View> pageLoadingViewClass = null;
+    public static Class<? extends LoadingView> pageLoadingViewClass = null;
     public static Class<? extends View> loadViewClass = null;
 
 

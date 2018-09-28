@@ -1,38 +1,33 @@
 package com.lhx.library.loading;
 
+import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.lhx.library.R;
-import com.lhx.library.drawable.CornerBorderDrawable;
-import com.lhx.library.drawable.LoadingDrawable;
+//加载中菊花
+public abstract class LoadingView extends FrameLayout implements LoadingHandler{
 
-//加载中视图
-public class LoadingView extends FrameLayout {
+    //延迟
+    private long mDelay;
 
-    //菊花
-    protected ImageView mImageView;
-    protected LoadingDrawable mLoadingDrawable;
+    //延迟handler
+    private Handler mHandler;
+    private Runnable mDelayRunnable;
 
-    //文字
-    protected TextView mTextView;
-
-    //容器
-    protected FrameLayout mContainer;
+    //回调
+    private LoadingViewHandler mLoadingViewHandler;
 
     public LoadingView(@NonNull Context context) {
-        super(context);
+        this(context, null);
     }
 
     public LoadingView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public LoadingView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -40,32 +35,52 @@ public class LoadingView extends FrameLayout {
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+    public void setDelay(long delayMills) {
+        mDelay = delayMills;
+    }
 
-        mImageView = findViewById(R.id.loading);
-        mLoadingDrawable = new LoadingDrawable(getContext());
-        mImageView.setImageDrawable(mLoadingDrawable);
-
-        mTextView = findViewById(R.id.text_view);
-        mContainer = findViewById(R.id.container);
-
-        CornerBorderDrawable.setDrawable(mContainer, 15, Color.parseColor("#4c4c4c"));
+    public void setLoadingViewHandler(LoadingViewHandler loadingViewHandler) {
+        mLoadingViewHandler = loadingViewHandler;
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mLoadingDrawable.start();
+        final View contentView = getContentView();
+        if(mDelay > 0){
+            contentView.setVisibility(INVISIBLE);
+            if(mHandler == null){
+                mHandler = new Handler();
+                mDelayRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        contentView.setVisibility(VISIBLE);
+                        if(mLoadingViewHandler != null){
+                            mLoadingViewHandler.onShowAfterDelay();
+                        }
+                    }
+                };
+            }
+            mHandler.postDelayed(mDelayRunnable, mDelay);
+        }else {
+            contentView.setVisibility(VISIBLE);
+        }
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mLoadingDrawable.stop();
+        if(mHandler != null){
+            mHandler.removeCallbacksAndMessages(null);
+        }
     }
 
-    public TextView getTextView() {
-        return mTextView;
+    public abstract @NonNull View getContentView();
+
+    //视图回调
+    public interface LoadingViewHandler{
+
+        //视图已延迟显示
+        void onShowAfterDelay();
     }
 }

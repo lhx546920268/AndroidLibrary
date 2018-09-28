@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -69,6 +70,16 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 //        Log.d("AppBaseFragment", "onActivityCreated");
     }
 
+    //获取开场动画
+    public @AnimRes int getEnterAnim(){
+        return 0;
+    }
+
+    //获取出场动画
+    public @AnimRes int getExitAnim(){
+        return 0;
+    }
+
 //    @Override
 //    public void onStart() {
 //        super.onStart();
@@ -111,7 +122,8 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 //        super.onDetach();
 //        Log.d("AppBaseFragment", "onDetach");
 //    }
-    
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -340,11 +352,15 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     }
 
     public void setLoading(boolean loading){
-        mContainer.setLoading(loading, "加载中...");
+        setLoading(loading, 0, "加载中...");
     }
 
-    public void setLoading(boolean loading, String text){
-        mContainer.setLoading(loading, text);
+    public void setLoading(boolean loading, long delay){
+        setLoading(loading, delay,"加载中...");
+    }
+
+    public void setLoading(boolean loading, long delay, String text){
+        mContainer.setLoading(loading, delay, text);
     }
 
     public void setPageLoadFail(boolean pageLoadFail){

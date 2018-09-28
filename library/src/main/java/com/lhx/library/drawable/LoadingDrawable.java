@@ -225,6 +225,10 @@ public class LoadingDrawable extends BaseDrawable implements Animatable{
     @Override
     public BaseDrawable copy() {
         LoadingDrawable drawable = new LoadingDrawable(mContext);
+        drawable.setColor(mColor);
+        drawable.setInnerCircleRatio(mInnerCircleRatio);
+        drawable.setPetalsCount(mPetalsCount);
+        drawable.setPetalsStrokeWidth(mPetalsStrokeWidth);
 
         return drawable;
     }

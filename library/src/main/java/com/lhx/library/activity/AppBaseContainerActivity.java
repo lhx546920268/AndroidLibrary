@@ -274,7 +274,7 @@ public abstract class AppBaseContainerActivity extends AppBaseActivity implement
 
     public void setLoading(boolean loading) {
         if(loading){
-            DialogUtil.showLoadingDialog(this, false, null);
+            DialogUtil.showLoadingDialog(this, 0, false, null);
         }else {
             DialogUtil.dismissLoadingDialog();
         }

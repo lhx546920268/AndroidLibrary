@@ -7,7 +7,9 @@ import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -66,13 +68,17 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
     @Override
     public void onResume() {
         super.onResume();
-        mCameraManager.onResume();
+        if(!mPausing){
+            mCameraManager.onResume();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mCameraManager.onPause();
+        if(!mPausing){
+            mCameraManager.onPause();
+        }
     }
 
     @Override
@@ -91,7 +97,14 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mCameraManager.setPreviewSize(width, height);
-        mCameraManager.openCamera(surface);
+        mCameraManager.setSurfaceTexture(surface);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCameraManager.openCamera();
+            }
+        }, 300);
     }
 
     @Override
@@ -108,6 +121,27 @@ public abstract class ScanFragment extends AppBaseFragment implements TextureVie
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
 
+    }
+
+    //暂停相机
+    protected void pauseCamera(){
+        if(mCameraManager.isCameraInit()){
+            mPausing = true;
+            mCameraManager.onPause();
+        }
+    }
+
+    //重启相机
+    protected void resumeCamera(){
+        if(mPausing){
+            mCameraManager.onResume();
+            mPausing = false;
+        }
+    }
+
+    //设置开灯状态
+    protected String setOpenLamp(boolean open){
+        return mCameraManager.setOpenLamp(open);
     }
 
     //没有权限 返回true 说明自己提示权限信息

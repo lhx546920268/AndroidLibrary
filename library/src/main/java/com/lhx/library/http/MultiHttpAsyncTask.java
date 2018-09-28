@@ -40,12 +40,7 @@ public abstract class MultiHttpAsyncTask implements HttpRequestHandler {
      */
     public HttpAsyncTask addTask(String URL, ContentValues params, HashMap<String, File> files) {
 
-        HttpAsyncTask task = new HttpAsyncTask(URL, params, files) {
-            @Override
-            public void onConfigure(HttpRequest request) {
-
-            }
-        };
+        HttpAsyncTask task = new HttpAsyncTask(URL, params, files);
         task.addHttpRequestHandler(this);
         mTasks.add(task);
 

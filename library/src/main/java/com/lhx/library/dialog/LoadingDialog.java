@@ -12,6 +12,7 @@ import android.view.WindowManager;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
+import com.lhx.library.loading.LoadingView;
 
 /**
  * 加载中弹窗
@@ -19,8 +20,12 @@ import com.lhx.library.R;
 
 public class LoadingDialog extends Dialog {
 
-    public LoadingDialog(@NonNull Context context) {
+    //延迟
+    private long mDelay;
+
+    public LoadingDialog(@NonNull Context context, long delay) {
         super(context, R.style.Theme_dialog_loading);
+        mDelay = delay;
         initialization();
     }
 
@@ -37,18 +42,18 @@ public class LoadingDialog extends Dialog {
     //初始化
     private void initialization(){
 
-        View contentView;
+        LoadingView contentView;
         if(App.loadViewClass != null){
             try {
-                contentView = App.loadViewClass.getConstructor(Context.class).newInstance(getContext());
+                contentView = (LoadingView)App.loadViewClass.getConstructor(Context.class).newInstance(getContext());
             }catch (Exception e){
                 throw new IllegalStateException("pageLoadingViewClass 无法通过context实例化");
             }
         }else {
-            contentView = View.inflate(getContext(), R.layout.loading_view, null);
+            contentView = (LoadingView)View.inflate(getContext(), R.layout.default_loading_view, null);
         }
 
-
+        contentView.setDelay(mDelay);
         setContentView(contentView);
 
         setCancelable(false);
@@ -57,6 +62,7 @@ public class LoadingDialog extends Dialog {
         Window window = getWindow();
         if(window != null){
             WindowManager.LayoutParams layoutParams = window.getAttributes();
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
             layoutParams.gravity = Gravity.CENTER;
             layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
             layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;

@@ -17,7 +17,7 @@ import java.util.Map;
  * http json请求
  */
 
-public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
+public abstract class HttpJsonAsyncTask implements HttpRequestHandler, HttpAsyncTask.HttpAsyncTaskHandler{
 
     //请求方法
     public static final String POST = "POST";
@@ -29,8 +29,8 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
     //http异步任务
     private HttpAsyncTask mTask;
 
-    //错误信息
-    private String mErrorMessage;
+    //提示信息
+    private String mMessage;
 
     protected Context mContext;
 
@@ -45,12 +45,12 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         return mApiError;
     }
 
-    public String getErrorMessage() {
-        return mErrorMessage;
+    public String getMessage() {
+        return mMessage;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        mErrorMessage = errorMessage;
+    public void setMessage(String message) {
+        mMessage = message;
     }
 
     public HttpJsonAsyncTask(Context context) {
@@ -82,25 +82,24 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         }
 
         mApiError = false;
-        mErrorMessage = null;
+        mMessage = null;
         String url = getRequestURL();
 
         ContentValues params = getParams();
         Map<String, File> files = getFiles();
         processParams(params, files);
 
-        mTask = new HttpAsyncTask(url, params , files) {
-            @Override
-            public void onConfigure(HttpRequest request) {
-
-                request.setTimeoutInterval(mTimeout);
-            }
-        };
+        mTask = new HttpAsyncTask(url, params , files);
 
         mTask.setHttpMethod(getHttpMethod());
         mTask.setName(getClass().getName());
         mTask.addHttpRequestHandler(this);
         return mTask;
+    }
+
+    @Override
+    public void onConfigure(HttpRequest request) {
+        request.setTimeoutInterval(mTimeout);
     }
 
     @Override
@@ -118,7 +117,7 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
         }catch (JSONException e){
             e.printStackTrace();
             mApiError = true;
-            mErrorMessage = "JSON解析错误";
+            mMessage = "JSON解析错误";
             mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
             onFail(this);
         }
@@ -127,7 +126,7 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler{
     @Override
     public final void onFail(HttpAsyncTask task, int errorCode, int httpCode) {
         mApiError = false;
-        mErrorMessage = HttpRequest.getErrorStringFromCode(errorCode, httpCode);
+        mMessage = HttpRequest.getErrorStringFromCode(errorCode, httpCode);
         onFail(this);
     }
 

@@ -7,7 +7,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,9 @@ import android.widget.TextView;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.bar.NavigationBar;
+import com.lhx.library.loading.DefaultLoadingView;
 import com.lhx.library.loading.LoadingView;
 import com.lhx.library.loading.PageLoadingView;
-import com.lhx.library.util.SizeUtil;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * 基础视图容器
@@ -54,7 +51,7 @@ public class AppBaseContainer extends RelativeLayout {
 
     //显示菊花
     private boolean mLoading = false;
-    private View mLoadingView;
+    private LoadingView mLoadingView;
 
     //页面是否载入失败
     private boolean mPageLoadFail = false;
@@ -398,25 +395,27 @@ public class AppBaseContainer extends RelativeLayout {
     }
 
     //显示菊花
-    public void setLoading(boolean loading, String text){
+    public void setLoading(boolean loading, long delay, String text){
         if(mLoading != loading){
             mLoading = loading;
 
             if(mLoading){
                 if(App.loadViewClass != null){
                     try {
-                        mLoadingView = App.loadViewClass.getConstructor(Context.class).newInstance(mContext);
+                        mLoadingView = (LoadingView)App.loadViewClass.getConstructor(Context.class).newInstance
+                                (mContext);
                     }catch (Exception e){
                         throw new IllegalStateException("loadViewClass 无法通过context实例化");
                     }
 
                 }else {
-                    mLoadingView = LayoutInflater.from(mContext).inflate(R.layout.loading_view,
+                    mLoadingView = (LoadingView)LayoutInflater.from(mContext).inflate(R.layout.default_loading_view,
                             this, false);
                 }
 
-                if(mLoadingView instanceof LoadingView){
-                    ((LoadingView) mLoadingView).getTextView().setText(text);
+                mLoadingView.setDelay(delay);
+                if(mLoadingView instanceof DefaultLoadingView){
+                    ((DefaultLoadingView) mLoadingView).getTextView().setText(text);
                 }
 
                 LayoutParams params = (LayoutParams)mLoadingView.getLayoutParams();
@@ -575,6 +574,15 @@ public class AppBaseContainer extends RelativeLayout {
 
     public View getBottomView() {
         return mBottomView;
+    }
+
+    //设置顶部视图 但是不加入到父视图上
+    public void setTopViewWithoutAttach(View topView){
+        if(mTopView != null){
+            removeView(mTopView);
+        }
+        mTopView = topView;
+        mTopView.setId(R.id.app_base_fragment_top_id);
     }
 
     public void setTopView(View topView){

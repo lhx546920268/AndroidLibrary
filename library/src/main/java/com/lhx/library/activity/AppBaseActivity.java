@@ -47,8 +47,8 @@ public class AppBaseActivity extends AppCompatActivity {
     //activity 名称 为fragment的类名 或者 activity类名
     private String mName;
 
-    ///当前显示的Fragment
-    private AppBaseFragment fragment;
+    //当前显示的Fragment
+    private AppBaseFragment mFragment;
 
     //是否可见
     private boolean mVisible;
@@ -162,6 +162,12 @@ public class AppBaseActivity extends AppCompatActivity {
 
                     throw new RuntimeException(className + "不能实例化");
                 }
+
+                int enter = mFragment.getEnterAnim();
+                if(enter != 0){
+                    overridePendingTransition(enter, R.anim.anim_no);
+                }
+
             } catch (Exception e) {
 
                 e.printStackTrace();
@@ -206,7 +212,7 @@ public class AppBaseActivity extends AppCompatActivity {
      */
     public void setCurrentFragment(AppBaseFragment currentFragment, @AnimRes int enter, @AnimRes int exit) {
 
-        fragment = currentFragment;
+        mFragment = currentFragment;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (enter != 0 && exit != 0) {
@@ -214,7 +220,7 @@ public class AppBaseActivity extends AppCompatActivity {
             transaction.setCustomAnimations(enter, exit);
         }
 
-        transaction.replace(R.id.fragment_container, fragment);
+        transaction.replace(R.id.fragment_container, mFragment);
         transaction.commitAllowingStateLoss();
     }
 
@@ -246,13 +252,24 @@ public class AppBaseActivity extends AppCompatActivity {
     }
 
     @Override
+    public void finish() {
+        super.finish();
+        if(mFragment != null){
+            int exit = mFragment.getExitAnim();
+            if(exit != 0){
+                overridePendingTransition(R.anim.anim_no, exit);
+            }
+        }
+    }
+
+    @Override
     @CallSuper
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK && isTaskRoot()){
             moveTaskToBack(true);
             return true;
         }else {
-            if (fragment != null && fragment.onKeyDown(keyCode, event)) {
+            if (mFragment != null && mFragment.onKeyDown(keyCode, event)) {
                 return true;
             }
             return super.onKeyDown(keyCode, event);
@@ -262,7 +279,7 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
 
-        if (fragment != null && fragment.dispatchKeyEvent(event)) {
+        if (mFragment != null && mFragment.dispatchKeyEvent(event)) {
             return true;
         }
         return super.dispatchKeyEvent(event);
@@ -271,8 +288,8 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (fragment != null) {
-            fragment.onWindowFocusChanged(hasFocus);
+        if (mFragment != null) {
+            mFragment.onWindowFocusChanged(hasFocus);
         }
     }
 
@@ -280,8 +297,8 @@ public class AppBaseActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
             grantResults) {
-        if (fragment != null) {
-            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (mFragment != null) {
+            mFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -315,6 +332,7 @@ public class AppBaseActivity extends AppCompatActivity {
     public int pxFromDip(float dip){
         return SizeUtil.pxFormDip(dip, this);
     }
+
     //获取颜色
     public @ColorInt int getColorCompat(@ColorRes int colorRes){
         return ContextCompat.getColor(this, colorRes);

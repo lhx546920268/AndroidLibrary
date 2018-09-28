@@ -26,18 +26,19 @@ public class DialogUtil {
     }
 
     public static void showLoadingDialog(Context context){
-        showLoadingDialog(context, false, null);
+        showLoadingDialog(context, 0,false, null);
     }
 
     //显示加载菊花
-    public static void showLoadingDialog(Context context, boolean cancelable, DialogInterface.OnCancelListener
+    public static void showLoadingDialog(Context context, long delay, boolean cancelable, DialogInterface
+            .OnCancelListener
             onCancelListener) {
 
         if(mLoadingDialog != null && mLoadingDialog.isShowing())
             return;
-        mLoadingDialog = new LoadingDialog(context);
+        mLoadingDialog = new LoadingDialog(context, delay);
         mLoadingDialog.setCancelable(cancelable);
-        mLoadingDialog.setCanceledOnTouchOutside(cancelable);
+        mLoadingDialog.setCanceledOnTouchOutside(false);
         mLoadingDialog.setOnCancelListener(onCancelListener);
         mLoadingDialog.show();
     }
