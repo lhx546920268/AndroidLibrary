@@ -16,6 +16,8 @@
     <!--黑色半透明背景-->
     <color name="translucent_black">#77000000</color>
 
+    <!--弹窗背景-->
+    <color name="dialog_background">#66000000</color>
 
     <!--灰色-->
     <color name="gray">#808080</color>

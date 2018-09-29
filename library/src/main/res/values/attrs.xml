@@ -23,4 +23,19 @@
         <attr name="isFull" format="boolean"/>
     </declare-styleable>
 
+    <!--角标填充也是-->
+    <declare-styleable name="PopoverLayout">
+        <attr name="popover_color" format="color"/>
+        <attr name="corner_radius" format="dimension"/>
+        <attr name="arrow_width" format="dimension"/>
+        <attr name="arrow_height" format="dimension"/>
+        <attr name="arrow_offset" format="dimension"/>
+        <attr name="arrow_direction" format="enum">
+            <enum name="top" value="0"/>
+            <enum name="left" value="1"/>
+            <enum name="bottom" value="2"/>
+            <enum name="right" value="3"/>
+        </attr>
+    </declare-styleable>
+
 </resources>

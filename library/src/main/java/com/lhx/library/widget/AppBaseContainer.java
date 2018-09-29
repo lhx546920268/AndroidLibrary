@@ -186,7 +186,7 @@ public class AppBaseContainer extends RelativeLayout {
             if(flag){
                 params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             }else {
-                params.addRule(BELOW, R.id.app_base_fragment_top_id);
+                params.addRule(BELOW, mTopView.getId());
             }
         }
     }
@@ -199,13 +199,13 @@ public class AppBaseContainer extends RelativeLayout {
             LayoutParams params = (LayoutParams)mContentView.getLayoutParams();
             if(mTopView != null){
                 params.addRule(BELOW, 0);
-                params.addRule(BELOW, R.id.app_base_fragment_top_id);
+                params.addRule(BELOW, mTopView.getId());
             }else {
                 params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             }
 
             if(mBottomView != null){
-                params.addRule(ABOVE, R.id.app_base_fragment_bottom_id);
+                params.addRule(ABOVE, mBottomView.getId());
             }
         }
     }
@@ -290,14 +290,14 @@ public class AppBaseContainer extends RelativeLayout {
                 if(mTopView == null || (mOverlayArea & OVERLAY_AREA_PAGE_LOADING_TOP) == OVERLAY_AREA_PAGE_LOADING_TOP){
                     params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
                 }else {
-                    params.addRule(BELOW, R.id.app_base_fragment_top_id);
+                    params.addRule(BELOW, mTopView.getId());
                 }
 
                 if(mBottomView == null || (mOverlayArea & OVERLAY_AREA_PAGE_LOADING_BOTTOM) ==
                         OVERLAY_AREA_PAGE_LOADING_BOTTOM){
                     params.addRule(ALIGN_PARENT_BOTTOM);
                 }else {
-                    params.addRule(ABOVE, R.id.app_base_fragment_bottom_id);
+                    params.addRule(ABOVE, mBottomView.getId());
                 }
 
                 if(mOnEventHandler != null){
@@ -331,6 +331,8 @@ public class AppBaseContainer extends RelativeLayout {
         if (mPageLoadFail != pageLoadFail) {
             mPageLoadFail = pageLoadFail;
 
+            setLoading(false, 0, null);
+            setPageLoading(false);
             if (mPageLoadFail) {
                 mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail,
                         this, false);
@@ -367,14 +369,14 @@ public class AppBaseContainer extends RelativeLayout {
                 if(mTopView == null || (mOverlayArea & OVERLAY_AREA_FAIL_TOP) == OVERLAY_AREA_FAIL_TOP){
                     params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
                 }else {
-                    params.addRule(BELOW, R.id.app_base_fragment_top_id);
+                    params.addRule(BELOW, mTopView.getId());
                 }
 
                 if(mBottomView == null || (mOverlayArea & OVERLAY_AREA_FAIL_BOTTOM) ==
                         OVERLAY_AREA_FAIL_BOTTOM){
                     params.addRule(ALIGN_PARENT_BOTTOM);
                 }else {
-                    params.addRule(ABOVE, R.id.app_base_fragment_bottom_id);
+                    params.addRule(ABOVE, mBottomView.getId());
                 }
 
                 if(mOnEventHandler != null){
@@ -428,7 +430,7 @@ public class AppBaseContainer extends RelativeLayout {
                 params.addRule(ALIGN_PARENT_BOTTOM);
 
                 addView(mLoadingView);
-            }else if(mPageLoadingView != null){
+            }else if(mLoadingView != null){
                 removeView(mLoadingView);
                 mLoadingView = null;
             }
@@ -501,14 +503,14 @@ public class AppBaseContainer extends RelativeLayout {
             if(mTopView == null || (mOverlayArea & OVERLAY_AREA_EMPTY_TOP) == OVERLAY_AREA_EMPTY_TOP){
                 params.addRule(BELOW, R.id.app_base_fragment_navigation_bar_id);
             }else {
-                params.addRule(BELOW, R.id.app_base_fragment_top_id);
+                params.addRule(BELOW, mTopView.getId());
             }
 
             if(mBottomView == null || (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) ==
                     OVERLAY_AREA_EMPTY_BOTTOM){
                 params.addRule(ALIGN_PARENT_BOTTOM);
             }else {
-                params.addRule(ABOVE, R.id.app_base_fragment_bottom_id);
+                params.addRule(ABOVE, mBottomView.getId());
             }
 
             if(mOnEventHandler != null){
@@ -574,15 +576,6 @@ public class AppBaseContainer extends RelativeLayout {
 
     public View getBottomView() {
         return mBottomView;
-    }
-
-    //设置顶部视图 但是不加入到父视图上
-    public void setTopViewWithoutAttach(View topView){
-        if(mTopView != null){
-            removeView(mTopView);
-        }
-        mTopView = topView;
-        mTopView.setId(R.id.app_base_fragment_top_id);
     }
 
     public void setTopView(View topView){

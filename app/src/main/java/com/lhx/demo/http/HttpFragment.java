@@ -81,12 +81,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
         values.put("password", "123456");
         values.put("sign", signatureParams(values));
 
-        HttpAsyncTask task = new HttpAsyncTask(DOMAIN, values) {
-            @Override
-            public void onConfigure(HttpRequest request) {
-                request.setPostBodyFormat(HttpRequest.POST_BODY_FORMAT_MULTI_PART_FORM_DATA);
-            }
-        };
+        HttpAsyncTask task = new HttpAsyncTask(DOMAIN, values);
 
         task.setHttpRequestHandler(new HttpRequestHandler() {
             @Override
@@ -116,14 +111,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
         switch (id){
             case R.id.download_img :
 
-                mDownloadImgTask = new HttpAsyncTask("http://chinauenvi.wxy01.com/public/images/ea/0b/12/18ad2dc9140c710738f2cd092164f2b798a0a026.jpg?1496365993#w"){
-                    @Override
-                    public void onConfigure(HttpRequest request) {
-                        request.setDownloadTemporayPath(FileUtil.getTemporaryFilePath(mContext, ""));
-                        request.setDownloadDestinationPath(FileUtil.getTemporaryFilePath(mContext, ""));
-                        request.setShowDownloadProgress(true);
-                    }
-                };
+                mDownloadImgTask = new HttpAsyncTask("http://chinauenvi.wxy01.com/public/images/ea/0b/12/18ad2dc9140c710738f2cd092164f2b798a0a026.jpg?1496365993#w");
                 mDownloadImgTask.setHttpRequestHandler(new HttpRequestHandler() {
                     @Override
                     public void onSuccess(HttpAsyncTask task, byte[] result) {
@@ -198,13 +186,7 @@ public class HttpFragment extends AppBaseFragment implements View.OnClickListene
                 HashMap<String, File> map = new HashMap<>();
                 map.put("file", file);
 
-                mUploadImgTask = new HttpAsyncTask(DOMAIN, values, map) {
-                    @Override
-                    public void onConfigure(HttpRequest request) {
-
-                        request.setShowUploadProgress(true);
-                    }
-                };
+                mUploadImgTask = new HttpAsyncTask(DOMAIN, values, map);
 
                 mUploadImgTask.setHttpRequestHandler(new HttpRequestHandler() {
                     @Override

@@ -2,6 +2,7 @@ package com.lhx.library.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -15,7 +16,8 @@ import com.lhx.library.widget.AppBaseContainer;
  * 基础dailog
  */
 
-public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEventHandler{
+public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEventHandler,
+        DialogInterface.OnDismissListener{
 
     protected Context mContext;
 
@@ -30,7 +32,13 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         super(context, R.style.Theme_dialog_noTitle_noBackground);
 
         mContext = context;
+        setOnDismissListener(this);
         initialize();
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+
     }
 
     //初始化
@@ -69,6 +77,10 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
     @Override
     public void show() {
         super.show();
+    }
+
+    public void setLoading(boolean loading){
+        mContainer.setLoading(loading, 0, "加载中...");
     }
 
     public void setPageLoading(boolean pageLoading){

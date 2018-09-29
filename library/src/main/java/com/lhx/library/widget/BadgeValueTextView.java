@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.lhx.library.R;
@@ -50,9 +51,21 @@ public class BadgeValueTextView extends AppCompatTextView {
         }
 
         mDrawable = new CornerBorderDrawable();
-        mDrawable.setShouldAbsoluteCircle(true);
         mDrawable.setBackgroundColor(mFillColor);
         mDrawable.attachView(this);
+
+        setIncludeFontPadding(false);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = getMeasuredWidth();
+        int height = getMeasuredHeight();
+
+        mDrawable.setCornerRadius(height / 2);
+        setMeasuredDimension(Math.max(width, height), height);
     }
 
     @Override
@@ -63,6 +76,10 @@ public class BadgeValueTextView extends AppCompatTextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
+        int value = StringUtil.parseInt(text);
+        if(value > 99){
+            text = "99+";
+        }
         super.setText(text, type);
         hideIfNeeded();
     }

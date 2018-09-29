@@ -24,10 +24,10 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler, HttpAsync
     public static final String GET = "GET";
 
     //请求api错误
-    private boolean mApiError;
+    protected boolean mApiError;
 
     //http异步任务
-    private HttpAsyncTask mTask;
+    protected HttpAsyncTask mTask;
 
     //提示信息
     private String mMessage;
@@ -105,21 +105,25 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler, HttpAsync
     @Override
     public final void onSuccess(HttpAsyncTask task, byte[] result) {
         String string = StringUtil.stringFromBytes(result, mTask.getStringEncoding());
-        try {
-            JSONObject object = new JSONObject(string);
-            if(resultFromJSONObject(object)){
-                onSuccess(this, processResult(object));
-            }else {
+        if(shouldParseJSON()){
+            try {
+                JSONObject object = new JSONObject(string);
+                if(resultFromJSONObject(object)){
+                    onSuccess(this, processResult(object));
+                }else {
+                    mApiError = true;
+                    mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
+                    onFail(this);
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
                 mApiError = true;
+                mMessage = "JSON解析错误";
                 mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
                 onFail(this);
             }
-        }catch (JSONException e){
-            e.printStackTrace();
-            mApiError = true;
-            mMessage = "JSON解析错误";
-            mTask.setErrorCode(HttpRequest.ERROR_CODE_API);
-            onFail(this);
+        }else {
+            onSuccess(string);
         }
     }
 
@@ -148,6 +152,16 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler, HttpAsync
     //获取文件
     public Map<String, File> getFiles(){
         return null;
+    }
+
+    //是否需要转换成json
+    public boolean shouldParseJSON(){
+        return true;
+    }
+
+    //当不需要转换成json时 这个会调用
+    public void onSuccess(String result){
+
     }
 
     //处理参数 比如签名
