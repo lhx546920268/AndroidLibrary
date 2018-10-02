@@ -27,18 +27,18 @@ public class RecyclerViewFragment extends PageFragment{
         int res = getContentRes();
         if(res != 0){
             setContentView(res);
-            if(hasRefresh()){
-                mRefreshLayout = findViewById(R.id.ptr_layout);
-                mRefreshLayout.setPtrHandler(this);
-            }
         }else {
             if(hasRefresh()){
                 setContentView(R.layout.recycler_view_refresh_fragment);
-                mRefreshLayout = findViewById(R.id.ptr_layout);
-                mRefreshLayout.setPtrHandler(this);
             }else {
                 setContentView(R.layout.recycler_view_fragment);
             }
+        }
+
+        if(hasRefresh()){
+            mRefreshLayout = findViewById(R.id.ptr_layout);
+            mRefreshLayout.setPtrHandler(this);
+            mRefreshLayout.setPtrFrameLayoutOnScrollHandler(this);
         }
         mRecyclerView = findViewById(R.id.recycler_view);
         setRefreshView(mRecyclerView);

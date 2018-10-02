@@ -297,7 +297,7 @@ public class NavigationBar extends RelativeLayout {
         }
 
         textView.setGravity(Gravity.CENTER);
-        textView.setPadding(SizeUtil.pxFormDip(10, getContext()), 0, SizeUtil.pxFormDip(10, getContext()), 0);
+        textView.setPadding(SizeUtil.pxFormDip(12, getContext()), 0, SizeUtil.pxFormDip(12, getContext()), 0);
         textView.setTextColor(ContextCompat.getColor(getContext(), R.color
                 .navigation_bar_tint_color));
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(R.dimen.navigation_bar_item_text_size));

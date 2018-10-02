@@ -30,38 +30,20 @@ public class PopoverFragment extends AppBaseFragment {
             @Override
             public void onSingleClick(View v) {
 
-                Popover popover = new Popover(mContext);
+                PopoverContainer popover = new PopoverContainer(mContext);
+                popover.setPadding(pxFromDip(10), pxFromDip(10), pxFromDip(10), pxFromDip(10));
+                TextView textView = new TextView(getContext());
+                textView.setTextSize(20);
+                textView.setText("这是一个很大很大的气泡弹窗编译版本的问题，\n" +
+                        "            module的编译版本（即你的主app）必须和library的一致才行，");
+                textView.setTextColor(Color.BLACK);
+                popover.setContentView(textView);
+
                 LinearLayout linearLayout = (LinearLayout)getContentView();
                 linearLayout.addView(popover, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
+                popover.show(v, true);
             }
         });
-    }
-
-    private static class Popover extends PopoverContainer{
-
-        public Popover(@NonNull Context context) {
-            super(context);
-        }
-
-        public Popover(@NonNull Context context, @Nullable AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public Popover(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-            super(context, attrs, defStyleAttr);
-        }
-
-        @NonNull
-        @Override
-        public View getContentView(PopoverLayout parent) {
-            TextView textView = new TextView(getContext());
-            textView.setTextSize(20);
-            textView.setText("这是一个很大很大的气泡弹窗编译版本的问题，\n" +
-                    "            module的编译版本（即你的主app）必须和library的一致才行，");
-            textView.setTextColor(Color.BLACK);
-
-            return textView;
-        }
     }
 }

@@ -19,12 +19,14 @@ import com.lhx.library.widget.BackToTopButton;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
+import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 /**
  * 可翻页的 fragment
  */
 
-public abstract class PageFragment extends AppBaseFragment implements PtrHandler {
+public abstract class PageFragment extends AppBaseFragment implements PtrHandler,
+        DefaultPtrFrameLayout.PtrFrameLayoutOnScrollHandler {
 
 
     //当前第几页
@@ -130,6 +132,11 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         }
 
         return mBackToTopButton;
+    }
+
+    @Override
+    public void onScroll(PtrIndicator ptrIndicator) {
+
     }
 
     //返回自定义的 layout res

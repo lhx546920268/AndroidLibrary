@@ -3,14 +3,20 @@ package com.lhx.library.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
 import com.lhx.library.R;
+import com.lhx.library.popupWindow.BasePopupWindow;
 import com.lhx.library.widget.AppBaseContainer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 基础dailog
@@ -24,6 +30,12 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
     //容器
     private AppBaseContainer mContainer;
 
+    //弹窗消失回调
+    private Set<OnDismissHandler> mOnDismissHandlers;
+
+    //是否是自己设置消失回调
+    private boolean mSetByThis;
+
     public AppBaseContainer getContainer() {
         return mContainer;
     }
@@ -31,14 +43,56 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
     public BaseDialog(@NonNull Context context) {
         super(context, R.style.Theme_dialog_noTitle_noBackground);
 
+        setCancelable(true);
+        setCanceledOnTouchOutside(true);
+
         mContext = context;
+        mSetByThis = true;
         setOnDismissListener(this);
+        mSetByThis = false;
         initialize();
     }
 
     @Override
     public void onDismiss(DialogInterface dialog) {
 
+        if(mOnDismissHandlers != null && mOnDismissHandlers.size() > 0){
+
+            for(OnDismissHandler onDismissHandler : mOnDismissHandlers){
+                onDismissHandler.onDismiss(this);
+            }
+        }
+    }
+
+    //添加弹窗消失回调
+    public void addOnDismissHandler(OnDismissHandler onDismissHandler){
+        if(onDismissHandler == null)
+            return;
+        if(mOnDismissHandlers == null){
+            mOnDismissHandlers = new HashSet<>();
+        }
+        mOnDismissHandlers.add(onDismissHandler);
+    }
+
+    //移除
+    public void removeOnDismissHandler(OnDismissHandler onDismissHandler){
+        if(onDismissHandler == null || mOnDismissHandlers == null)
+            return;
+        mOnDismissHandlers.remove(onDismissHandler);
+    }
+
+    @Override
+    public void setOnDismissListener(OnDismissListener onDismissListener) {
+        if(!mSetByThis){
+            try {
+                throw new IllegalAccessException("请使用addOnDismissHandler");
+            }catch (IllegalAccessException e){
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        super.setOnDismissListener(onDismissListener);
     }
 
     //初始化
@@ -61,11 +115,10 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         //设置弹窗大小
         Window window = getWindow();
         if(window != null){
+            window.setDimAmount(0.4f);
             onConfigure(window);
             onConfigure(window, (AppBaseContainer.LayoutParams)mContainer.getContentView().getLayoutParams());
 
-            setCancelable(true);
-            setCanceledOnTouchOutside(true);
 
             View view = window.getDecorView();
             if(view != null){
@@ -192,4 +245,11 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * 是否显示导航栏
      */
     public abstract boolean showNavigationBar();
+
+    //弹窗消失回调
+    public interface OnDismissHandler{
+
+        //弹窗消失
+        void onDismiss(DialogInterface dialog);
+    }
 }

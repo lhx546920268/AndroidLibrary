@@ -3,10 +3,9 @@
     
     <!--无标题无背景的弹窗-->
     <style name="Theme_dialog_noTitle_noBackground" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@color/dialog_background</item>
+        <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">false</item>
-        <item name="android:backgroundDimEnabled">false</item>
     </style>
     
     

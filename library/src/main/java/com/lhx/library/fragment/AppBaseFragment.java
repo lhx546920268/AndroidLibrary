@@ -156,7 +156,7 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     ///是否需要显示返回按钮
     protected boolean showBackItem(){
-        return mActivity != null && mActivity.isTaskRoot();
+        return mActivity != null && !mActivity.isTaskRoot();
     }
 
     ///获取内容视图
