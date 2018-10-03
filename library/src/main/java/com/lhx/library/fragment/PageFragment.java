@@ -39,7 +39,7 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     private BackToTopButton mBackToTopButton;
 
     //回到顶部按钮图标
-    private static @DrawableRes int mScrollToTopIconRes;
+    private @DrawableRes int mScrollToTopIconRes;
 
     //当前用来下拉刷新的视图
     private View mRefreshView;
@@ -100,7 +100,7 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         return false;
     }
 
-    public static void setScrollToTopIconRes(int scrollToTopIconRes) {
+    public void setScrollToTopIconRes(int scrollToTopIconRes) {
         if(mScrollToTopIconRes != scrollToTopIconRes){
             mScrollToTopIconRes = scrollToTopIconRes;
         }

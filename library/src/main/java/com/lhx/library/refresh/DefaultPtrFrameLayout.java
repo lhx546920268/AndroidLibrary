@@ -26,11 +26,11 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
     private View mHeader;
 
     //菊花
-    private ImageView mImageView;
+    protected ImageView mImageView;
     private LoadingDrawable mLoadingDrawable;
 
     //文本
-    private TextView mTextView;
+    protected TextView mTextView;
 
     private PtrFrameLayoutOnScrollHandler mPtrFrameLayoutOnScrollHandler;
 

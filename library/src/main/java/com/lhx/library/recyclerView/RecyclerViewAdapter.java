@@ -166,9 +166,15 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         return mLoadMoreEnable;
     }
 
+    //当没有数据时是否可以加载更多 默认不行
+    public boolean loadMoreEnableForData(int count) {
+        return count > 0;
+    }
+
     //是否是加载更多的UI
     protected boolean isLoadMoreItem(int position){
-        return mRealCount > 0 && position == mRealCount && loadMoreEnable() && getLoadMoreControl().shouldDisplay();
+        return loadMoreEnableForData(mRealCount) && position == mRealCount && loadMoreEnable() && getLoadMoreControl()
+                .shouldDisplay();
     }
 
     //是否正在加载更多

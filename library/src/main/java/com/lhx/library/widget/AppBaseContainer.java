@@ -260,9 +260,6 @@ public class AppBaseContainer extends RelativeLayout {
         if(mPageLoading != pageLoading){
             mPageLoading = pageLoading;
 
-            if(mPageLoadFail){
-                setPageLoadFail(false);
-            }
             if(mPageLoading){
                 if(App.pageLoadingViewClass != null){
                     try {
@@ -305,6 +302,8 @@ public class AppBaseContainer extends RelativeLayout {
                 }
 
                 addView(mPageLoadingView);
+
+                setPageLoadFail(false);
             }else if(mPageLoadingView != null){
                 removeView(mPageLoadingView);
                 mPageLoadingView = null;
@@ -331,8 +330,6 @@ public class AppBaseContainer extends RelativeLayout {
         if (mPageLoadFail != pageLoadFail) {
             mPageLoadFail = pageLoadFail;
 
-            setLoading(false, 0, null);
-            setPageLoading(false);
             if (mPageLoadFail) {
                 mPageLoadFailView = LayoutInflater.from(mContext).inflate(R.layout.common_page_load_fail,
                         this, false);
@@ -384,6 +381,9 @@ public class AppBaseContainer extends RelativeLayout {
                 }
 
                 addView(mPageLoadFailView);
+
+                setLoading(false, 0, null);
+                setPageLoading(false);
 
             } else if (mPageLoadFailView != null) {
                 removeView(mPageLoadFailView);

@@ -3,6 +3,7 @@ package com.lhx.library.fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.LayoutRes;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -66,10 +67,22 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         return mAgentWeb;
     }
 
+    //返回自定义的 layout res
+    public @LayoutRes
+    int getContentRes(){
+        return 0;
+    }
+
     @Override
     @CallSuper
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
-        setContentView(R.layout.web_fragment);
+
+        int res = getContentRes();
+        if(res != 0){
+            setContentView(res);
+        }else {
+            setContentView(R.layout.web_fragment);
+        }
 
         mShouldUseWebTitle = getExtraBooleanFromBundle(WEB_USE_WEB_TITLE, true);
         mShouldDisplayProgress = getExtraBooleanFromBundle(WEB_DISPLAY_PROGRESS, true);
@@ -114,7 +127,7 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
         willCreateAgentWeb();
 
         AgentWeb.IndicatorBuilderForFragment indicatorBuilder = AgentWeb.with(this)//
-                .setAgentWebParent((ViewGroup) getContentView(), new FrameLayout.LayoutParams(ViewGroup.LayoutParams
+                .setAgentWebParent(getWebContainer(), new ViewGroup.LayoutParams(ViewGroup.LayoutParams
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         AgentWeb.CommonBuilderForFragment builder;
@@ -310,5 +323,10 @@ public class WebFragment extends AppBaseFragment implements ChromeClientCallback
     //获取自定义的webView
     public WebView getWebView() {
         return null;
+    }
+
+    //获取webView容器
+    public ViewGroup getWebContainer(){
+        return (ViewGroup)getContentView();
     }
 }

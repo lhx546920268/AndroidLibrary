@@ -23,7 +23,6 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     //需要移动到的位置
     private int mTargetPosition = -1;
 
-
     //是否要自动轮播
     private boolean mShouldAutoPlay = false;
 
@@ -31,7 +30,10 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     private int mAutoPlayInterval = 5000;
 
     //自动轮播计时器
-    CountDownTimer mCountDownTimer;
+    private CountDownTimer mCountDownTimer;
+
+    //是否需要循环
+    private boolean mShouldCycle = true;
 
     public CyclePagerAdapter(ViewPager viewPager) {
         super(viewPager);
@@ -58,12 +60,16 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
 
     @Override
     public void onPageSelected(int position) {
-        if(mRealCount > 1){
-            if(position == 0){
-                mTargetPosition = mRealCount;
-            }else if(position == mRealCount + 1){
-                mTargetPosition = 1;
+        if(mShouldCycle){
+            if(mRealCount > 1){
+                if(position == 0){
+                    mTargetPosition = mRealCount;
+                }else if(position == mRealCount + 1){
+                    mTargetPosition = 1;
+                }
             }
+        }else {
+            mTargetPosition = position;
         }
     }
 
@@ -89,7 +95,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
         mRealCount = getRealCount();
 
         //当只有一个view时，不需要循环
-        return mRealCount > 1 ? mRealCount + 2 : mRealCount;
+        return mRealCount > 1 && mShouldCycle ? mRealCount + 2 : mRealCount;
     }
 
     //移动到第一个位置
@@ -97,7 +103,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     protected void scrollToFirstPosition() {
 
         if(mRealCount > 1){
-            mViewPager.setCurrentItem(1, false);
+            mViewPager.setCurrentItem(mShouldCycle ? 1 : 0, false);
             mTargetPosition = -1;
             startAutoPlayTimer();
         }
@@ -106,7 +112,11 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     //移动到某个位置
     public void scrollToPosition(int position, boolean smooth){
         if(mRealCount > 1 && position >= 0 && position < mRealCount){
-            mViewPager.setCurrentItem(position + 1, smooth);
+            if(mShouldCycle){
+                mViewPager.setCurrentItem(position + 1, smooth);
+            }else {
+                mViewPager.setCurrentItem(position, smooth);
+            }
         }
     }
 
@@ -118,7 +128,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
      */
     @Override
     public int getRealPosition(int position) {
-        if(mRealCount <= 1){
+        if(mRealCount <= 1 || !mShouldCycle){
             return position;
         }else {
             if(position == 0){
@@ -136,8 +146,8 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
      * @param position 数据源位置
      * @return 布局位置
      */
-    public int getAdatperPosition(int position){
-        if(mRealCount <= 1){
+    public int getAdapterPosition(int position){
+        if(mRealCount <= 1 || !mShouldCycle){
             return position;
         }else {
             return position + 1;
@@ -163,6 +173,13 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
             }else {
                 stopAutoPlayTimer();
             }
+        }
+    }
+
+    public void setShouldCycle(boolean shouldCycle) {
+        if(mShouldCycle != shouldCycle){
+            mShouldCycle = shouldCycle;
+            notifyDataSetChanged();
         }
     }
 
