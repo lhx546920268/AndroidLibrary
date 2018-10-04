@@ -179,11 +179,19 @@ public class PopoverLayout extends FrameLayout {
         }
     }
 
+    public int getArrowDirection() {
+        return mArrowDirection;
+    }
+
     public void setArrowOffset(int arrowOffset) {
         if(mArrowOffset != arrowOffset){
             mArrowOffset = arrowOffset;
             postInvalidate();
         }
+    }
+
+    public int getArrowOffset() {
+        return mArrowOffset;
     }
 
     @Override

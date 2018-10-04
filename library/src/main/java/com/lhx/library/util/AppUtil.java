@@ -260,24 +260,25 @@ public class AppUtil {
         context.startActivity(intent);
     }
 
-    public static boolean setStatusBarStyle(Activity activity, @ColorInt int backgroundColor, boolean isLight){
-        return AppUtil.setStatusBarStyle(activity, backgroundColor, isLight, backgroundColor == 0);
+    public static boolean setStatusBarStyle(Window window, @ColorInt int backgroundColor, boolean isLight){
+        return AppUtil.setStatusBarStyle(window, backgroundColor, isLight, backgroundColor == 0);
     }
 
     /**
      * 设置状态栏样式
-     * @param activity 对应activity
+     * @param window 对应window
      * @param backgroundColor 背景颜色 0不改变并且全屏
      * @param isLight 内容是否是浅色(白色）
      * @param overlay 状态栏是否是否覆盖在布局上面
      * @return 是否成功
      */
-    public static boolean setStatusBarStyle(Activity activity, @ColorInt int backgroundColor, boolean isLight,
+    public static boolean setStatusBarStyle(Window window, @ColorInt int backgroundColor, boolean isLight,
                                             boolean overlay){
 
+        if(window == null)
+            return false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            Window window = activity.getWindow();
             if(backgroundColor != 0){
                 window.setStatusBarColor(backgroundColor);
             }
@@ -308,9 +309,11 @@ public class AppUtil {
         return false;
     }
 
-    public static boolean setStatusBarTranslucent(Activity activity, boolean translucent){
+    public static boolean setStatusBarTranslucent(Window window, boolean translucent){
 
-        Window window = activity.getWindow();
+        if(window == null)
+            return false;
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
 
             View decorView = window.getDecorView();
@@ -318,7 +321,7 @@ public class AppUtil {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 //android6.0以后可以对状态栏文字颜色和图标进行修改
-                if(!activity.getResources().getBoolean(R.bool.status_bar_is_light)){
+                if(!window.getContext().getResources().getBoolean(R.bool.status_bar_is_light)){
                     flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
                 }
             }
@@ -328,7 +331,8 @@ public class AppUtil {
                 flags = flags | View.SYSTEM_UI_FLAG_VISIBLE;
             }
             decorView.setSystemUiVisibility(flags);
-            window.setStatusBarColor(translucent ? Color.TRANSPARENT : ContextCompat.getColor(activity, R.color.status_bar_background_color));
+            window.setStatusBarColor(translucent ? Color.TRANSPARENT : ContextCompat.getColor(window.getContext(), R.color
+                    .status_bar_background_color));
 
             return true;
         }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){

@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.loading.LoadingView;
+import com.lhx.library.util.SizeUtil;
 
 /**
  * 加载中弹窗
@@ -65,7 +66,7 @@ public class LoadingDialog extends Dialog {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
             layoutParams.gravity = Gravity.CENTER;
             layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = SizeUtil.getWindowHeight(getContext());
             window.setAttributes(layoutParams);
         }
     }

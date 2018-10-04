@@ -22,77 +22,20 @@ import java.util.Set;
  * 基础dailog
  */
 
-public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEventHandler,
-        DialogInterface.OnDismissListener{
-
-    protected Context mContext;
+public abstract class BaseDialog extends SeaDialog implements AppBaseContainer.OnEventHandler{
 
     //容器
     private AppBaseContainer mContainer;
 
-    //弹窗消失回调
-    private Set<OnDismissHandler> mOnDismissHandlers;
-
-    //是否是自己设置消失回调
-    private boolean mSetByThis;
 
     public AppBaseContainer getContainer() {
         return mContainer;
     }
 
     public BaseDialog(@NonNull Context context) {
-        super(context, R.style.Theme_dialog_noTitle_noBackground);
+        super(context);
 
-        setCancelable(true);
-        setCanceledOnTouchOutside(true);
-
-        mContext = context;
-        mSetByThis = true;
-        setOnDismissListener(this);
-        mSetByThis = false;
         initialize();
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-
-        if(mOnDismissHandlers != null && mOnDismissHandlers.size() > 0){
-
-            for(OnDismissHandler onDismissHandler : mOnDismissHandlers){
-                onDismissHandler.onDismiss(this);
-            }
-        }
-    }
-
-    //添加弹窗消失回调
-    public void addOnDismissHandler(OnDismissHandler onDismissHandler){
-        if(onDismissHandler == null)
-            return;
-        if(mOnDismissHandlers == null){
-            mOnDismissHandlers = new HashSet<>();
-        }
-        mOnDismissHandlers.add(onDismissHandler);
-    }
-
-    //移除
-    public void removeOnDismissHandler(OnDismissHandler onDismissHandler){
-        if(onDismissHandler == null || mOnDismissHandlers == null)
-            return;
-        mOnDismissHandlers.remove(onDismissHandler);
-    }
-
-    @Override
-    public void setOnDismissListener(OnDismissListener onDismissListener) {
-        if(!mSetByThis){
-            try {
-                throw new IllegalAccessException("请使用addOnDismissHandler");
-            }catch (IllegalAccessException e){
-                e.printStackTrace();
-            }
-            return;
-        }
-
-        super.setOnDismissListener(onDismissListener);
     }
 
     //初始化
@@ -115,15 +58,8 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
         //设置弹窗大小
         Window window = getWindow();
         if(window != null){
-            window.setDimAmount(0.4f);
             onConfigure(window);
             onConfigure(window, (AppBaseContainer.LayoutParams)mContainer.getContentView().getLayoutParams());
-
-
-            View view = window.getDecorView();
-            if(view != null){
-                view.setPadding(0, 0, 0 , 0);
-            }
         }
     }
 
@@ -245,11 +181,4 @@ public abstract class BaseDialog extends Dialog implements AppBaseContainer.OnEv
      * 是否显示导航栏
      */
     public abstract boolean showNavigationBar();
-
-    //弹窗消失回调
-    public interface OnDismissHandler{
-
-        //弹窗消失
-        void onDismiss(DialogInterface dialog);
-    }
 }

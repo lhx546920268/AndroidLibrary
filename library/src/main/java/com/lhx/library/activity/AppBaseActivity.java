@@ -122,7 +122,7 @@ public class AppBaseActivity extends AppCompatActivity {
 //        Log.d("AppBaseActivity", "onCreate");
         super.onCreate(savedInstanceState);
 
-        AppUtil.setStatusBarStyle(this, ContextCompat.getColor(this, R.color.status_bar_background_color),
+        AppUtil.setStatusBarStyle(getWindow(), ContextCompat.getColor(this, R.color.status_bar_background_color),
                 getResources().getBoolean(R.bool.status_bar_is_light));
 
         int layoutRes = getContentViewRes();

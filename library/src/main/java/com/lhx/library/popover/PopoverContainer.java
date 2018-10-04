@@ -19,16 +19,13 @@ import com.lhx.library.util.ViewUtil;
 import com.lhx.library.widget.OnSingleClickListener;
 
 //弹窗容器
-public class PopoverContainer extends FrameLayout {
+public class PopoverContainer extends ViewGroup {
 
     //当前视图在屏幕中位置
     private int[] mLocations = new int[2];
 
     //气泡
     private PopoverLayout mPopoverLayout;
-
-    //是否自动计算箭头方向
-    private boolean mAutoDetectArrowDirection = true;
 
     //遮罩
     private View mOverlayView;
@@ -45,6 +42,9 @@ public class PopoverContainer extends FrameLayout {
 
     //回调
     private PopoverHandler mPopoverHandler;
+
+    //是否要执行动画
+    private boolean mShouldExecuteAnimate = true;
 
     public PopoverContainer(@NonNull Context context) {
         this(context, null);
@@ -68,8 +68,7 @@ public class PopoverContainer extends FrameLayout {
         addView(mOverlayView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         mPopoverLayout = new PopoverLayout(context);
-        addView(mPopoverLayout, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams
-                .WRAP_CONTENT));
+        addView(mPopoverLayout, new LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public PopoverLayout getPopoverLayout() {
@@ -96,17 +95,7 @@ public class PopoverContainer extends FrameLayout {
         mPaddingTop = top;
         mPaddingBottom = bottom;
 
-        LayoutParams params = (LayoutParams)mPopoverLayout.getLayoutParams();
-        params.leftMargin = left;
-        params.rightMargin = right;
-        params.bottomMargin = bottom;
-        params.topMargin = top;
-
         super.setPadding(0, 0, 0, 0);
-    }
-
-    public void setAutoDetectArrowDirection(boolean autoDetectArrowDirection) {
-        mAutoDetectArrowDirection = autoDetectArrowDirection;
     }
 
     //显示
@@ -155,96 +144,182 @@ public class PopoverContainer extends FrameLayout {
 
     //获取动画x
     private float getCurrentPivotX(){
-        if(mClickedView != null){
 
-            return mClickedLocations[0] - mLocations[0] + mClickedView.getWidth() / 2 - mPaddingLeft;
+        if(mClickedView != null){
+            return mPopoverLayout.getArrowOffset();
         }else {
             return mPopoverLayout.getMeasuredWidth() / 2;
         }
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        if(mAutoDetectArrowDirection){
-            mAutoDetectArrowDirection = false;
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
 
-            getLocationOnScreen(mLocations);
-            if(mClickedView != null){
-                LayoutParams params = (LayoutParams)mPopoverLayout.getLayoutParams();
-                params.leftMargin = mPaddingLeft;
-                params.rightMargin = mPaddingRight;
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-                int x1 = mClickedLocations[0];
-                int y1 = mClickedLocations[1];
-                int x2 = mLocations[0];
-                int y2 = mLocations[1];
+        //测量子视图大小
+        mOverlayView.measure(widthMeasureSpec, heightMeasureSpec);
 
-                if(y1 > y2){
-                    //点击视图在范围内
-                    if(y1 < y2 + getMeasuredHeight()){
+        LayoutParams params = mPopoverLayout.getLayoutParams();
+        int childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
+                mPaddingLeft + mPaddingRight, params.width);
+        int childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
+                mPaddingTop + mPaddingBottom, params.height);
+        mPopoverLayout.measure(childWidthMeasureSpec, childHeightMeasureSpec);
 
-                        if(y1 - y2 + mClickedView.getHeight() + mPopoverLayout.getMeasuredHeight() <
-                                getMeasuredHeight()){
-                            mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_BOTTOM);
-                            params.gravity = Gravity.BOTTOM;
-                            params.bottomMargin = getMeasuredHeight() - mClickedView.getHeight() - y1 + y2 + mPaddingBottom;
-                        }else {
-                            mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_TOP);
-                            params.gravity = Gravity.TOP;
-                            params.topMargin = y1 - y2 + mClickedView.getHeight() + mPaddingTop;
-                        }
-                    }else{
-                        //点击视图在弹窗底部
-                        params.gravity = Gravity.BOTTOM;
-                        params.bottomMargin = mPaddingBottom;
+        int width = 0;
+        int height = 0;
+
+        switch (widthMode){
+            case MeasureSpec.EXACTLY : {
+                width = widthSize;
+            }
+            break;
+            case MeasureSpec.AT_MOST : {
+                width = Math.min(widthSize, mPopoverLayout.getMeasuredWidth());
+            }
+            break;
+            case MeasureSpec.UNSPECIFIED : {
+                width = mPopoverLayout.getMeasuredWidth();
+            }
+            break;
+            default :
+                width = widthSize;
+                break;
+        }
+
+        switch (heightMode){
+            case MeasureSpec.EXACTLY : {
+                height = heightSize;
+            }
+            break;
+            case MeasureSpec.AT_MOST : {
+                height = Math.min(heightSize, mPopoverLayout.getMeasuredHeight());
+            }
+            break;
+            case MeasureSpec.UNSPECIFIED : {
+                height = mPopoverLayout.getMeasuredHeight();
+            }
+            break;
+            default :
+                height = heightSize;
+                break;
+        }
+
+        setMeasuredDimension(width, height);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+
+        int width = right - left;
+        int height = bottom - top;
+        mOverlayView.layout(0, 0, width, height);
+
+        int pLeft = mPaddingLeft;
+        int pTop = mPaddingTop;
+        int pRight = pLeft + mPopoverLayout.getMeasuredWidth();
+        int pBottom = pTop + mPopoverLayout.getMeasuredHeight();
+
+        getLocationOnScreen(mLocations);
+
+        if(mClickedView != null){
+
+            int x1 = mClickedLocations[0];
+            int y1 = mClickedLocations[1];
+            int x2 = mLocations[0];
+            int y2 = mLocations[1];
+
+            //中心点位置
+            int centerX = x1 - x2 + mClickedView.getWidth() / 2;
+
+            pLeft = mPaddingLeft + centerX - mPopoverLayout.getMeasuredWidth() / 2;
+            if(pLeft + mPopoverLayout.getMeasuredWidth() > width){
+                pLeft = width - mPopoverLayout.getMeasuredWidth() - mPaddingRight;
+            }
+
+
+            mPopoverLayout.setArrowOffset(centerX - pLeft);
+            pRight = pLeft + mPopoverLayout.getMeasuredWidth();
+
+            if(y1 > y2){
+                //点击视图在范围内
+                if(y1 < y2 + getMeasuredHeight()){
+
+                    if(y1 - y2 + mClickedView.getHeight() + mPopoverLayout.getMeasuredHeight() <
+                            getMeasuredHeight()){
+                        mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_TOP);
+                        pTop = y1 - y2 + mClickedView.getHeight() + mPaddingTop;
+                        pBottom = pTop + mPopoverLayout.getMeasuredHeight();
+
+                    }else {
+                        pBottom = y1 - y2 - mPaddingBottom;
+                        pTop = pBottom - mPopoverLayout.getMeasuredHeight();
+                        mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_BOTTOM);
                     }
-
                 }else{
-                    //点击视图在弹窗上面
-                    params.gravity = Gravity.TOP;
-                    params.topMargin = mPaddingTop;
+                    //点击视图在弹窗底部
+                    mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_BOTTOM);
+                    pBottom = getMeasuredHeight() - mPaddingBottom;
+                    pTop = pBottom - mPopoverLayout.getMeasuredHeight();
                 }
 
-                mPopoverLayout.setArrowOffset(x1 - x2 + mClickedView.getWidth() / 2 - mPaddingLeft);
+            }else{
+                //点击视图在弹窗上面
+                mPopoverLayout.setArrowDirection(PopoverLayout.ARROW_DIRECTION_TOP);
+                pTop = mPaddingTop;
+                pBottom = pTop + mPopoverLayout.getMeasuredHeight();
             }
         }
 
-        if(mShouldAnimate){
-            mShouldAnimate = false;
-            ScaleAnimation animation = new ScaleAnimation(0, 1.0f, 0, 1.0f, getCurrentPivotX(),
-                    0);
-            animation.setDuration(250);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+        mPopoverLayout.layout(pLeft, pTop, pRight, pBottom);
+        executeAnimate();
 
-                }
+    }
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if(mPopoverHandler != null){
-                        mPopoverHandler.onPopoverShow();
+    //执行动画
+    private void executeAnimate(){
+        if(mShouldExecuteAnimate){
+            mShouldExecuteAnimate = false;
+            if(mShouldAnimate){
+                ScaleAnimation animation = new ScaleAnimation(0, 1.0f, 0, 1.0f, getCurrentPivotX(),
+                        0);
+                animation.setDuration(250);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
                     }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        if(mPopoverHandler != null){
+                            mPopoverHandler.onPopoverShow();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                mPopoverLayout.startAnimation(animation);
+
+                AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1.0f);
+                alphaAnimation.setDuration(250);
+                mOverlayView.startAnimation(alphaAnimation);
+            }else {
+                if(mPopoverHandler != null){
+                    mPopoverHandler.onPopoverShow();
                 }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            mPopoverLayout.startAnimation(animation);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1.0f);
-            alphaAnimation.setDuration(250);
-            mOverlayView.startAnimation(alphaAnimation);
-        }else {
-            if(mPopoverHandler != null){
-                mPopoverHandler.onPopoverShow();
             }
         }
     }
+
 
     //回调
     public interface PopoverHandler{
