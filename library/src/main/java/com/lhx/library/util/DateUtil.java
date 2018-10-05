@@ -172,6 +172,20 @@ public class DateUtil {
     }
 
     /**
+     * 格式化秒
+     * @param seconds 要格式化的秒
+     * @return 00:00:00
+     */
+    public static String formatSeconds(int seconds){
+        int result = seconds / 60;
+        int second = seconds % 60;
+        int minute = result % 60;
+        int hour = result / 60;
+
+        return String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
+    }
+
+    /**
      * 获取符合java的时间戳
      * @param timestamp 时间戳
      * @return 13位时间戳
