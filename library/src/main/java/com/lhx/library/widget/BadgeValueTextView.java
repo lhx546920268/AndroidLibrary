@@ -11,6 +11,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.TextView;
 
 import com.lhx.library.R;
@@ -49,6 +50,8 @@ public class BadgeValueTextView extends AppCompatTextView {
             mFillColor = array.getColor(R.styleable.BadgeValueTextView_fill_color, Color.RED);
             array.recycle();
         }
+
+        setGravity(Gravity.CENTER);
 
         mDrawable = new CornerBorderDrawable();
         mDrawable.setBackgroundColor(mFillColor);
