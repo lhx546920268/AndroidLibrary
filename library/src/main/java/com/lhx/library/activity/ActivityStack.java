@@ -1,5 +1,6 @@
 package com.lhx.library.activity;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -112,6 +113,15 @@ public class ActivityStack {
                 }
                 activity.finish();
             }
+        }
+    }
+
+    /**
+     * 销毁所有activity
+     */
+    public static void finishAllActivities(){
+        for(Activity activity : activities){
+            activity.finish();
         }
     }
 }
