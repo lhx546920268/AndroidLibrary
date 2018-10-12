@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.AnimRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -32,6 +33,7 @@ import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.AppBaseContainer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -502,6 +504,20 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     }
 
     ///获取bundle内容
+    public <T extends Parcelable> ArrayList<T> getExtraParcelableArrayListFromBundle(String key){
+
+        Bundle nBundle = getBundle();
+        if(nBundle == null) return null;
+        return nBundle.getParcelableArrayList(key);
+    }
+
+    public <T extends Parcelable> T getExtraParcelableFromBundle(String key){
+
+        Bundle nBundle = getBundle();
+        if(nBundle == null) return null;
+        return nBundle.getParcelable(key);
+    }
+
     public String getExtraStringFromBundle(String key){
 
         Bundle nBundle = getBundle();

@@ -91,6 +91,20 @@ public class DateUtil {
     }
 
     /**
+     * 获取时间戳
+     * @param time 时间字符串
+     * @param format 时间格式
+     * @return 时间戳
+     */
+    public static long timestampFromTime(String time, String format){
+        Date date = parseTime(time, format);
+        if(date != null){
+            return date.getTime();
+        }
+        return 0;
+    }
+
+    /**
      * 获取当前时间
      * @param format 时间格式
      */

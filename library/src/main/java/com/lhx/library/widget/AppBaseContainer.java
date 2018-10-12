@@ -302,6 +302,10 @@ public class AppBaseContainer extends RelativeLayout {
                 }
 
                 addView(mPageLoadingView);
+                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) !=
+                        OVERLAY_AREA_EMPTY_BOTTOM) {
+                    mBottomView.bringToFront();
+                }
 
                 setPageLoadFail(false);
             }else if(mPageLoadingView != null){
@@ -384,6 +388,10 @@ public class AppBaseContainer extends RelativeLayout {
 
                 setLoading(false, 0, null);
                 setPageLoading(false);
+                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) !=
+                        OVERLAY_AREA_EMPTY_BOTTOM) {
+                    mBottomView.bringToFront();
+                }
 
             } else if (mPageLoadFailView != null) {
                 removeView(mPageLoadFailView);
@@ -518,6 +526,11 @@ public class AppBaseContainer extends RelativeLayout {
             }
 
             addView(mEmptyView);
+
+            if(mBottomView != null && (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) !=
+                    OVERLAY_AREA_EMPTY_BOTTOM){
+                mBottomView.bringToFront();
+            }
         }else {
             if(mEmptyView != null){
                 removeView(mEmptyView);

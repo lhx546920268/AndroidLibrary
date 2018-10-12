@@ -23,7 +23,7 @@
         <attr name="isFull" format="boolean"/>
     </declare-styleable>
 
-    <!--角标填充也是-->
+    <!--气泡-->
     <declare-styleable name="PopoverLayout">
         <attr name="popover_color" format="color"/>
         <attr name="corner_radius" format="dimension"/>
@@ -38,4 +38,20 @@
         </attr>
     </declare-styleable>
 
+    <!--虚线-->
+    <declare-styleable name="DashView">
+        <attr name="orientation" format="enum">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+        <attr name="dash_length" format="dimension"/>
+        <attr name="dash_interval" format="dimension"/>
+        <attr name="dash_color" format="color"/>
+        <attr name="dash_stroke_width" format="dimension"/>
+        <attr name="rect_corner_radius" format="dimension"/>
+        <attr name="shape" format="enum">
+            <enum name="line" value="0"/>
+            <enum name="rect" value="1"/>
+        </attr>
+    </declare-styleable>
 </resources>
