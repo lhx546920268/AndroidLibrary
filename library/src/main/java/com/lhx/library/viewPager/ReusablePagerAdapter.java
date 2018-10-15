@@ -62,7 +62,8 @@ public abstract class ReusablePagerAdapter extends PagerAdapter implements ViewP
     }
 
     @Override
-    public final Object instantiateItem(ViewGroup container, int position) {
+    @NonNull
+    public final Object instantiateItem(@NonNull ViewGroup container, int position) {
 
         int type = getViewType(position);
 

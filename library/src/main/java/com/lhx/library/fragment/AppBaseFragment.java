@@ -207,21 +207,31 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
         backTo(fragmentClass.getName());
     }
 
-    public void backToFragment(@NonNull Class<? extends AppBaseFragment> fragmentClass, int resultCode){
-        backTo(fragmentClass.getName(), resultCode);
+    public void backTo(@NonNull Class<? extends AppBaseFragment> fragmentClass, boolean include){
+        backToFragment(fragmentClass, include, Integer.MAX_VALUE);
+    }
+
+    public void backToFragment(@NonNull Class<? extends AppBaseFragment> fragmentClass, boolean include, int
+            resultCode){
+        backTo(fragmentClass.getName(), include, resultCode);
     }
 
     public void backTo(@NonNull String toName){
-        backTo(toName, Integer.MAX_VALUE);
+        backTo(toName, false, Integer.MAX_VALUE);
+    }
+
+    public void backTo(@NonNull String toName, boolean include){
+        backTo(toName, include, Integer.MAX_VALUE);
     }
 
     /**
      * 返回某个指定的 fragment
      * @param toName 对应的fragment类名 或者 activity类名 {@link AppBaseActivity#mName}
+     * @param include 是否包含toName
      * @param resultCode {@link android.app.Activity#setResult(int)}
      */
-    public void backTo(@NonNull String toName, int resultCode){
-        ActivityStack.finishActivities(toName, resultCode);
+    public void backTo(@NonNull String toName, boolean include, int resultCode){
+        ActivityStack.finishActivities(toName, include, resultCode);
     }
 
     /**

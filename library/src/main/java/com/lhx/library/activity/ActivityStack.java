@@ -73,20 +73,26 @@ public class ActivityStack {
         }
     }
 
-    /**
-     * 关闭多个activity
-     * @param toName 在这个activity名称之后的都关闭，不包括这个
-     */
     public static void finishActivities(@NonNull String toName){
         finishActivities(toName, Integer.MAX_VALUE);
     }
 
+    public static void finishActivities(@NonNull String toName, int resultCode){
+        finishActivities(toName, false, resultCode);
+    }
+
+    public static void finishActivities(@NonNull String toName, boolean include){
+        finishActivities(toName, include, Integer.MAX_VALUE);
+    }
+
     /**
      * 关闭多个activity
-     * @param toName 在这个activity名称之后的都关闭，不包括这个
+     * @param toName 在这个activity名称之后的都关闭
+     * @param include 是否包含toName
      * @param resultCode {@link android.app.Activity#setResult(int)}
      */
-    public static void finishActivities(@NonNull String toName, int resultCode){
+    public static void finishActivities(@NonNull String toName, boolean include, int resultCode){
+
         int index = -1;
         for(int i = activities.size() - 1;i >= 0;i --){
             AppBaseActivity activity = activities.get(i);
@@ -96,16 +102,20 @@ public class ActivityStack {
             }
         }
 
-        if(index != -1 && index != activities.size() - 1){
+        if(index != -1){
 
             //要关闭的activity
             Set<AppBaseActivity> closeActivities = new HashSet<>();
+            if(!include){
+                index ++;
+            }
 
-            for(int i = index + 1;i < activities.size();i ++){
+            for(int i = index;i < activities.size();i ++){
                 closeActivities.add(activities.get(i));
             }
 
             Iterator<AppBaseActivity> iterator = closeActivities.iterator();
+
             while (iterator.hasNext()){
                 AppBaseActivity activity = iterator.next();
                 if(resultCode != Integer.MAX_VALUE){
