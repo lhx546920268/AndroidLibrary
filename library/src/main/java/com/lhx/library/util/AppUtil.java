@@ -255,9 +255,7 @@ public class AppUtil {
 
     //打开app设置详情
     public static void openAppSettings(Context context){
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.fromParts("package", context.getPackageName(), null));
-        context.startActivity(intent);
+        PermissionSettingsPage.start(context, false);
     }
 
     public static boolean setStatusBarStyle(Window window, @ColorInt int backgroundColor, boolean isLight){
