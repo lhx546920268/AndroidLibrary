@@ -37,8 +37,18 @@ public class ViewUtil {
         if(view != null){
             ViewGroup.LayoutParams params = view.getLayoutParams();
             if(params != null){
-                params.width = SizeUtil.pxFormDip(width, view.getContext());
-                params.height = SizeUtil.pxFormDip(height, view.getContext());
+                if(width != ViewGroup.LayoutParams.WRAP_CONTENT && width != ViewGroup.LayoutParams.MATCH_PARENT){
+                    params.width = SizeUtil.pxFormDip(width, view.getContext());
+                }else {
+                    params.width = (int)width;
+                }
+
+                if(height != ViewGroup.LayoutParams.WRAP_CONTENT && height != ViewGroup.LayoutParams.MATCH_PARENT){
+                    params.height = SizeUtil.pxFormDip(height, view.getContext());
+                }else {
+                    params.height = (int)height;
+                }
+
                 view.setLayoutParams(params);
             }
         }

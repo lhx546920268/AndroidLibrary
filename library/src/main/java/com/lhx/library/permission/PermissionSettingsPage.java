@@ -1,4 +1,4 @@
-package com.lhx.library.util;
+package com.lhx.library.permission;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,7 +19,7 @@ public class PermissionSettingsPage {
      * @param context 上下文对象
      * @param newTask 是否使用新的任务栈启动
      */
-    static void start(Context context, boolean newTask) {
+    public static void start(Context context, boolean newTask) {
 
         Intent intent = null;
         if (MARK.contains("huawei")) {

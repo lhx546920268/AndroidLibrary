@@ -29,8 +29,10 @@ import com.lhx.library.util.SizeUtil;
 import java.io.Serializable;
 import java.util.List;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
 @SuppressWarnings("unchecked")
-public class AppBaseActivity extends AppCompatActivity {
+public class AppBaseActivity extends AppCompatActivity{
 
     //activity里面fragment的类名
     public static final String FRAGMENT_STRING = "fragmentString";
@@ -53,6 +55,9 @@ public class AppBaseActivity extends AppCompatActivity {
     //是否可见
     private boolean mVisible;
 
+    //权限回调
+    private EasyPermissions.PermissionCallbacks mPermissionCallbacks;
+
     public String getName() {
         return mName;
     }
@@ -63,6 +68,10 @@ public class AppBaseActivity extends AppCompatActivity {
 
     public boolean isVisible() {
         return mVisible;
+    }
+
+    public void setPermissionCallbacks(EasyPermissions.PermissionCallbacks permissionCallbacks) {
+        mPermissionCallbacks = permissionCallbacks;
     }
 
     //    @Override
@@ -300,8 +309,14 @@ public class AppBaseActivity extends AppCompatActivity {
         if (mFragment != null) {
             mFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+
+        if(mPermissionCallbacks != null){
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, mPermissionCallbacks);
+        }
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

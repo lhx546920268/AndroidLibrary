@@ -1,6 +1,6 @@
 package com.lhx.library.util;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -9,10 +9,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.Settings;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,9 +21,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.lhx.library.R;
+import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.dialog.AlertController;
+import com.lhx.library.permission.PermissionSettingsPage;
 
+import java.util.List;
 import java.util.Locale;
+
+import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * app有关的工具类
@@ -126,20 +132,11 @@ public class AppUtil {
                 @Override
                 public void onItemClick(AlertController controller, int index) {
                     if(index < phones.length){
-                        String nPhone = phones[index];
-                        if (nPhone.contains("-")) {
-                            nPhone = nPhone.replaceAll("-", "");
-                        }
-                        try{
-                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                        }catch (SecurityException e){
-
-                        }
+                        requestPhoneCall(context, phones[index]);
                     }
                 }
             });
+            controller.show();
         }else {
             final String phone = phones[0];
             AlertController controller = AlertController.buildAlert(context, "是否拨打 " + phone, "取消", "拨打");
@@ -147,21 +144,56 @@ public class AppUtil {
                 @Override
                 public void onItemClick(AlertController controller, int index) {
                     if(index == 1){
-                        String nPhone = phone;
-                        if (nPhone.contains("-")) {
-                            nPhone = nPhone.replaceAll("-", "");
-                        }
-                        try{
-                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                        }catch (SecurityException e){
-
-                        }
+                        requestPhoneCall(context, phone);
                     }
                 }
             });
             controller.show();
+        }
+    }
+
+    //拨打电话 会请求权限
+    private static void requestPhoneCall(final Context context, final String mobile){
+        if(EasyPermissions.hasPermissions(context, Manifest.permission.CALL_PHONE)){
+            makeSafePhoneCall(context, mobile);
+        }else {
+            if(context instanceof AppBaseActivity){
+                final AppBaseActivity activity = (AppBaseActivity)context;
+                activity.setPermissionCallbacks(new EasyPermissions.PermissionCallbacks() {
+                    @Override
+                    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+                        activity.setPermissionCallbacks(null);
+                        makeSafePhoneCall(context, mobile);
+                    }
+
+                    @Override
+                    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+                        activity.setPermissionCallbacks(null);
+                    }
+
+                    @Override
+                    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                                           @NonNull int[] grantResults) {
+
+                    }
+                });
+                EasyPermissions.requestPermissions(activity, "", 20101, Manifest.permission.CALL_PHONE);
+            }
+        }
+    }
+
+    //安全的拨打电话
+    private static void makeSafePhoneCall(Context context, String mobile){
+        String nPhone = mobile;
+        if (nPhone.contains("-")) {
+            nPhone = nPhone.replaceAll("-", "");
+        }
+        try{
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + nPhone));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }catch (SecurityException e){
+
         }
     }
 

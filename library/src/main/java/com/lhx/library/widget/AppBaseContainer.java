@@ -490,7 +490,11 @@ public class AppBaseContainer extends RelativeLayout {
     public void setShowEmptyView(boolean show, View emptyView){
 
         if(show && emptyView != null){
+            if(mEmptyView != null){
+                removeView(mEmptyView);
+            }
             mEmptyView = emptyView;
+            mEmptyView.setClickable(true);
 
             if(isPageLoading()){
                 setPageLoading(false);
