@@ -4,4 +4,13 @@
               android:layout_height="match_parent">
 
     <!--浏览器-->
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/web_view"/>
+    
+    <com.lhx.library.progress.ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/web_progress_height_dp"
+        android:id="@+id/progress_bar"/>
 </FrameLayout>

@@ -28,6 +28,7 @@ import com.lhx.demo.toast.ToastFragment;
 import com.lhx.demo.viewPager.CyclePagerActivity;
 import com.lhx.demo.widget.popover.PopoverFragment;
 import com.lhx.library.activity.AppBaseActivity;
+import com.lhx.library.fragment.WebFragment;
 import com.lhx.library.media.fragment.MediaFragment;
 import com.lhx.library.scan.fragment.ScanFragment;
 import com.lhx.library.viewHoler.ViewHolder;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("State");
         infos.add("扫一扫");
         infos.add("气泡");
+        infos.add("web");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -158,6 +160,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 17 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, PopoverFragment.class));
+                        break;
+                    case 18 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, WebFragment.class)
+                                .putExtra(WebFragment.WEB_URL, "http://dev.yijiago.com:8102/h5/#/channel-shenghuoquan"));
                         break;
                 }
 
