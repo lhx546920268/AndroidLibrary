@@ -27,10 +27,30 @@ public class BadgeValueTextView extends AppCompatTextView {
     //背景颜色
     private @ColorInt int mFillColor = Color.RED;
 
+    //边框颜色
+    private @ColorInt int mStrokeColor = Color.TRANSPARENT;
+
+    //边框
+    private int mStrokeWidth;
+
     public void setFillColor(int fillColor) {
         if(mFillColor != fillColor){
             mFillColor = fillColor;
             mDrawable.setBackgroundColor(mFillColor);
+        }
+    }
+
+    public void setStrokeWidth(int strokeWidth) {
+        if(mStrokeWidth != strokeWidth){
+            mStrokeWidth = strokeWidth;
+            mDrawable.setBorderWidth(mStrokeWidth);
+        }
+    }
+
+    public void setStrokeColor(int strokeColor) {
+        if(mStrokeColor != strokeColor){
+            mStrokeColor = strokeColor;
+            mDrawable.setBorderColor(mStrokeColor);
         }
     }
 
@@ -47,14 +67,21 @@ public class BadgeValueTextView extends AppCompatTextView {
 
         if(attrs != null){
             TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.BadgeValueTextView);
-            mFillColor = array.getColor(R.styleable.BadgeValueTextView_fill_color, Color.RED);
+            mFillColor = array.getColor(R.styleable.BadgeValueTextView_badge_fill_color, Color.RED);
+            mStrokeColor = array.getColor(R.styleable.BadgeValueTextView_badge_stroke_color, Color.TRANSPARENT);
+            mStrokeWidth = array.getDimensionPixelOffset(R.styleable.BadgeValueTextView_badge_stroke_width, 0);
+
             array.recycle();
         }
 
+        setTextColor(Color.WHITE);
         setGravity(Gravity.CENTER);
 
         mDrawable = new CornerBorderDrawable();
         mDrawable.setBackgroundColor(mFillColor);
+        mDrawable.setBorderColor(mStrokeColor);
+        mDrawable.setBorderWidth(mStrokeWidth);
+        mDrawable.setShouldAbsoluteCircle(true);
         mDrawable.attachView(this);
 
         setIncludeFontPadding(false);
@@ -67,7 +94,6 @@ public class BadgeValueTextView extends AppCompatTextView {
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
 
-        mDrawable.setCornerRadius(height / 2);
         setMeasuredDimension(Math.max(width, height), height);
     }
 

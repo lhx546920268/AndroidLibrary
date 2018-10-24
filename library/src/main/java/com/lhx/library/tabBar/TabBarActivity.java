@@ -1,4 +1,4 @@
-package com.lhx.library.activity;
+package com.lhx.library.tabBar;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -18,41 +18,48 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
+import com.lhx.library.activity.AppBaseContainerActivity;
 import com.lhx.library.drawable.DrawableUtil;
 import com.lhx.library.fragment.AppBaseFragment;
 import com.lhx.library.util.ViewUtil;
+import com.lhx.library.widget.OnSingleClickListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 标签栏 activity
  */
 
-public abstract class TabBarActivity extends AppBaseContainerActivity implements RadioGroup.OnCheckedChangeListener{
+public abstract class TabBarActivity extends AppBaseContainerActivity{
 
     //没有位置
     public static final int NO_POSITION = -1;
 
     //标签栏
-    protected RadioGroup mTabBar;
+    protected LinearLayout mTabBar;
 
     //分割线
     protected View mDivider;
 
     //当前选中的
-    private int mCheckedPosition;
+    private int mCheckedPosition = NO_POSITION;
 
     //背景视图
     private View mBackgroundView;
 
     //按钮信息
-    private List<TabBarItem> mTabBarItems;
+    private List<TabBarItemInfo> mTabBarItemInfos;
+
+    //按钮
+    protected List<TabBarItem> mTabBarItems = new ArrayList<>();
 
     //当前fragment
     AppBaseFragment mCurrentFragment;
@@ -60,9 +67,8 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     @Override
     protected final void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         setContentView(R.layout.tab_bar_activity);
-        mTabBar = (RadioGroup)findViewById(R.id.tabBar);
+        mTabBar = findViewById(R.id.tabBar);
         mDivider = findViewById(R.id.divider);
-        mTabBar.setOnCheckedChangeListener(this);
 
         initTabBar();
     }
@@ -93,70 +99,77 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     //加载tab
     protected void initTabBar(){
         //初始化标签
-        mTabBarItems = getTabBarItems();
-        if(mTabBarItems != null && mTabBarItems.size() > 0){
-            for(int i = 0;i < mTabBarItems.size();i ++){
-                TabBarItem item = mTabBarItems.get(i);
-                RadioButton button = new RadioButton(this);
-                button.setText(item.getTitle());
-                button.setId(i);
-                button.setTextSize(getItemTextSize(i));
-                button.setTextColor(getTextColor(item));
-                button.setGravity(Gravity.CENTER);
-                button.setCompoundDrawables(null, getIcon(item), null, null);
-                button.setCompoundDrawablePadding(pxFromDip(2));
-                button.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
+        mTabBarItemInfos = getTabBarItemInfos();
+        if(mTabBarItemInfos != null && mTabBarItemInfos.size() > 0){
+            for(int i = 0;i < mTabBarItemInfos.size();i ++){
+                TabBarItemInfo info = mTabBarItemInfos.get(i);
+                TabBarItem item = (TabBarItem)LayoutInflater.from(this).inflate(R.layout.tab_bar_item, null);
+                item.getTextView().setText(info.getTitle());
+                item.getTextView().setTextSize(getItemTextSize(i));
+                item.getTextView().setTextColor(getTextColor(item));
+                item.getImageView().setImageDrawable(getIcon(info));
+                item.setImageTextPadding(pxFromDip(2));
+                item.setOnClickListener(new OnSingleClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        TabBarItem tabBarItem = (TabBarItem)v;
+                        if(!tabBarItem.isChecked()){
+                            int position = mTabBarItems.indexOf(tabBarItem);
+                            if(shouldCheck(position)){
+                                setCheckedPosition(position);
+                            }
+                        }
+                    }
+                });
 
-                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.weight = 1;
                 params.gravity = Gravity.CENTER_VERTICAL;
 
-                onConfigureItem(button, params, i);
+                onConfigureItem(item, params, i);
 
-                mTabBar.addView(button, params);
+                mTabBar.addView(item, params);
+                mTabBarItems.add(item);
             }
 
-            mTabBar.check(mCheckedPosition);
+            setCheckedPosition(0);
         }
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-        if(shouldCheck(checkedId)){
-            TabBarItem item = mTabBarItems.get(checkedId);
-            if(item.getFragment() != null){
-                switchFragment(item.getFragment());
-                mCheckedPosition = checkedId;
-            }else {
-                checkWithoutListener(mCheckedPosition);
-            }
-            onCheck(checkedId);
-        }else {
-            checkWithoutListener(mCheckedPosition);
-        }
-    }
-
-    //选择某个
-    private void checkWithoutListener(int position){
-        mTabBar.setOnCheckedChangeListener(null);
-        mTabBar.check(position);
-        mTabBar.setOnCheckedChangeListener(this);
     }
 
     //设置选中
     public void setCheckedPosition(int checkedPosition) {
         if(mCheckedPosition != checkedPosition){
+
+            if(checkedPosition < 0){
+                checkedPosition = 0;
+            }else if(checkedPosition >= mTabBarItems.size()){
+                mCheckedPosition = mTabBarItems.size() - 1;
+            }
+
+            if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
+                TabBarItem item = mTabBarItems.get(mCheckedPosition);
+                item.setChecked(false);
+            }
+
             mCheckedPosition = checkedPosition;
-            mTabBar.check(mCheckedPosition);
+
+            TabBarItemInfo info = mTabBarItemInfos.get(mCheckedPosition);
+            if(info.getFragment() != null){
+                TabBarItem item = mTabBarItems.get(mCheckedPosition);
+                item.setChecked(true);
+                switchFragment(info.getFragment());
+            }
+
+            onCheck(mCheckedPosition);
         }
     }
 
     //获取对应fragment位置 没有则返回
     public int getPosition(Class<? extends AppBaseFragment> fragmentClass){
-        if(mTabBarItems != null && mTabBarItems.size() > 0){
-            for(int i = 0;i < mTabBarItems.size();i ++){
-                TabBarItem item = mTabBarItems.get(i);
-                if(item.getFragment() != null && item.getFragment().getClass() == fragmentClass){
+        if(mTabBarItemInfos != null && mTabBarItemInfos.size() > 0){
+            for(int i = 0;i < mTabBarItemInfos.size();i ++){
+                TabBarItemInfo info = mTabBarItemInfos.get(i);
+                if(info.getFragment() != null && info.getFragment().getClass() == fragmentClass){
                     return i;
                 }
             }
@@ -167,6 +180,14 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
 
     public int getCheckedPosition() {
         return mCheckedPosition;
+    }
+
+    //设置角标
+    public void setBadgeValue(String badgeValue, int position){
+        if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
+            TabBarItem item = mTabBarItems.get(position);
+            item.setBadgeValue(badgeValue);
+        }
     }
 
     //显示某个fragment
@@ -200,7 +221,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     }
 
     //获取图标
-    private Drawable getIcon(TabBarItem item){
+    private Drawable getIcon(TabBarItemInfo item){
         StateListDrawable stateListDrawable = new StateListDrawable();
 
         Drawable drawable = ContextCompat.getDrawable(this, item.getIcon());
@@ -218,7 +239,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
         }
 
         checkDrawable.setBounds(0, 0, width, height);
-        stateListDrawable.addState(new int[]{android.R.attr.state_checked}, checkDrawable);
+        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, checkDrawable);
 
         int color = getNormalTintColor();
         if(color != 0){
@@ -237,7 +258,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     private ColorStateList getTextColor(TabBarItem item){
 
         int[][] states = new int[2][];
-        states[0] = new int[]{android.R.attr.state_checked};
+        states[0] = new int[]{android.R.attr.state_selected};
         states[1] = new int[]{};
 
         int[] colors = new int[]{getCheckedTitleColor(), getNormalTitleColor()};
@@ -246,7 +267,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     }
 
     //配置button
-    public void onConfigureItem(RadioButton button, RadioGroup.LayoutParams params, int position){
+    public void onConfigureItem(TabBarItem item, LinearLayout.LayoutParams params, int position){
 
     }
 
@@ -272,7 +293,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     public abstract @ColorInt int getCheckedTitleColor();
 
     //按钮信息
-    public abstract List<TabBarItem> getTabBarItems();
+    public abstract List<TabBarItemInfo> getTabBarItemInfos();
 
     //选择某个tab
     public void onCheck(int position){
@@ -282,55 +303,5 @@ public abstract class TabBarActivity extends AppBaseContainerActivity implements
     //某个标签是否可以点击
     public boolean shouldCheck(int position){
         return true;
-    }
-
-    //标签栏按钮信息
-    public static class TabBarItem{
-
-        //标题
-        private @NonNull String mTitle;
-
-        //图标
-        private @DrawableRes int mIcon;
-
-        //选中图标 当为空时，可使用tintColor 着色 mIcon
-        private @DrawableRes int mCheckedIcon;
-
-        //关联的fragment 当为空不会有选中效果
-        private AppBaseFragment mFragment;
-
-        public TabBarItem(@NonNull String title, @DrawableRes int icon) {
-            this(title, icon, null);
-        }
-
-        public TabBarItem(@NonNull String title, @DrawableRes int icon, AppBaseFragment fragment) {
-            this(title, icon, 0, fragment);
-        }
-
-        public TabBarItem(@NonNull String title, @DrawableRes int icon, @DrawableRes int checkedIcon, AppBaseFragment fragment) {
-            mTitle = title;
-            mIcon = icon;
-            mCheckedIcon = checkedIcon;
-            mFragment = fragment;
-            if(icon == 0){
-                throw new IllegalArgumentException("TabBarActivity TabBarItem 图标不能为空");
-            }
-        }
-
-        public String getTitle() {
-            return mTitle;
-        }
-
-        public int getIcon() {
-            return mIcon;
-        }
-
-        public int getCheckedIcon() {
-            return mCheckedIcon;
-        }
-
-        public AppBaseFragment getFragment() {
-            return mFragment;
-        }
     }
 }

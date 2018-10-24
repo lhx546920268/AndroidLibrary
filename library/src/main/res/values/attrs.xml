@@ -8,7 +8,9 @@
 
     <!--角标填充也是-->
     <declare-styleable name="BadgeValueTextView">
-        <attr name="fill_color" format="color"/>
+        <attr name="badge_fill_color" format="color"/>
+        <attr name="badge_stroke_color" format="color"/>
+        <attr name="badge_stroke_width" format="dimension"/>
     </declare-styleable>
 
     <!--可换行的线性布局-->

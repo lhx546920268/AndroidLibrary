@@ -58,6 +58,9 @@ public abstract class HttpJsonAsyncTask implements HttpRequestHandler, HttpAsync
         mContext = context;
     }
 
+    public HttpJsonAsyncTask() {
+    }
+
     //取消任务
     public void cancel(){
         if(mTask != null && mTask.isExecuting()){

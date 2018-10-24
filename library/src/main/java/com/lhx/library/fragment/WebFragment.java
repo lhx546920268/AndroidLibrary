@@ -26,6 +26,7 @@ import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.progress.ProgressBar;
 import com.lhx.library.util.StringUtil;
+import com.lhx.library.widget.SeaWebView;
 
 import java.util.Locale;
 
@@ -45,7 +46,7 @@ public class WebFragment extends AppBaseFragment {
     public static final String WEB_DISPLAY_INDICATOR = "com.lhx.WEB_DISPLAY_INDICATOR";//是否显示菊花，默认不显示
 
     //浏览器
-    protected WebView mWebView;
+    protected SeaWebView mWebView;
 
     //进度条
     protected ProgressBar mProgressBar;
