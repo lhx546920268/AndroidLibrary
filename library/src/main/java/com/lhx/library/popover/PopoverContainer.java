@@ -246,7 +246,7 @@ public class PopoverContainer extends ViewGroup {
             mPopoverLayout.setArrowOffset(centerX - pLeft);
             pRight = pLeft + mPopoverLayout.getMeasuredWidth();
 
-            if(y1 > y2){
+            if(y1 + mClickedView.getMeasuredHeight() > y2){
                 //点击视图在范围内
                 if(y1 < y2 + getMeasuredHeight()){
 

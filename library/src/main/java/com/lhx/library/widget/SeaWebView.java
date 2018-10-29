@@ -29,11 +29,11 @@ public class SeaWebView extends WebView {
     private boolean mShouldGetViewPager = true;
 
     public SeaWebView(Context context) {
-        this(context, null, 0);
+        super(context);
     }
 
     public SeaWebView(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
+        super(context, attrs);
     }
 
     public SeaWebView(Context context, AttributeSet attrs, int defStyleAttr) {

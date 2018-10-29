@@ -6,6 +6,7 @@
                  android:supportsRtl="true">
 
         <activity android:name=".activity.AppBaseActivity"
+                  android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait"/>
 
     </application>

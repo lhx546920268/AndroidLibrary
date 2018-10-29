@@ -55,16 +55,22 @@ public class BadgeValueTextView extends AppCompatTextView {
     }
 
     public BadgeValueTextView(Context context) {
-        this(context, null);
+        super(context);
+        init(context, null);
     }
 
     public BadgeValueTextView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        init(context, attrs);
     }
 
     public BadgeValueTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs);
+    }
 
+    //初始化
+    private void init(Context context, @Nullable AttributeSet attrs){
         if(attrs != null){
             TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.BadgeValueTextView);
             mFillColor = array.getColor(R.styleable.BadgeValueTextView_badge_fill_color, Color.RED);
@@ -83,8 +89,6 @@ public class BadgeValueTextView extends AppCompatTextView {
         mDrawable.setBorderWidth(mStrokeWidth);
         mDrawable.setShouldAbsoluteCircle(true);
         mDrawable.attachView(this);
-
-        setIncludeFontPadding(false);
     }
 
     @Override
@@ -94,7 +98,12 @@ public class BadgeValueTextView extends AppCompatTextView {
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
 
-        setMeasuredDimension(Math.max(width, height), height);
+        if(width < height){
+            int size = Math.max(width, height);
+            int widthSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY);
+            int heightSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY);
+            super.onMeasure(widthSpec, heightSpec);
+        }
     }
 
     @Override

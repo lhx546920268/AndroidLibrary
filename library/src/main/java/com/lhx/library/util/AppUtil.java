@@ -203,12 +203,14 @@ public class AppUtil {
      * @param view 当前焦点
      */
     public static void hideSoftInputMethod(Context context, View view) {
-        try {
-            // 隐藏软键盘
-            ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .hideSoftInputFromWindow(view.getWindowToken(), 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(view != null){
+            try {
+                // 隐藏软键盘
+                ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .hideSoftInputFromWindow(view.getWindowToken(), 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

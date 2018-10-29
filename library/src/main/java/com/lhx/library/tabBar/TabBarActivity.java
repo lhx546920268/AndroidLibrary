@@ -143,24 +143,25 @@ public abstract class TabBarActivity extends AppBaseContainerActivity{
             if(checkedPosition < 0){
                 checkedPosition = 0;
             }else if(checkedPosition >= mTabBarItems.size()){
-                mCheckedPosition = mTabBarItems.size() - 1;
+                checkedPosition = mTabBarItems.size() - 1;
             }
 
-            if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
-                TabBarItem item = mTabBarItems.get(mCheckedPosition);
-                item.setChecked(false);
-            }
-
-            mCheckedPosition = checkedPosition;
-
-            TabBarItemInfo info = mTabBarItemInfos.get(mCheckedPosition);
+            TabBarItemInfo info = mTabBarItemInfos.get(checkedPosition);
             if(info.getFragment() != null){
+
+                if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
+                    TabBarItem item = mTabBarItems.get(mCheckedPosition);
+                    item.setChecked(false);
+                }
+
+                mCheckedPosition = checkedPosition;
+
                 TabBarItem item = mTabBarItems.get(mCheckedPosition);
                 item.setChecked(true);
                 switchFragment(info.getFragment());
             }
 
-            onCheck(mCheckedPosition);
+            onCheck(checkedPosition);
         }
     }
 

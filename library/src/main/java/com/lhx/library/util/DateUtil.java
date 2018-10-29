@@ -211,4 +211,12 @@ public class DateUtil {
 
         return timestamp * 1000;
     }
+
+    public static long getPHPTimestamp(long timestamp){
+        if(String.valueOf(timestamp).length() == 10){
+            return timestamp;
+        }
+
+        return timestamp / 1000;
+    }
 }
