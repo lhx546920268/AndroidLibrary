@@ -43,9 +43,9 @@ public class BackToTopButton extends AppCompatImageView implements AbsListView.O
             @Override
             public void onClick(View v) {
                 if(mRecyclerView != null){
-                    mRecyclerView.scrollToPosition(0);
+                    mRecyclerView.smoothScrollToPosition(0);
                 }else if(mListView != null){
-                    mListView.setSelection(0);
+                    mListView.smoothScrollToPosition(0);
                 }
 
                 if(mBackToTopHandler != null){
