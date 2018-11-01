@@ -345,10 +345,20 @@ public class ImageLoaderUtil implements ImageLoadingListener{
     public static DisplayImageOptions getDisplayImageOptions(int placeholderImageRes, ImageScaleType type,
                                                              BitmapDisplayer displayer, String url){
 
+        return getDisplayImageOptionsBuilder(placeholderImageRes, type, displayer, url).build();
+    }
+
+    public static DisplayImageOptions.Builder getDisplayImageOptionsBuilder(String url){
+        return getDisplayImageOptionsBuilder(App.ImagePlaceHolder, ImageScaleType.EXACTLY, new FadeInBitmapDisplayer(200, true, false, false)
+                , url);
+    }
+
+    public static DisplayImageOptions.Builder getDisplayImageOptionsBuilder(int placeholderImageRes, ImageScaleType type,
+                                                                     BitmapDisplayer displayer, String url){
         //判断是否是本地图片
         boolean localUrl = StringUtil.hasPrefix(url, "file://");
 
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
+        DisplayImageOptions.Builder builder = new DisplayImageOptions.Builder()
 
                 .showImageOnLoading(placeholderImageRes)
                 .showImageForEmptyUri(placeholderImageRes)
@@ -359,10 +369,9 @@ public class ImageLoaderUtil implements ImageLoadingListener{
                 .cacheOnDisk(!localUrl)
                 .imageScaleType(type)
                 .displayer(displayer)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
+                .bitmapConfig(Bitmap.Config.RGB_565);
 
-        return options;
+        return builder;
     }
 
     //圆形图片显示器
