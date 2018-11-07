@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +27,7 @@ import com.lhx.library.R;
 import com.lhx.library.drawable.CornerBorderDrawable;
 import com.lhx.library.util.FileUtil;
 import com.lhx.library.util.StringUtil;
+import com.lhx.library.util.ThreadUtil;
 import com.lhx.library.util.ViewUtil;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -446,5 +448,69 @@ public class ImageLoaderUtil implements ImageLoadingListener{
 
             imageAware.setImageDrawable(drawable);
         }
+    }
+
+    //获取缓存大小
+    public static void getImageCacheSize(final Context context, final CalculateImageCacheHandler handler){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                File file = new File(FileUtil.getImageCacheFolder(context));
+                final long size = FileUtil.getFileSize(file);
+
+                if(handler != null){
+                    ThreadUtil.runOnMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.onCalculateImageCache(size);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    //清除图片缓存
+    public static void clearImageCache(final Context context, final ClearImageCacheHandler handler){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(FileUtil.getImageCacheFolder(context));
+                if (file.exists() && file.isDirectory()) {
+                    File[] files = file.listFiles();
+                    if (files != null && files.length > 0) {
+
+                        for (File f : files){
+                            f.delete();
+                        }
+                    }
+                }
+                if(handler != null){
+                    ThreadUtil.runOnMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.onClearImageCache();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    //计算缓存完成回调
+    public interface CalculateImageCacheHandler{
+
+        //计算完成 字节
+        void onCalculateImageCache(long size);
+    }
+
+    //清除缓存大小回调
+    public interface ClearImageCacheHandler{
+
+        //清除完成回调
+        void onClearImageCache();
     }
 }

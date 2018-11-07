@@ -33,6 +33,9 @@ public class App {
     public static Class<? extends LoadingView> pageLoadingViewClass = null;
     public static Class<? extends View> loadViewClass = null;
 
+    //自定义下拉刷新头部 要实现 PtrUIHandler
+    public static Class<? extends View> refreshHeaderClass = null;
+
 
     public static void init(Context context){
         ImageLoaderUtil.initialize(context);

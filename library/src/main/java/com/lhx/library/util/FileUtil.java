@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 
 /**
@@ -426,14 +427,41 @@ public class FileUtil {
     public static void deleteAllFiles(@NonNull File file) {
         if (file.exists() && file.isDirectory()) {
             File[] files = file.listFiles();
-            if (files != null) {
+            if (files != null && files.length > 0) {
 
                 for (File f : files){
                     deleteAllFiles(f);
                 }
+            }else {
+                deleteFile(file);
             }
         } else {
             deleteFile(file);
+        }
+    }
+
+    public static String formatBytes(long bytes){
+        if(bytes > 1024){
+            long kb = bytes / 1024;
+            if(kb > 1024){
+                long mb = kb / 1024;
+                if(mb > 1024){
+                    long gb = mb / 1024;
+                    if(gb > 1024){
+                        return String.format(Locale.getDefault(), "%.2fT", (double)gb / 1024.0);
+                    }else{
+                        return String.format(Locale.getDefault(), "%.2fG", (double)mb / 1024.0);
+                    }
+                }
+                else{
+                    return String.format(Locale.getDefault(), "%.2fM", (double)kb / 1024.0);
+                }
+            }
+            else{
+                return kb + "K";
+            }
+        }else{
+            return bytes + "字节";
         }
     }
 }

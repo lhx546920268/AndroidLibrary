@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.lhx.library.App;
 import com.lhx.library.R;
 import com.lhx.library.drawable.LoadingDrawable;
 
@@ -23,16 +24,13 @@ import in.srain.cube.views.ptr.indicator.PtrIndicator;
 public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandler {
 
     //内容视图
-    private View mHeader;
+    private PtrUIHandler mPtrUIHandler;
 
-    //菊花
-    protected ImageView mImageView;
-    private LoadingDrawable mLoadingDrawable;
+    //头部
+    protected View mHeader;
 
-    //文本
-    protected TextView mTextView;
-
-    private PtrFrameLayoutOnScrollHandler mPtrFrameLayoutOnScrollHandler;
+    //滑动回调
+    private DefaultPtrFrameLayout.PtrFrameLayoutOnScrollHandler mPtrFrameLayoutOnScrollHandler;
 
     public void setPtrFrameLayoutOnScrollHandler(PtrFrameLayoutOnScrollHandler ptrFrameLayoutOnScrollHandler) {
         mPtrFrameLayoutOnScrollHandler = ptrFrameLayoutOnScrollHandler;
@@ -49,59 +47,51 @@ public class DefaultPtrFrameLayout extends PtrFrameLayout implements PtrUIHandle
     public DefaultPtrFrameLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        mHeader = LayoutInflater.from(context).inflate(R.layout.refresh_control_header, this, false);
-        mImageView = mHeader.findViewById(R.id.loading);
-        mLoadingDrawable = new LoadingDrawable(context);
-        mLoadingDrawable.setColor(Color.GRAY);
-        mImageView.setImageDrawable(mLoadingDrawable);
-        mImageView.setVisibility(GONE);
+        if(App.refreshHeaderClass != null){
+            try {
+                mHeader = App.refreshHeaderClass.getConstructor(Context.class).newInstance(context);
+                setHeaderView(mHeader);
+            }catch (Exception e){
+                throw new IllegalStateException("refreshHeaderClass 无法通过context实例化");
+            }
+        }else {
+            DefaultRefreshHeader header = (DefaultRefreshHeader)LayoutInflater.from(context).inflate(R.layout
+                            .refresh_control_header, this,
+                    false);
+            mHeader = header;
+            setHeaderView(header);
+        }
 
-        mTextView = mHeader.findViewById(R.id.text_view);
+        mPtrUIHandler = (PtrUIHandler)mHeader;
 
-        setHeaderView(mHeader);
         addPtrUIHandler(this);
-        setDurationToCloseHeader(2000);
+        setDurationToCloseHeader(1500);
     }
 
     @Override
     public void onUIReset(PtrFrameLayout frame) {
-        mImageView.setVisibility(View.GONE);
-        mLoadingDrawable.stop();
-        mTextView.setText("下拉刷新");
+        mPtrUIHandler.onUIReset(frame);
     }
 
     @Override
     public void onUIRefreshPrepare(PtrFrameLayout frame) {
+        mPtrUIHandler.onUIRefreshPrepare(frame);
 
     }
 
     @Override
     public void onUIRefreshBegin(PtrFrameLayout frame) {
-        mImageView.setVisibility(View.VISIBLE);
-        mLoadingDrawable.start();
-        mTextView.setText("加载中...");
+        mPtrUIHandler.onUIRefreshBegin(frame);
     }
 
     @Override
     public void onUIRefreshComplete(PtrFrameLayout frame) {
-        mImageView.setVisibility(View.GONE);
-        mLoadingDrawable.stop();
-        mTextView.setText("刷新成功");
+        mPtrUIHandler.onUIRefreshComplete(frame);
     }
 
     @Override
     public void onUIPositionChange(PtrFrameLayout frame, boolean isUnderTouch, byte status, PtrIndicator ptrIndicator) {
-
-        int offsetToRefresh = ptrIndicator.getOffsetToRefresh();
-        int offset = ptrIndicator.getCurrentPosY();
-
-        if(isUnderTouch && status == PtrFrameLayout.PTR_STATUS_PREPARE){
-            if(offset >= offsetToRefresh){
-                mTextView.setText("松开即可刷新");
-            }else {
-                mTextView.setText("下拉刷新");
-            }
-        }
+        mPtrUIHandler.onUIPositionChange(frame, isUnderTouch, status, ptrIndicator);
         if(mPtrFrameLayoutOnScrollHandler != null){
             mPtrFrameLayoutOnScrollHandler.onScroll(ptrIndicator);
         }

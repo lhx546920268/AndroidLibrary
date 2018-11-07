@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -229,6 +230,17 @@ public class WebFragment extends AppBaseFragment {
         return true;
     }
 
+    //调用js
+    public void evaluateJavascript(String js){
+        if(StringUtil.isEmpty(js))
+            return;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            mWebView.evaluateJavascript(js, null);
+        }else {
+            mWebView.loadUrl(js);
+        }
+    }
+
     //
     protected WebChromeClient mWebChromeClient = new WebChromeClient(){
 
@@ -269,6 +281,7 @@ public class WebFragment extends AppBaseFragment {
                 setPageLoading(false);
                 mShouldDisplayIndicator = false;
             }
+            onPageFinish(url);
         }
 
         @Override
@@ -289,6 +302,11 @@ public class WebFragment extends AppBaseFragment {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    //加载完成
+    protected void onPageFinish(String url){
+
     }
 
 
