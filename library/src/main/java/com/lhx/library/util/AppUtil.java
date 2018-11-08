@@ -359,13 +359,14 @@ public class AppUtil {
                     .status_bar_background_color));
 
             return true;
-        }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            if(translucent){
-                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            }else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            }
         }
+//        else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+//            if(translucent){
+//                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            }else {
+//                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            }
+//        }
 
         return false;
     }

@@ -33,8 +33,8 @@ public class AppBaseContainer extends RelativeLayout {
     public static final int OVERLAY_AREA_FAIL_BOTTOM = 1 << 1; //失败视图将遮住footer
     public static final int OVERLAY_AREA_PAGE_LOADING_TOP = 1 << 2; //pageLoading视图将遮住header
     public static final int OVERLAY_AREA_PAGE_LOADING_BOTTOM = 1 << 3; //pageLoading视图将遮住footer
-    public static final int OVERLAY_AREA_EMPTY_TOP = 1 << 2; //空视图将遮住header
-    public static final int OVERLAY_AREA_EMPTY_BOTTOM = 1 << 3; //空视图将遮住footer
+    public static final int OVERLAY_AREA_EMPTY_TOP = 1 << 4; //空视图将遮住header
+    public static final int OVERLAY_AREA_EMPTY_BOTTOM = 1 << 5; //空视图将遮住footer
 
     //内容视图
     private View mContentView;
