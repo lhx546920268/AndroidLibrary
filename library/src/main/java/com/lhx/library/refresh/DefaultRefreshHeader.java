@@ -12,13 +12,14 @@ import android.widget.TextView;
 
 import com.lhx.library.R;
 import com.lhx.library.drawable.LoadingDrawable;
+import com.scwang.smartrefresh.layout.api.RefreshKernel;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 
-import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrUIHandler;
-import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 //默认下拉刷新头部
-public class DefaultRefreshHeader extends FrameLayout implements PtrUIHandler{
+public class DefaultRefreshHeader extends RefreshHeader{
 
     //菊花
     protected ImageView mImageView;
@@ -26,6 +27,7 @@ public class DefaultRefreshHeader extends FrameLayout implements PtrUIHandler{
 
     //文本
     protected TextView mTextView;
+
 
     public DefaultRefreshHeader(@NonNull Context context) {
         super(context);
@@ -53,43 +55,40 @@ public class DefaultRefreshHeader extends FrameLayout implements PtrUIHandler{
     }
 
     @Override
-    public void onUIReset(PtrFrameLayout frame) {
+    public void onInitialized(@NonNull RefreshKernel kernel, int height, int maxDragHeight) {
         mImageView.setVisibility(View.GONE);
         mLoadingDrawable.stop();
         mTextView.setText("下拉刷新");
     }
 
-    @Override
-    public void onUIRefreshPrepare(PtrFrameLayout frame) {
-
-    }
 
     @Override
-    public void onUIRefreshBegin(PtrFrameLayout frame) {
-        mImageView.setVisibility(View.VISIBLE);
-        mLoadingDrawable.start();
-        mTextView.setText("加载中...");
-    }
-
-    @Override
-    public void onUIRefreshComplete(PtrFrameLayout frame) {
+    public int onFinish(@NonNull RefreshLayout refreshLayout, boolean success) {
         mImageView.setVisibility(View.GONE);
         mLoadingDrawable.stop();
         mTextView.setText("刷新成功");
+        return mShouldCloseImmediately ? 0 : 200;
     }
 
     @Override
-    public void onUIPositionChange(PtrFrameLayout frame, boolean isUnderTouch, byte status, PtrIndicator ptrIndicator) {
-
-        int offsetToRefresh = ptrIndicator.getOffsetToRefresh();
-        int offset = ptrIndicator.getCurrentPosY();
-
-        if(isUnderTouch && status == PtrFrameLayout.PTR_STATUS_PREPARE){
-            if(offset >= offsetToRefresh){
-                mTextView.setText("松开即可刷新");
-            }else {
+    public void onStateChanged(@NonNull RefreshLayout refreshLayout, @NonNull RefreshState oldState, @NonNull RefreshState newState) {
+        switch (newState){
+            case None :
+            case PullDownToRefresh :
+                mImageView.setVisibility(View.GONE);
+                mLoadingDrawable.stop();
                 mTextView.setText("下拉刷新");
-            }
+                break;
+            case Refreshing :
+                mImageView.setVisibility(View.VISIBLE);
+                mLoadingDrawable.start();
+                mTextView.setText("加载中...");
+                break;
+            case ReleaseToRefresh :
+                mTextView.setText("松开即可刷新");
+                break;
         }
     }
+
+
 }

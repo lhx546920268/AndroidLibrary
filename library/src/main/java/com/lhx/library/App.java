@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.lhx.library.image.ImageLoaderUtil;
 import com.lhx.library.loading.LoadingView;
+import com.lhx.library.refresh.RefreshHeader;
 
 /**
  * app信息
@@ -34,7 +35,7 @@ public class App {
     public static Class<? extends View> loadViewClass = null;
 
     //自定义下拉刷新头部 要实现 PtrUIHandler
-    public static Class<? extends View> refreshHeaderClass = null;
+    public static Class<? extends RefreshHeader> refreshHeaderClass = null;
 
 
     public static void init(Context context){

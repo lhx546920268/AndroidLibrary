@@ -35,11 +35,7 @@ public class RecyclerViewFragment extends PageFragment{
             }
         }
 
-        if(hasRefresh()){
-            mRefreshLayout = findViewById(R.id.ptr_layout);
-            mRefreshLayout.setPtrHandler(this);
-            mRefreshLayout.setPtrFrameLayoutOnScrollHandler(this);
-        }
+
         mRecyclerView = findViewById(R.id.recycler_view);
         setRefreshView(mRecyclerView);
 

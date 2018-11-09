@@ -34,11 +34,6 @@ public class ListViewFragment extends PageFragment {
             }
         }
 
-        if(hasRefresh()){
-            mRefreshLayout = findViewById(R.id.ptr_layout);
-            mRefreshLayout.setPtrHandler(this);
-            mRefreshLayout.setPtrFrameLayoutOnScrollHandler(this);
-        }
         mListView = findViewById(R.id.list_view);
         setRefreshView(mListView);
 

@@ -23,13 +23,17 @@ public class GridViewFragment extends PageFragment {
     public void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
         super.initialize(inflater, container, saveInstanceState);
-        if(hasRefresh()){
-            setContentView(R.layout.grid_view_refresh_fragment);
-            mRefreshLayout = findViewById(R.id.ptr_layout);
-            mRefreshLayout.setPtrHandler(this);
+        int res = getContentRes();
+        if(res != 0){
+            setContentView(res);
         }else {
-            setContentView(R.layout.grid_view_fragment);
+            if(hasRefresh()){
+                setContentView(R.layout.grid_view_refresh_fragment);
+            }else {
+                setContentView(R.layout.grid_view_fragment);
+            }
         }
+
         mGridView = findViewById(R.id.grid_view);
         setRefreshView(mGridView);
 

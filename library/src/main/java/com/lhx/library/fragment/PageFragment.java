@@ -1,39 +1,43 @@
 package com.lhx.library.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.lhx.library.App;
 import com.lhx.library.R;
-import com.lhx.library.refresh.DefaultPtrFrameLayout;
+import com.lhx.library.refresh.DefaultRefreshHeader;
+import com.lhx.library.refresh.RefreshHeader;
 import com.lhx.library.util.SizeUtil;
 import com.lhx.library.widget.AppBaseContainer;
 import com.lhx.library.widget.BackToTopButton;
-
-import in.srain.cube.views.ptr.PtrDefaultHandler;
-import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrHandler;
-import in.srain.cube.views.ptr.indicator.PtrIndicator;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 /**
  * 可翻页的 fragment
  */
 
-public abstract class PageFragment extends AppBaseFragment implements PtrHandler,
-        DefaultPtrFrameLayout.PtrFrameLayoutOnScrollHandler {
+public abstract class PageFragment extends AppBaseFragment implements OnRefreshListener,
+        RefreshHeader.RefreshOnScrollHandler {
 
 
     //当前第几页
     protected int mCurPage;
 
     //下拉刷新控件
-    protected DefaultPtrFrameLayout mRefreshLayout;
+    protected SmartRefreshLayout mRefreshLayout;
+
+    //是否正在下拉刷新
+    private boolean mRefreshing;
 
     //回到顶部按钮
     private BackToTopButton mBackToTopButton;
@@ -44,21 +48,26 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     //当前用来下拉刷新的视图
     private View mRefreshView;
 
+    //刷新头部
+    protected RefreshHeader mRefreshHeader;
+
     //是否有下拉刷新功能
     public boolean hasRefresh(){
         return false;
     }
 
-    @Override
-    public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-        if(mRefreshView == null)
-            return false;
-        return PtrDefaultHandler.checkContentCanBePulledDown(frame, mRefreshView, header);
-    }
 
     //开始下拉刷新，子类重写
     @Override
-    public void onRefreshBegin(PtrFrameLayout frame) {
+    public final void onRefresh(@NonNull RefreshLayout refreshLayout) {
+
+        mRefreshHeader.setShouldCloseImmediately(false);
+        mRefreshing = true;
+        onRefresh();
+    }
+
+    //
+    public void onRefresh(){
 
     }
 
@@ -71,33 +80,85 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
         }
     }
 
+    @Override
+    protected void setContentView(View contentView) {
+        super.setContentView(contentView);
+        initRefreshLayout();
+    }
+
+    @Override
+    protected void setContentView(int layoutResId) {
+        super.setContentView(layoutResId);
+        initRefreshLayout();
+    }
+
+    //设置是否可以刷新
+    public void setRefreshEnable(boolean enable){
+        if(mRefreshLayout != null){
+            mRefreshLayout.setEnableRefresh(enable);
+        }
+    }
+
+    //初始化刷新控件
+    private void initRefreshLayout(){
+        if(hasRefresh() && mRefreshLayout == null){
+
+            mRefreshHeader = getRefreshHeader();
+            mRefreshHeader.setOnScrollHandler(this);
+            mRefreshLayout = findViewById(R.id.smart_layout);
+            mRefreshLayout.setHeaderHeight(50);
+            mRefreshLayout.setRefreshHeader(mRefreshHeader);
+            mRefreshLayout.setOnRefreshListener(this);
+        }
+    }
+
     //是否需要显示回到顶部按钮
     public boolean shouldDisplayBackToTop(){
         return true;
     }
 
-    //停止下拉刷新
-    public final void refreshComplete(){
+    //获取下拉刷新头部
+    protected @NonNull RefreshHeader getRefreshHeader(){
+        RefreshHeader refreshHeader;
+        if(App.refreshHeaderClass != null){
+            try {
+                refreshHeader = App.refreshHeaderClass.getConstructor(Context.class).newInstance(mContext);
+            }catch (Exception e){
+                throw new IllegalStateException("refreshHeaderClass 无法通过context实例化");
+            }
+        }else {
+            refreshHeader = (DefaultRefreshHeader)LayoutInflater.from(mContext).inflate(R.layout
+                    .refresh_control_header, null);
+        }
+        return refreshHeader;
+    }
 
-        if(mRefreshLayout != null && mRefreshLayout.isRefreshing()){
-            mRefreshLayout.refreshComplete();
+    //停止下拉刷新
+    @CallSuper
+    public void stopRefresh(){
+        stopRefresh(false);
+    }
+
+    //停止下拉刷新
+    @CallSuper
+    public void stopRefresh(boolean closeImmediately){
+        if(mRefreshLayout != null && mRefreshing){
+            mRefreshing = false;
+            mRefreshHeader.setShouldCloseImmediately(closeImmediately);
+            mRefreshLayout.finishRefresh();
         }
     }
 
     //手动刷新
     public void autoRefresh(){
-        if(mRefreshLayout != null && !mRefreshLayout.isRefreshing()){
+        if(mRefreshLayout != null && !mRefreshing){
             mRefreshLayout.autoRefresh();
         }
     }
 
     //是否正在刷新
     public boolean isRefreshing(){
-
-        if(mRefreshLayout != null){
-            return mRefreshLayout.isRefreshing();
-        }
-        return false;
+        return mRefreshing;
     }
 
     public void setScrollToTopIconRes(int scrollToTopIconRes) {
@@ -135,7 +196,7 @@ public abstract class PageFragment extends AppBaseFragment implements PtrHandler
     }
 
     @Override
-    public void onScroll(PtrIndicator ptrIndicator) {
+    public void onScroll(boolean isDragging, float percent, int offset) {
 
     }
 

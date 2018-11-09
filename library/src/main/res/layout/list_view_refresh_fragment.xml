@@ -4,10 +4,10 @@
               android:layout_height="match_parent">
 
     <!--有下拉刷新的listviw fragment-->
-    <com.lhx.library.refresh.DefaultPtrFrameLayout
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/ptr_layout">
+        android:id="@+id/smart_layout">
 
         <com.lhx.library.listView.StickListView
             android:layout_width="match_parent"
@@ -15,6 +15,6 @@
             android:overScrollMode="never"
             style="@style/listview"
             android:id="@+id/list_view"/>
-    </com.lhx.library.refresh.DefaultPtrFrameLayout>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
 </FrameLayout>

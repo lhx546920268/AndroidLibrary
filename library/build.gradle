@@ -27,7 +27,6 @@ android {
 }
 
 dependencies {
-    api 'in.srain.cube:ultra-ptr:1.0.11'
 
     api fileTree(include: ['*.jar'], dir: 'libs')
     api 'com.android.support:appcompat-v7:27.1.1'
@@ -44,5 +43,8 @@ dependencies {
     api 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
     //Zxing核心包
     api 'com.google.zxing:core:3.3.0'
+
+    //加载更多 下拉刷新
+    api 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-14'
 }
 

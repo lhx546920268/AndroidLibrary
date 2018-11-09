@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -180,6 +181,7 @@ public class WebFragment extends AppBaseFragment {
         settings.setDatabaseEnabled(true);
         settings.setAppCacheEnabled(true);
 
+
         loadWebContent();
     }
 
@@ -259,6 +261,8 @@ public class WebFragment extends AppBaseFragment {
                 mProgressBar.setProgress(newProgress / 100.0f);
             }
         }
+
+
     };
 
     boolean mLoadURL = false;
@@ -286,6 +290,7 @@ public class WebFragment extends AppBaseFragment {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+
             if (mShouldDisplayIndicator) {
                 setPageLoading(true);
             }

@@ -5,15 +5,15 @@
 
     <!--可下拉刷新的recycerView-->
 
-    <com.lhx.library.refresh.DefaultPtrFrameLayout
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/ptr_layout">
+        android:id="@+id/smart_layout">
 
         <com.lhx.library.recyclerView.StickRecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
             android:id="@+id/recycler_view"/>
-    </com.lhx.library.refresh.DefaultPtrFrameLayout>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </FrameLayout>

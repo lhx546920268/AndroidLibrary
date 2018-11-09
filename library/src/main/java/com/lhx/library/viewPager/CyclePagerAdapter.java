@@ -35,6 +35,8 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     //是否需要循环
     private boolean mShouldCycle = true;
 
+    private boolean mDetachedFromWindow;
+
     public CyclePagerAdapter(ViewPager viewPager) {
         super(viewPager);
 
@@ -43,10 +45,16 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
             @Override
             public void onViewAttachedToWindow(View v) {
                 startAutoPlayTimer();
+                if(mDetachedFromWindow){
+                    //ViewPager 会在 AttachedToWindow 需要重新布局，会导致第一次smoothScroll没有动画
+                    mViewPager.requestLayout();
+                    mDetachedFromWindow = false;
+                }
             }
 
             @Override
             public void onViewDetachedFromWindow(View v) {
+                mDetachedFromWindow = true;
                 stopAutoPlayTimer();
             }
         });
@@ -158,6 +166,9 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     private void nextPage(){
         int position = mViewPager.getCurrentItem();
         position ++;
+        if(position >= getCount()){
+            position = getRealCount() != getCount() ? 1 : 0;
+        }
         mViewPager.setCurrentItem(position, true);
     }
 
@@ -258,7 +269,7 @@ public abstract class CyclePagerAdapter extends ReusablePagerAdapter implements 
     public class PagerScroller extends Scroller {
         private int mDuration = 1000;
 
-        public void setmDuration(int mDuration) {
+        public void setDuration(int mDuration) {
             this.mDuration = mDuration;
         }
 
