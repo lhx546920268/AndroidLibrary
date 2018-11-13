@@ -18,6 +18,7 @@ import com.lhx.demo.http.HttpFragment;
 import com.lhx.demo.listview.StickListViewFragment;
 import com.lhx.demo.loadmore.ListViewLoadMoreFragment;
 import com.lhx.demo.loadmore.RecyclerViewLoadMoreFragment;
+import com.lhx.demo.nest.NestScrollViewFragment;
 import com.lhx.demo.recyclerview.CycleRecyclerViewFragment;
 import com.lhx.demo.recyclerview.TetrisFragment;
 import com.lhx.demo.refresh.RefreshActivity;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         infos.add("扫一扫");
         infos.add("气泡");
         infos.add("web");
+        infos.add("嵌套滚动");
 
         ListView listView = (ListView)findViewById(R.id.list_view);
         listView.setAdapter(new BaseAdapter() {
@@ -164,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
                     case 18 :
                         startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, WebFragment.class)
                                 .putExtra(WebFragment.WEB_URL, "http://dev.yijiago.com:8102/h5/#/channel-shenghuoquan"));
+                        break;
+                    case 19 :
+                        startActivity(AppBaseActivity.getIntentWithFragment(MainActivity.this, NestScrollViewFragment.class));
                         break;
                 }
 

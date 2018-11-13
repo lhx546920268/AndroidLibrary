@@ -1,6 +1,7 @@
 package com.lhx.library.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.DownloadListener;
+import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -151,6 +153,8 @@ public class WebFragment extends AppBaseFragment {
         settings.setJavaScriptEnabled(true);
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
+        settings.setDefaultFontSize(12);
+        settings.setDefaultFixedFontSize(12);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //适配5.0不允许http和https混合使用情况
@@ -181,8 +185,21 @@ public class WebFragment extends AppBaseFragment {
         settings.setDatabaseEnabled(true);
         settings.setAppCacheEnabled(true);
 
+        settings.setGeolocationEnabled(true);
+        //设置定位的数据库路径
+        String dir = mContext.getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
+        settings.setGeolocationDatabasePath(dir);
+
 
         loadWebContent();
+    }
+
+    @Override
+    public void onDestroy() {
+        if(mWebView != null){
+            mWebView.destroy();
+        }
+        super.onDestroy();
     }
 
     public void setShouldDisplayProgress(boolean shouldDisplayProgress) {
@@ -207,6 +224,8 @@ public class WebFragment extends AppBaseFragment {
 
     //加载
     public void loadWebContent() {
+        if(mWebView == null)
+            return;
         if (!StringUtil.isEmpty(mURL) || !StringUtil.isEmpty(mHtmlString)) {
 
             if (!StringUtil.isEmpty(mURL)) {
@@ -262,7 +281,10 @@ public class WebFragment extends AppBaseFragment {
             }
         }
 
-
+        @Override
+        public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+            callback.invoke(origin, true, false);
+        }
     };
 
     boolean mLoadURL = false;

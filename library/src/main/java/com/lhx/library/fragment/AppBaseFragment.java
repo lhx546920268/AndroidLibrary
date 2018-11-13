@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.lhx.library.R;
 import com.lhx.library.activity.ActivityStack;
 import com.lhx.library.activity.AppBaseActivity;
 import com.lhx.library.bar.NavigationBar;
@@ -80,6 +81,11 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     //获取出场动画
     public @AnimRes int getExitAnim(){
         return 0;
+    }
+
+    //无动画
+    public @AnimRes int getNoneAnim(){
+        return R.anim.anim_no;
     }
 
 //    @Override

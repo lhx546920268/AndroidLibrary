@@ -3,6 +3,7 @@ package com.lhx.library.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -174,7 +175,7 @@ public class AppBaseActivity extends AppCompatActivity{
 
                 int enter = mFragment.getEnterAnim();
                 if(enter != 0){
-                    overridePendingTransition(enter, R.anim.anim_no);
+                    overridePendingTransition(enter, mFragment.getNoneAnim());
                 }
 
             } catch (Exception e) {
@@ -188,6 +189,20 @@ public class AppBaseActivity extends AppCompatActivity{
 
         //添加到堆栈中
         ActivityStack.addActivity(this);
+    }
+
+    /**
+     * 重写 getResource 方法，防止系统字体影响
+     */
+    @Override
+    public Resources getResources() {//禁止app字体大小跟随系统字体大小调节
+        Resources resources = super.getResources();
+        if (resources != null && resources.getConfiguration().fontScale != 1.0f) {
+            android.content.res.Configuration configuration = resources.getConfiguration();
+            configuration.fontScale = 1.0f;
+            resources.updateConfiguration(configuration, resources.getDisplayMetrics());
+        }
+        return resources;
     }
 
     @Override
@@ -266,13 +281,12 @@ public class AppBaseActivity extends AppCompatActivity{
         if(mFragment != null){
             int exit = mFragment.getExitAnim();
             if(exit != 0){
-                overridePendingTransition(R.anim.anim_no, exit);
+                overridePendingTransition(mFragment.getNoneAnim(), exit);
             }
         }
     }
 
     @Override
-    @CallSuper
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK && isTaskRoot()){
             moveTaskToBack(true);

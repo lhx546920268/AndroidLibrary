@@ -63,7 +63,7 @@ public class ProgressBar extends View {
             }
             setVisibility(VISIBLE);
 
-            Log.d("progress", mCurrentProgress + ", " + mTargetProgress);
+//            Log.d("progress", mCurrentProgress + ", " + mTargetProgress);
             if(mTargetProgress > mCurrentProgress){
                 startAnimate();
             }

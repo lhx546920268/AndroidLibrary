@@ -56,13 +56,13 @@ public abstract class TabBarActivity extends AppBaseContainerActivity{
     private View mBackgroundView;
 
     //按钮信息
-    private List<TabBarItemInfo> mTabBarItemInfos;
+    protected List<TabBarItemInfo> mTabBarItemInfos;
 
     //按钮
     protected List<TabBarItem> mTabBarItems = new ArrayList<>();
 
     //当前fragment
-    AppBaseFragment mCurrentFragment;
+    protected AppBaseFragment mCurrentFragment;
 
     @Override
     protected final void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {

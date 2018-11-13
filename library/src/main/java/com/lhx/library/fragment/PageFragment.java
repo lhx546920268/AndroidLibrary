@@ -30,6 +30,8 @@ public abstract class PageFragment extends AppBaseFragment implements OnRefreshL
         RefreshHeader.RefreshOnScrollHandler {
 
 
+    //<editor-fold desc="变量">
+
     //当前第几页
     protected int mCurPage;
 
@@ -56,7 +58,10 @@ public abstract class PageFragment extends AppBaseFragment implements OnRefreshL
         return false;
     }
 
+    //</editor-fold>
 
+
+    //<editor-fold desc="刷新">
     //开始下拉刷新，子类重写
     @Override
     public final void onRefresh(@NonNull RefreshLayout refreshLayout) {
@@ -109,12 +114,9 @@ public abstract class PageFragment extends AppBaseFragment implements OnRefreshL
             mRefreshLayout.setHeaderHeight(50);
             mRefreshLayout.setRefreshHeader(mRefreshHeader);
             mRefreshLayout.setOnRefreshListener(this);
+            mRefreshLayout.setEnableAutoLoadMore(false);
+            mRefreshLayout.setEnableLoadMore(false);
         }
-    }
-
-    //是否需要显示回到顶部按钮
-    public boolean shouldDisplayBackToTop(){
-        return true;
     }
 
     //获取下拉刷新头部
@@ -161,15 +163,29 @@ public abstract class PageFragment extends AppBaseFragment implements OnRefreshL
         return mRefreshing;
     }
 
-    public void setScrollToTopIconRes(int scrollToTopIconRes) {
-        if(mScrollToTopIconRes != scrollToTopIconRes){
-            mScrollToTopIconRes = scrollToTopIconRes;
-        }
-    }
-
     public void setRefreshView(View refreshView){
         if(mRefreshView != refreshView){
             mRefreshView = refreshView;
+        }
+    }
+
+    @Override
+    public void onScroll(boolean isDragging, float percent, int offset) {
+
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="回到顶部">
+
+    //是否需要显示回到顶部按钮
+    public boolean shouldDisplayBackToTop(){
+        return true;
+    }
+
+    public void setScrollToTopIconRes(int scrollToTopIconRes) {
+        if(mScrollToTopIconRes != scrollToTopIconRes){
+            mScrollToTopIconRes = scrollToTopIconRes;
         }
     }
 
@@ -195,10 +211,7 @@ public abstract class PageFragment extends AppBaseFragment implements OnRefreshL
         return mBackToTopButton;
     }
 
-    @Override
-    public void onScroll(boolean isDragging, float percent, int offset) {
-
-    }
+    //</editor-fold>
 
     //返回自定义的 layout res
     public @LayoutRes int getContentRes(){
