@@ -6,6 +6,8 @@ import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -29,7 +31,16 @@ public class NestedParentLinearLayout extends LinearLayout{
         mTopViewHeight = SizeUtil.pxFormDip(265, context);
     }
 
-//    @Override
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        boolean consume = super.dispatchTouchEvent(ev);
+
+        Log.d("dispatchTouchEvent", "NestedParentLinearLayout = " + consume );
+        return consume;
+    }
+
+
+    //    @Override
 //    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
 //        return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
 //    }

@@ -44,61 +44,55 @@ public class RefreshLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
     @Override
     public boolean onTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
 
-//        Log.d("onTouchEvent ", "offset = " + ev.getY());
-//
-//        if(mAppBarLayout.getTop() == 0 && (ev.getY() > mTouchY || mRecyclerView.getTop() < 0)){
-//            boolean consume = child.dispatchTouchEvent(ev);
-//            Log.d("onTouchEvent ", "consume = " + consume);
-//            return consume;
+//        switch (ev.getAction()){
+//            case MotionEvent.ACTION_DOWN : {
+//                mTouchY = ev.getY();
+//                if(mAppBarLayout.getTop() == 0){
+//                    boolean consume = mRefreshLayout.dispatchTouchEvent(ev);
+//                    Log.d("onTouchEvent ", "consume = " + consume);
+//                    return consume;
+//                }
+//            }
+//            break;
+//            case MotionEvent.ACTION_MOVE :
+//            case MotionEvent.ACTION_CANCEL :
+//            case MotionEvent.ACTION_UP : {
+//                if(mAppBarLayout.getTop() == 0){
+//                    boolean consume = mRefreshLayout.dispatchTouchEvent(ev);
+//                    Log.d("onTouchEvent ", "consume = " + consume + " offset = " + mRecyclerView.getTop());
+//                    return consume;
+//                }
+//                break;
+//            }
 //        }
 
-        switch (ev.getAction()){
-            case MotionEvent.ACTION_DOWN : {
-                mTouchY = ev.getY();
-                if(mAppBarLayout.getTop() == 0){
-                    boolean consume = mRefreshLayout.dispatchTouchEvent(ev);
-                    Log.d("onTouchEvent ", "consume = " + consume);
-                    return consume;
-                }
-            }
-            break;
-            case MotionEvent.ACTION_MOVE :
-            case MotionEvent.ACTION_CANCEL :
-            case MotionEvent.ACTION_UP : {
-                if(mAppBarLayout.getTop() == 0 && mRecyclerView.getTop() >= 0){
-                    boolean consume = mRefreshLayout.dispatchTouchEvent(ev);
-                    Log.d("onTouchEvent ", "consume = " + consume + " offset = " + mRecyclerView.getTop());
-                    return consume;
-                }
-                break;
-            }
-        }
-
-        return super.onTouchEvent(parent, child, ev);
+        return false;
     }
 
     @Override
     public boolean onInterceptTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
 
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_DOWN: {
+        Log.d("MotionEvent", "action = " + ev.getAction());
 
-                if(mTouchY == 0){
-                    mTouchY = ev.getY();
-                }
-                Log.d("onInterceptTouchEvent ", "consume = " + (ev.getY() >= mTouchY) + "y = " + mTouchY + ", newY " +
-                        "= " + ev.getY());
-                return ev.getY() >= mTouchY;
-            }
+//        switch (ev.getAction()) {
+//            case MotionEvent.ACTION_MOVE:
+//            case MotionEvent.ACTION_DOWN: {
+//
+//                if(mTouchY == 0){
+//                    mTouchY = ev.getY();
+//                }
+//                Log.d("onInterceptTouchEvent ", "consume = " + (ev.getY() >= mTouchY) + "y = " + mTouchY + ", newY " +
+//                        "= " + ev.getY());
+//                return ev.getY() >= mTouchY;
+//            }
+//
+//            case MotionEvent.ACTION_CANCEL:
+//            case MotionEvent.ACTION_UP: {
+//                mTouchY = 0;
+//            }
+//            break;
+//        }
 
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP: {
-                mTouchY = 0;
-            }
-            break;
-        }
-
-        return super.onInterceptTouchEvent(parent, child, ev);
+        return false;
     }
 }

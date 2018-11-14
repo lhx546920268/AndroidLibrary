@@ -76,6 +76,9 @@ public class WebFragment extends AppBaseFragment {
     //是否显示菊花 与进度条互斥
     protected boolean mShouldDisplayIndicator = false;
 
+    //是否需要清除历史
+    private boolean mShouldClearHistory;
+
     //返回自定义的 layout res
     public @LayoutRes
     int getContentRes(){
@@ -228,6 +231,7 @@ public class WebFragment extends AppBaseFragment {
             return;
         if (!StringUtil.isEmpty(mURL) || !StringUtil.isEmpty(mHtmlString)) {
 
+            mShouldClearHistory = true;
             if (!StringUtil.isEmpty(mURL)) {
                 mWebView.loadUrl(mURL);
             } else {
@@ -307,7 +311,12 @@ public class WebFragment extends AppBaseFragment {
                 setPageLoading(false);
                 mShouldDisplayIndicator = false;
             }
+
             onPageFinish(url);
+            if(mShouldClearHistory){
+                mShouldClearHistory = false;
+                mWebView.clearHistory();
+            }
         }
 
         @Override
