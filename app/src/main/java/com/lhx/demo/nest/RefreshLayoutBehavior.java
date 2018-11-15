@@ -1,6 +1,7 @@
 package com.lhx.demo.nest;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -44,6 +46,9 @@ public class RefreshLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
     @Override
     public boolean onTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
 
+
+        Log.d("onTouchEvent", "action = " + ev.getAction());
+//        mRefreshLayout.dispatchTouchEvent(ev);
 //        switch (ev.getAction()){
 //            case MotionEvent.ACTION_DOWN : {
 //                mTouchY = ev.getY();
@@ -66,13 +71,24 @@ public class RefreshLayoutBehavior extends AppBarLayout.ScrollingViewBehavior {
 //            }
 //        }
 
+////        return false;
+//        mAppBarLayout.dispatchTouchEvent(ev);
+//        mRefreshLayout.dispatchTouchEvent(ev);
+
         return false;
+    }
+
+    @Override
+    public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull View child, @NonNull View
+            target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
+        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed,
+                type);
     }
 
     @Override
     public boolean onInterceptTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
 
-        Log.d("MotionEvent", "action = " + ev.getAction());
+        Log.d("onInterceptTouchEvent", "action = " + ev.getAction());
 
 //        switch (ev.getAction()) {
 //            case MotionEvent.ACTION_MOVE:

@@ -31,14 +31,13 @@ public class NestedParentLinearLayout extends LinearLayout{
         mTopViewHeight = SizeUtil.pxFormDip(265, context);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean consume = super.dispatchTouchEvent(ev);
-
-        Log.d("dispatchTouchEvent", "NestedParentLinearLayout = " + consume );
-        return consume;
-    }
-
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        boolean consume = super.dispatchTouchEvent(ev);
+//
+//        Log.d("dispatchTouchEvent", "NestedParentLinearLayout = " + consume + ", " + ev.toString() );
+//        return consume;
+//    }
 
     //    @Override
 //    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {

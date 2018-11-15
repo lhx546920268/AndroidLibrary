@@ -54,13 +54,14 @@ public class NestScrollViewFragment extends PageFragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(new RecyclerAdater(mRecyclerView));
 
-        LinearLayout linearLayout = findViewById(R.id.container);
+        NestedParentLinearLayout linearLayout = findViewById(R.id.container);
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)linearLayout.getLayoutParams();
         RefreshLayoutBehavior behavior = (RefreshLayoutBehavior)params.getBehavior();
         behavior.setRefreshLayout(mRefreshLayout);
 
-        AppBarLayout appBarLayout = findViewById(R.id.app_bar_layout);
+        NestedAppBarLayout appBarLayout = findViewById(R.id.app_bar_layout);
         behavior.setAppBarLayout(appBarLayout);
+        appBarLayout.setNestedParentLinearLayout(linearLayout);
 
         behavior.setRecyclerView(mRecyclerView);
     }

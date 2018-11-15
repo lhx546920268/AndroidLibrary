@@ -6,10 +6,11 @@
                                                  android:layout_height="match_parent">
 
 
-    <android.support.design.widget.AppBarLayout
+    <com.lhx.demo.nest.NestedAppBarLayout
         android:layout_width="match_parent"
         app:elevation="0dp"
         android:id="@+id/app_bar_layout"
+        app:layout_behavior="com.lhx.demo.nest.AppBarBehavior"
         android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
@@ -24,7 +25,7 @@
                 "@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme=
                 "@style/ThemeOverlay.AppCompat.Light" />
-    </android.support.design.widget.AppBarLayout>
+    </com.lhx.demo.nest.NestedAppBarLayout>
 
     <com.lhx.demo.nest.NestedParentLinearLayout
         android:layout_width="match_parent"
@@ -32,7 +33,7 @@
         android:id="@+id/container"
         app:layout_behavior="@string/refresh_behavior">
 
-        <ListView
+        <com.lhx.demo.nest.NestedListView
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:id="@+id/list_view">
@@ -40,7 +41,7 @@
 
 
 
-        </ListView>
+        </com.lhx.demo.nest.NestedListView>
 
         <com.scwang.smartrefresh.layout.SmartRefreshLayout
             android:layout_width="match_parent"
