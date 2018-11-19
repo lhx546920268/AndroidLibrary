@@ -196,17 +196,23 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     //返回
     public void back(){
-        mActivity.finish();
+        if(mActivity != null){
+            mActivity.finish();
+        }
     }
 
     public void back(int resultCode){
-        mActivity.setResult(resultCode);
-        mActivity.finish();
+        if(mActivity != null){
+            mActivity.setResult(resultCode);
+            mActivity.finish();
+        }
     }
 
     public void back(int resultCode, Intent data){
-        mActivity.setResult(resultCode, data);
-        mActivity.finish();
+        if(mActivity != null){
+            mActivity.setResult(resultCode, data);
+            mActivity.finish();
+        }
     }
 
     public void backToFragment(@NonNull Class<? extends AppBaseFragment> fragmentClass){

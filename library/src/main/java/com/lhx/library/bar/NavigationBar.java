@@ -41,10 +41,10 @@ public class NavigationBar extends RelativeLayout {
     public @interface Position{}
 
     ///左右边距
-    public static int LEFT_RIGHT_MARGIN = 20;
+    public static int LEFT_RIGHT_MARGIN = 0;
 
     ///按钮、标题之间的间距
-    public static int VIEW_INTERVAL = 20;
+    public static int VIEW_INTERVAL = 0;
 
     ///标题
     private TextView title_textView;
@@ -356,12 +356,9 @@ public class NavigationBar extends RelativeLayout {
             int maxItemWidth = Math.max(leftItemWidth, rightItemWidth);
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) title_view.getLayoutParams();
 
-            if(left_navigationBarItem == null && left_navigationBarItem == null)
-            {
+            if(left_navigationBarItem == null && left_navigationBarItem == null) {
                 layoutParams.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-            }
-            else
-            {
+            } else {
                 if(right_navigationBarItem != null){
 
                     layoutParams.addRule(RelativeLayout.LEFT_OF, right_navigationBarItem.getId());
