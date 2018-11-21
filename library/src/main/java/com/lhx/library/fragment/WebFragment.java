@@ -1,13 +1,18 @@
 package com.lhx.library.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -49,6 +54,9 @@ public class WebFragment extends AppBaseFragment {
     public static final String WEB_DISPLAY_PROGRESS = "com.lhx.WEB_DISPLAY_PROGRESS";//是否显示进度条 默认显示
     public static final String WEB_DISPLAY_INDICATOR = "com.lhx.WEB_DISPLAY_INDICATOR";//是否显示菊花，默认不显示
 
+    //文件选择
+    private static final int FILE_CHOOSER_REQUEST_CODE = 1101;
+
     //浏览器
     protected SeaWebView mWebView;
 
@@ -78,6 +86,10 @@ public class WebFragment extends AppBaseFragment {
 
     //是否需要清除历史
     private boolean mShouldClearHistory;
+
+    //上传文件回调
+    private ValueCallback<Uri[]> mUploadFileCallback;
+    private ValueCallback<Uri> mUploadMsg;
 
     //返回自定义的 layout res
     public @LayoutRes
@@ -289,7 +301,56 @@ public class WebFragment extends AppBaseFragment {
         public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
             callback.invoke(origin, true, false);
         }
+
+        //4.0 - 5.0
+        public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+            mUploadMsg = uploadMsg;
+            WebFragment.this.openFileChooser(acceptType);
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams
+                fileChooserParams) {
+
+            //上传文件
+            mUploadFileCallback = filePathCallback;
+
+            String type = null;
+            String[] types = fileChooserParams.getAcceptTypes();
+            if(types != null && types.length > 0){
+                StringBuilder builder = new StringBuilder();
+                int i = 0;
+                for(String str : types){
+                    builder.append(str);
+                    if(i < types.length - 1){
+                        builder.append(",");
+                    }
+                    i++;
+                }
+                type = builder.toString();
+            }
+            WebFragment.this.openFileChooser(type);
+
+            return true;
+        }
     };
+
+    //打开文件选择器
+    private void openFileChooser(String mineType){
+
+        if(StringUtil.isEmpty(mineType)){
+            mineType = "*/*";
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType(mineType);
+            startActivityForResult(intent, FILE_CHOOSER_REQUEST_CODE);
+        }catch (ActivityNotFoundException e){
+            e.printStackTrace();
+        }
+    }
 
     boolean mLoadURL = false;
 
@@ -338,6 +399,30 @@ public class WebFragment extends AppBaseFragment {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == Activity.RESULT_OK){
+            switch (requestCode){
+                case FILE_CHOOSER_REQUEST_CODE : {
+                    //文件选择完成
+                    if(data != null){
+                        Uri uri = data.getData();
+                        if(uri != null){
+                            if(mUploadFileCallback != null){
+                                mUploadFileCallback.onReceiveValue(new  Uri[]{uri});
+                            }else if(mUploadMsg != null){
+                                mUploadMsg.onReceiveValue(uri);
+                            }
+                        }
+                        mUploadFileCallback = null;
+                        mUploadMsg = null;
+                    }
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     //加载完成
