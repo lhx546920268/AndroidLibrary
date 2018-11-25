@@ -237,6 +237,10 @@ public class WebFragment extends AppBaseFragment {
         mURL = URL;
     }
 
+    public void setShouldClearHistory(boolean shouldClearHistory) {
+        mShouldClearHistory = shouldClearHistory;
+    }
+
     //加载
     public void loadWebContent() {
         if(mWebView == null)
