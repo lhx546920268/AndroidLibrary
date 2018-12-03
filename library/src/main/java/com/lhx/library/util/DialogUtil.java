@@ -1,7 +1,9 @@
 package com.lhx.library.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 
 import com.lhx.library.dialog.LoadingDialog;
 
@@ -16,7 +18,19 @@ public class DialogUtil {
     //隐藏加载菊花
     public static void dismissLoadingDialog(){
         if(mLoadingDialog != null){
-            mLoadingDialog.dismiss();
+            if(mLoadingDialog.isShowing()){
+                Context context = mLoadingDialog.getContext();
+                Activity activity = ContextUtil.getActivity(context);
+                if(activity != null){
+                    if(activity.isFinishing())
+                        return;
+
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed())
+                        return;
+                }
+
+                mLoadingDialog.dismiss();
+            }
             mLoadingDialog = null;
         }
     }

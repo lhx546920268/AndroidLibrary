@@ -289,7 +289,7 @@ public class AppUtil {
 
     //打开app设置详情
     public static void openAppSettings(Context context){
-        PermissionSettingsPage.start(context, false);
+        PermissionSettingsPage.start(context, true);
     }
 
     public static boolean setStatusBarStyle(Window window, @ColorInt int backgroundColor, boolean isLight){

@@ -277,6 +277,7 @@ public class AppBaseContainer extends RelativeLayout {
                     ((PageLoadingView) mPageLoadingView).getTextView().setText(loadingText);
                 }
 
+                mPageLoadingView.setClickable(true);
                 LayoutParams params = (LayoutParams)mPageLoadingView.getLayoutParams();
                 if(params == null){
                     params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -302,8 +303,8 @@ public class AppBaseContainer extends RelativeLayout {
                 }
 
                 addView(mPageLoadingView);
-                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) !=
-                        OVERLAY_AREA_EMPTY_BOTTOM) {
+                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_PAGE_LOADING_BOTTOM) !=
+                        OVERLAY_AREA_PAGE_LOADING_BOTTOM) {
                     mBottomView.bringToFront();
                 }
 
@@ -348,17 +349,17 @@ public class AppBaseContainer extends RelativeLayout {
                     }
                 });
 
-                ImageView imageView = (ImageView) mPageLoadFailView.findViewById(R.id.logo);
+                ImageView imageView = mPageLoadFailView.findViewById(R.id.logo);
                 if(imageView != null){
                     imageView.setImageResource(logoResId);
                 }
 
-                TextView textView = (TextView) mPageLoadFailView.findViewById(R.id.title);
+                TextView textView = mPageLoadFailView.findViewById(R.id.title);
                 if(textView != null){
                     textView.setText(title);
                 }
 
-                textView = (TextView) mPageLoadFailView.findViewById(R.id.subtitle);
+                textView = mPageLoadFailView.findViewById(R.id.subtitle);
                 if(textView != null){
                     textView.setText(subtitle);
                 }
@@ -388,8 +389,8 @@ public class AppBaseContainer extends RelativeLayout {
 
                 setLoading(false, 0, null);
                 setPageLoading(false);
-                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_EMPTY_BOTTOM) !=
-                        OVERLAY_AREA_EMPTY_BOTTOM) {
+                if (mBottomView != null && (mOverlayArea & OVERLAY_AREA_FAIL_BOTTOM) !=
+                        OVERLAY_AREA_FAIL_BOTTOM) {
                     mBottomView.bringToFront();
                 }
 
