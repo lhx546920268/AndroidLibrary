@@ -112,43 +112,57 @@ public class AppUtil {
         }
     }
 
-    ///拨打电话
     public static void makePhoneCall(final Context context, final String phone){
+
+        makePhoneCall(context, phone, true);
+    }
+
+    ///拨打电话
+    public static void makePhoneCall(final Context context, final String phone, boolean flag){
 
         if(StringUtil.isEmpty(phone))
             return;
-        makePhoneCall(context, new String[]{phone});
+        makePhoneCall(context, new String[]{phone}, flag);
     }
 
     //拨打电话
     public static void makePhoneCall(final Context context, final String[] phones){
+        makePhoneCall(context, phones, true);
+    }
+
+    //拨打电话
+    public static void makePhoneCall(final Context context, final String[] phones, boolean flag){
 
         if(phones == null || phones.length == 0)
             return;
 
-        if(phones.length > 1){
-            AlertController controller = AlertController.buildActionSheet(context, null, phones);
-            controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
-                @Override
-                public void onItemClick(AlertController controller, int index) {
-                    if(index < phones.length){
-                        requestPhoneCall(context, phones[index]);
+        if(flag){
+            if(phones.length > 1){
+                AlertController controller = AlertController.buildActionSheet(context, null, phones);
+                controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AlertController controller, int index) {
+                        if(index < phones.length){
+                            requestPhoneCall(context, phones[index]);
+                        }
                     }
-                }
-            });
-            controller.show();
+                });
+                controller.show();
+            }else {
+                final String phone = phones[0];
+                AlertController controller = AlertController.buildAlert(context, "是否拨打 " + phone, "取消", "拨打");
+                controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AlertController controller, int index) {
+                        if(index == 1){
+                            requestPhoneCall(context, phone);
+                        }
+                    }
+                });
+                controller.show();
+            }
         }else {
-            final String phone = phones[0];
-            AlertController controller = AlertController.buildAlert(context, "是否拨打 " + phone, "取消", "拨打");
-            controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
-                @Override
-                public void onItemClick(AlertController controller, int index) {
-                    if(index == 1){
-                        requestPhoneCall(context, phone);
-                    }
-                }
-            });
-            controller.show();
+            requestPhoneCall(context, phones[0]);
         }
     }
 

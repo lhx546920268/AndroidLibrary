@@ -67,6 +67,9 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
     //相机是否已创建
     private boolean mCameraInit;
 
+    //是否已提示弹窗
+    private boolean mAlert;
+
     public CameraManager(@NonNull Context context, @NonNull Fragment fragment) {
         mContext = context;
         mFragment = fragment;
@@ -168,6 +171,8 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
                 }catch (IOException e){
                     e.printStackTrace();
                     Log.d("ScanFragment", "相机预览失败");
+                }catch (RuntimeException e){
+                    e.printStackTrace();
                 }
             }
         }else {
@@ -285,12 +290,14 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
         if(mCameraManagerHandler != null){
             alert = !mCameraManagerHandler.onPermissionsDenied(perms);
         }
-        if(alert){
-            AlertController controller = AlertController.buildActionSheet(mContext, "扫一扫需要您的相机权限才能使用",
+        if(alert && !mAlert){
+            mAlert = true;
+            AlertController controller = AlertController.buildAlert(mContext, "扫一扫需要您的相机权限才能使用",
                     "取消", "去打开");
             controller.setOnItemClickListener(new AlertController.OnItemClickListener() {
                 @Override
                 public void onItemClick(AlertController controller, int index) {
+                    mAlert = false;
                     if(index == 1){
                         AppUtil.openAppSettings(mContext);
                     }

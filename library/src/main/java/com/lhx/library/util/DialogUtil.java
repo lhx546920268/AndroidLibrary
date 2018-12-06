@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
+import android.util.Log;
 
 import com.lhx.library.dialog.LoadingDialog;
 
@@ -30,6 +31,7 @@ public class DialogUtil {
                 }
 
                 mLoadingDialog.dismiss();
+//                Log.d("", "菊花隐藏了");
             }
             mLoadingDialog = null;
         }
@@ -55,5 +57,6 @@ public class DialogUtil {
         mLoadingDialog.setCanceledOnTouchOutside(false);
         mLoadingDialog.setOnCancelListener(onCancelListener);
         mLoadingDialog.show();
+//        Log.d("", "菊花显示了");
     }
 }
