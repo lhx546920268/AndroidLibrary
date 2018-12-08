@@ -120,6 +120,11 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
         return -1;
     }
 
+    //空视图已显示
+    protected void onEmptyViewDisplay(View emptyView){
+
+    }
+
     @Override
     public boolean shouldExistSectionHeaderForSection(int section) {
         return false;
@@ -279,7 +284,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
 
             mRealCount = count;
 
-            if (mRealCount == 0 && shouldDisplayEmptyView() && getLoadMoreControl().displayEmptyViewEnable()) {
+            if (mRealCount == 0 && shouldDisplayEmptyView() && (getLoadMoreControl().displayEmptyViewEnable() || !mLoadMoreEnable)) {
                 mEmptyViewPosition = count;
                 count++;
             } else {
@@ -418,6 +423,7 @@ public abstract class AbsListViewAdapter extends BaseAdapter implements AbsListV
             params.height = height;
 
             emptyView.setLayoutParams(params);
+            onEmptyViewDisplay(emptyView);
             return emptyView;
         }
 

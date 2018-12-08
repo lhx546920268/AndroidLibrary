@@ -51,6 +51,9 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * 图片加载工具类
@@ -76,6 +79,10 @@ public class ImageLoaderUtil implements ImageLoadingListener{
 
     protected static ImageLoader mImageLoader = ImageLoader.getInstance();
 
+    public static ImageLoader getImageLoader() {
+        return mImageLoader;
+    }
+
     //初始化
     public static void initialize(Context context){
 
@@ -89,7 +96,7 @@ public class ImageLoaderUtil implements ImageLoadingListener{
         config.threadPoolSize(3);
         config.denyCacheImageMultipleSizesInMemory();
         config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-        config.imageDownloader(new BaseImageDownloader(context));
+        config.imageDownloader(new ImageDownloader(context));
         config.imageDecoder(new BaseImageDecoder(false));
         config.defaultDisplayImageOptions(DisplayImageOptions.createSimple());
         config.tasksProcessingOrder(QueueProcessingType.LIFO);
@@ -512,5 +519,26 @@ public class ImageLoaderUtil implements ImageLoadingListener{
 
         //清除完成回调
         void onClearImageCache();
+    }
+
+    private static class ImageDownloader extends BaseImageDownloader{
+
+
+        public ImageDownloader(Context context) {
+            super(context);
+        }
+
+        public ImageDownloader(Context context, int connectTimeout, int readTimeout) {
+            super(context, connectTimeout, readTimeout);
+        }
+
+        @Override
+        protected HttpURLConnection createConnection(String url, Object extra) throws IOException {
+            HttpURLConnection conn = (HttpURLConnection)(new URL(url)).openConnection();
+            conn.setConnectTimeout(this.connectTimeout);
+            conn.setReadTimeout(this.readTimeout);
+
+            return conn;
+        }
     }
 }

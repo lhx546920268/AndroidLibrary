@@ -115,9 +115,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity{
                         TabBarItem tabBarItem = (TabBarItem)v;
                         if(!tabBarItem.isChecked()){
                             int position = mTabBarItems.indexOf(tabBarItem);
-                            if(shouldCheck(position)){
-                                setCheckedPosition(position);
-                            }
+                            setCheckedPosition(position);
                         }
                     }
                 });
@@ -140,28 +138,30 @@ public abstract class TabBarActivity extends AppBaseContainerActivity{
     public void setCheckedPosition(int checkedPosition) {
         if(mCheckedPosition != checkedPosition){
 
-            if(checkedPosition < 0){
-                checkedPosition = 0;
-            }else if(checkedPosition >= mTabBarItems.size()){
-                checkedPosition = mTabBarItems.size() - 1;
-            }
-
-            TabBarItemInfo info = mTabBarItemInfos.get(checkedPosition);
-            if(info.getFragment() != null){
-
-                if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
-                    TabBarItem item = mTabBarItems.get(mCheckedPosition);
-                    item.setChecked(false);
+            if(shouldCheck(checkedPosition)){
+                if(checkedPosition < 0){
+                    checkedPosition = 0;
+                }else if(checkedPosition >= mTabBarItems.size()){
+                    checkedPosition = mTabBarItems.size() - 1;
                 }
 
-                mCheckedPosition = checkedPosition;
+                TabBarItemInfo info = mTabBarItemInfos.get(checkedPosition);
+                if(info.getFragment() != null){
 
-                TabBarItem item = mTabBarItems.get(mCheckedPosition);
-                item.setChecked(true);
-                switchFragment(info.getFragment());
+                    if(mCheckedPosition >= 0 && mCheckedPosition < mTabBarItems.size()){
+                        TabBarItem item = mTabBarItems.get(mCheckedPosition);
+                        item.setChecked(false);
+                    }
+
+                    mCheckedPosition = checkedPosition;
+
+                    TabBarItem item = mTabBarItems.get(mCheckedPosition);
+                    item.setChecked(true);
+                    switchFragment(info.getFragment());
+                }
+
+                onCheck(checkedPosition);
             }
-
-            onCheck(checkedPosition);
         }
     }
 
