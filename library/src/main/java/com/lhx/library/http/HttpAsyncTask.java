@@ -10,6 +10,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * http 异步任务
@@ -56,6 +62,31 @@ public class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> implements Htt
 
     //回调
     private HttpAsyncTaskHandler mHttpAsyncTaskHandler;
+
+    //并行队列
+    public static final Executor DEFAULT_POOL_EXECUTOR;
+
+    private static final ThreadFactory dThreadFactory = new ThreadFactory() {
+        private final AtomicInteger mCount = new AtomicInteger(1);
+
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
+        }
+    };
+
+    static {
+        int cpuCount = Runtime.getRuntime().availableProcessors();
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                Math.max(2, Math.min(cpuCount - 1, 4)),
+                cpuCount * 2 + 1,
+                30,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(128),
+                dThreadFactory,
+                new ThreadPoolExecutor.DiscardOldestPolicy());
+        threadPoolExecutor.allowCoreThreadTimeOut(true);
+        DEFAULT_POOL_EXECUTOR = threadPoolExecutor;
+    }
 
 
     public HttpAsyncTask(String URL, ContentValues params, Map<String, File> files) {
@@ -245,7 +276,7 @@ public class HttpAsyncTask extends AsyncTask<Void, Float, byte[]> implements Htt
     }
 
     public HttpAsyncTask startConcurrently(){
-        return (HttpAsyncTask)executeOnExecutor(THREAD_POOL_EXECUTOR);
+        return (HttpAsyncTask)executeOnExecutor(DEFAULT_POOL_EXECUTOR);
     }
 
     //回调

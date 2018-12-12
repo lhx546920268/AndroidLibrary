@@ -696,7 +696,9 @@ public class HttpRequest {
             return str.getBytes(mStringEncoding);
         }catch (UnsupportedEncodingException e){
             e.printStackTrace();
-            mConn.disconnect();
+            if(mConn != null && mState == HTTP_REQUEST_STATE_LOADING){
+                mConn.disconnect();
+            }
         }
 
         return null;

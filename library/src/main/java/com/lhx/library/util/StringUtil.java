@@ -345,7 +345,7 @@ public class StringUtil {
         //数字 除最后以为都为数字
         if (str.length() == 18) {
             Ai = str.substring(0, 17);
-        } else if (str.length() == 15) {
+        } else {
             Ai = str.substring(0, 6) + "19" + str.substring(6, 15);
         }
 
@@ -369,19 +369,19 @@ public class StringUtil {
         try {
 
             //身份证生日不在有效范围
-            if ((gc.get(Calendar.YEAR) - Integer.parseInt(strYear)) > 150
+            if ((gc.get(Calendar.YEAR) - parseInt(strYear)) > 150
                     || (gc.getTime().getTime() - s.parse(
                     strYear + "-" + strMonth + "-" + strDay).getTime()) < 0) {
                 return false;
             }
 
             //身份证月份无效
-            if (Integer.parseInt(strMonth) > 12 || Integer.parseInt(strMonth) == 0) {
+            if (parseInt(strMonth) > 12 || parseInt(strMonth) == 0) {
                 return false;
             }
 
             //身份证日期无效
-            if (Integer.parseInt(strDay) > 31 || Integer.parseInt(strDay) == 0) {
+            if (parseInt(strDay) > 31 || parseInt(strDay) == 0) {
                 return false;
             }
 
@@ -406,7 +406,7 @@ public class StringUtil {
                 "9", "10", "5", "8", "4", "2" };
 
         for (int i = 0; i < 17; i++) {
-            TotalmulAiWi = TotalmulAiWi + Integer.parseInt(String.valueOf(Ai.charAt(i))) * Integer.parseInt(Wi[i]);
+            TotalmulAiWi = TotalmulAiWi + parseInt(String.valueOf(Ai.charAt(i))) * parseInt(Wi[i]);
         }
 
         int modValue = TotalmulAiWi % 11;

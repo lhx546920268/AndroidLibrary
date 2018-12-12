@@ -194,11 +194,12 @@ public class CameraManager implements EasyPermissions.PermissionCallbacks{
 
     //关闭相机
     public void onDestroy(){
-        if(mCamera != null){
+        if(mCamera != null ){
 
             stopDecode();
             mPreviewing = false;
             mCamera.stopPreview();
+            mCamera.setPreviewCallback(null);
             mPausing = false;
             stopFocus();
             mCamera.release();
