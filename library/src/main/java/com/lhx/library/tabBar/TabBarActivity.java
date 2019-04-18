@@ -65,7 +65,7 @@ public abstract class TabBarActivity extends AppBaseContainerActivity{
     protected AppBaseFragment mCurrentFragment;
 
     @Override
-    protected final void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
+    protected void initialize(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         setContentView(R.layout.tab_bar_activity);
         mTabBar = findViewById(R.id.tabBar);
         mDivider = findViewById(R.id.divider);

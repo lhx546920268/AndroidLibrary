@@ -348,6 +348,9 @@ public class AppBaseActivity extends AppCompatActivity{
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+        if(mFragment != null && mFragment.isShouldActivityResult()){
+            mFragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public void startActivityForResult(Intent intent, int requestCode, LoginHandler loginHandler) {

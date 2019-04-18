@@ -59,8 +59,19 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
     //是否已初始化
     private boolean mInit;
 
+    //是否需要处理 onActivityResult
+    private boolean mShouldActivityResult;
+
     public boolean isInit() {
         return mInit;
+    }
+
+    public boolean isShouldActivityResult() {
+        return mShouldActivityResult;
+    }
+
+    public void setShouldActivityResult(boolean shouldActivityResult) {
+        mShouldActivityResult = shouldActivityResult;
     }
 
     @Override
@@ -389,6 +400,10 @@ public abstract class AppBaseFragment extends Fragment implements AppBaseContain
 
     public void setPageLoadFail(boolean pageLoadFail){
         mContainer.setPageLoadFail(pageLoadFail);
+    }
+
+    public View getPageLoadFailView() {
+        return mContainer.getPageLoadFailView();
     }
 
     /**

@@ -320,6 +320,10 @@ public class AppBaseContainer extends RelativeLayout {
         return mPageLoading;
     }
 
+    public View getPageLoadFailView() {
+        return mPageLoadFailView;
+    }
+
     public void setPageLoadFail(boolean pageLoadFail){
         setPageLoadFail(pageLoadFail, 0, "加载失败", "轻触屏幕重新加载");
     }
